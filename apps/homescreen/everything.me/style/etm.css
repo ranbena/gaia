@@ -1,0 +1,21 @@
+#etmConnection {
+	z-index: 1;
+	text-align: center;
+	background: #742d5d url('logo.png') center 5% no-repeat;
+}
+
+#etmConnection span {
+	color: #fff;
+	font-size: -moz-calc(10 * 0.226rem); /* 10pt */
+	margin: 12rem .5rem 0 .5rem;
+	display: block;
+}
+
+#etmPage > div, #etmPage > iframe {
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	position: absolute;
+}

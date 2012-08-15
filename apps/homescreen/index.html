@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="style/dragdrop.css"/>
     <link rel="stylesheet" type="text/css" href="style/dock.css"/>
     <link rel="stylesheet" type="text/css" href="style/search.css"/>
+    <link rel="stylesheet" type="text/css" href="everything.me/style/etm.css"/>
 
     <!-- Shared code -->
     <script type="text/javascript" src="shared/js/l10n.js"></script>
@@ -25,6 +26,8 @@
     <script type="text/javascript" defer src="js/dragdrop.js"></script>
     <script type="text/javascript" defer src="js/search.js"></script>
     <script type="text/javascript" defer src="js/homescreen.js"></script>
+    <script type="text/javascript" defer src="everything.me/js/connectionmanager.js"></script>
+    <script type="text/javascript" defer src="everything.me/js/etmmanager.js"></script>
   </head>
 
   <body data-mode="normal">
@@ -35,6 +38,12 @@
     </header>
 
     <div id="icongrid" class="apps" role="main">
+      <div id="etmPage">
+        <div id="etmConnection">
+          <span>Please connect to the internet to search...</span>
+        </div>
+        <iframe id="etmWidget" src="http://b2g.everything.me"></iframe>
+      </div>
       <div id="search" data-current-page="true">
         <img id="searchAction" src="resources/images/search/icon.png"></img>
       </div>
