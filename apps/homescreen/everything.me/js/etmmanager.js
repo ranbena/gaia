@@ -57,8 +57,7 @@ const EverythingMeManager = (function() {
         case 'add-bookmark':
           addBookmark(json.data);
           break;
-        case 'exit':
-          // Ask to Ran
+        case 'home':
           GridManager.goToPage(GridManager.landingPageIndex);
           break;
       }
@@ -73,6 +72,7 @@ const EverythingMeManager = (function() {
         url: url
       }
     });
+    setVisibilityChange(false);
   }
 
   function addBookmark(params) {
