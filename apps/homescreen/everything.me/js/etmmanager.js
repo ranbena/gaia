@@ -57,6 +57,10 @@ const EverythingMeManager = (function() {
         case 'add-bookmark':
           addBookmark(json.data);
           break;
+        case 'exit':
+          // Ask to Ran
+          GridManager.goToPage(GridManager.landingPageIndex);
+          break;
       }
     }
   });
