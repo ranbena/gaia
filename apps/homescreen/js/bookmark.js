@@ -16,7 +16,7 @@ var Bookmark = function Bookmark(params) {
 Bookmark.prototype = {
   launch: function bookmark_launch() {
     new MozActivity({
-      name: 'view',
+      name: 'launch',
       data: {
         type: 'url',
         url: this.origin

@@ -49,6 +49,8 @@ var Applications = (function() {
         return;
       }
 
+      if (app.manifest.name.indexOf('Everything.me') !== -1)
+        return;
 
       // If the manifest contains entry points, iterate over them
       // and add a fake app object for each one.

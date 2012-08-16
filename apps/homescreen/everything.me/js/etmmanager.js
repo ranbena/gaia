@@ -34,7 +34,7 @@ const EverythingMeManager = (function() {
       widget.src = widget.src;
     }
 
-    connection.style.display = connected ? 'none' : 'block';
+    // connection.style.display = connected ? 'none' : 'block';
   });
 
   var loadedWidget = false;
@@ -66,7 +66,7 @@ const EverythingMeManager = (function() {
 
   function openApp(url) {
     new MozActivity({
-      name: 'view',
+      name: 'launch',
       data: {
         type: 'url',
         url: url
