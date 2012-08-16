@@ -1,0 +1,25 @@
+{
+  "name": "Everything.me",
+  "description": "Web apps launcher",
+  "launch_path": "/index.html",
+  "developer": {
+    "name": "The Gaia Team",
+    "url": "https://github.com/mozilla-b2g/gaia"
+  },
+  "permissions": [
+    "browser",
+    "mozbrowser",
+    "systemXHR"
+  ],
+  "icons": {
+    "60": "/icon.png"
+  },
+  "default_locale": "en-US",
+  "activities": {
+    "launch": {
+      "filters": {
+        "type": "url"
+      }
+    }
+  }
+}
