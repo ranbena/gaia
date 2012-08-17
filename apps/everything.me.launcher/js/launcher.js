@@ -1,21 +1,19 @@
 
 'use strict';
 
-const Launcher = (function() {
+var Launcher = (function() {
 
-	var iframe = document.getElementById('app');
 	var loading = document.getElementById('loading');
+	var app = document.getElementById('app');
 
-	var appLoaded = true;
+	var backShowed = false, forwardShowed = false;
 
-	var backShowed = false;
-	var forwardShowed = false;
+	var iframe = undefined;
 
 	var back = document.getElementById('back');
 	var forward = document.getElementById('forward');
 
-	iframe.addEventListener('mozbrowserlocationchange',
-													function mozbrowserlocationchange() {
+	function mozbrowserlocationchange() {
 		iframe.getCanGoBack().onsuccess = function(e) {
 			if (e.target.result === true) {
 				if (!backShowed) {
@@ -41,35 +39,69 @@ const Launcher = (function() {
 				}
 			}
 		}
-	});
+	}
 
-	iframe.addEventListener('mozbrowserloadstart',
-													function mozbrowserloadstart() {
-		loading.hidden = false;
-	});
-
-	iframe.addEventListener('mozbrowserloadend',
-													function mozbrowserloadend() {
-		if (appLoaded)
-			loading.hidden = true;
-	});
-
-
-	back.addEventListener('click', function(event) {
+	function goBack() {
 		iframe.getCanGoBack().onsuccess = function(e) {
 			if (e.target.result === true) {
 				iframe.goBack();
 			}
 		}
-	});
+	}
 
-	forward.addEventListener('click', function(event) {
+	function goForward() {
 		iframe.getCanGoForward().onsuccess = function(e) {
 			if (e.target.result === true) {
 				iframe.goForward();
 			}
 		}
-	});
+	}
+
+	function mozbrowserloadstart() {
+		loading.hidden = false;
+	}
+
+	function mozbrowserloadend() {
+		loading.hidden = true;
+	}
+
+	function addFrame(url) {
+		loading.hidden = false;
+
+		if (iframe) {
+			iframe.removeEventListener('mozbrowserloadstart',
+																					mozbrowserloadstart);
+			iframe.removeEventListener('mozbrowserloadend',
+																					mozbrowserloadend);
+			iframe.removeEventListener('mozbrowserlocationchange',
+														mozbrowserlocationchange);
+			app.removeChild(iframe);
+			iframe = undefined;
+			backShowed = false;
+			back.style.MozTransform = 'translateX(-4.5rem)';
+			forwardShowed = false;
+			forward.style.MozTransform = 'translateX(4.5rem)';
+		} else {
+			back.addEventListener('click', goBack);
+			forward.addEventListener('click', goForward);
+		}
+
+		iframe = document.createElement('iframe');
+		iframe.id = 'app';
+		iframe.setAttribute('remote', 'true');
+		iframe.setAttribute('mozbrowser', 'true');
+		iframe.src = url;
+
+		// Events
+		iframe.addEventListener('mozbrowserloadstart',
+																			mozbrowserloadstart);
+		iframe.addEventListener('mozbrowserloadend',
+																			mozbrowserloadend);
+		iframe.addEventListener('mozbrowserlocationchange',
+														mozbrowserlocationchange);
+
+		app.appendChild(iframe);
+	}
 
 	return {
 		init: function l_init() {
@@ -84,14 +116,7 @@ const Launcher = (function() {
 		handleActivity: function(activity) {
 			switch (activity.source.data.type) {
 				case 'url':
-					loading.hidden = false;
-					appLoaded = false;
-					iframe.src = activity.source.data.url;
-					iframe.addEventListener('load', function end() {
-						iframe.removeEventListener('load', end);
-						loading.hidden = true;
-						appLoaded = true;
-					});
+					addFrame(activity.source.data.url);
 					break;
 			}
 		}
