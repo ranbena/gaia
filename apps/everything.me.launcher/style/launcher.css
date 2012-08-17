@@ -5,26 +5,25 @@ html, body {
   font-size: 10px;
 }
 
-.nodisplay {
-  display: none;
-}
-
 .option {
   position: absolute;
   bottom: 0;
   background: black;
   height: 8rem;
   width: 4.5rem;
+  -moz-transition: -moz-transform .5s;
 }
 
 .option-left {
   border-radius: 0 5rem 5rem 0;
+  -moz-transform: translateX(-4.5rem);
   left: 0;
 }
 
 .option-right {
   border-radius: 5rem 0 0 5rem;
   left: -moz-calc(100% - 4.5rem);
+  -moz-transform: translateX(4.5rem);
 }
 
 .icon-back {
