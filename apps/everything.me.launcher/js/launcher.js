@@ -10,18 +10,18 @@ var Launcher = (function() {
 
 	var iframe = undefined;
 
-	var back = document.getElementById('back');
-	var forward = document.getElementById('forward');
+	var back = document.getElementById('back-button');
+	var forward = document.getElementById('forward-button');
 
 	function mozbrowserlocationchange() {
 		iframe.getCanGoBack().onsuccess = function(e) {
 			if (e.target.result === true) {
 				if (!backShowed) {
-					back.style.MozTransform = 'translateX(0)';
+					back.disabled = false;
 					backShowed = true;
 				}
 			} else {
-				back.style.MozTransform = 'translateX(-4.5rem)';
+				back.disabled = true;
 				backShowed = false;
 			}
 		}
@@ -29,12 +29,12 @@ var Launcher = (function() {
 		iframe.getCanGoForward().onsuccess = function(e) {
 			if (e.target.result === true) {
 				if (!forwardShowed) {
-					forward.style.MozTransform = 'translateX(0)';
+					forward.disabled = false;
 					forwardShowed = true;
 				}
 			} else {
 				if (forwardShowed) {
-					forward.style.MozTransform = 'translateX(4.5rem)';
+					forward.disabled = true;
 					forwardShowed = false;
 				}
 			}
@@ -78,9 +78,7 @@ var Launcher = (function() {
 			app.removeChild(iframe);
 			iframe = undefined;
 			backShowed = false;
-			back.style.MozTransform = 'translateX(-4.5rem)';
 			forwardShowed = false;
-			forward.style.MozTransform = 'translateX(4.5rem)';
 		} else {
 			back.addEventListener('click', goBack);
 			forward.addEventListener('click', goForward);
