@@ -49,7 +49,7 @@ var Applications = (function() {
         return;
       }
 
-      if (app.manifest.name.indexOf('Everything.me') !== -1)
+      if (app.manifest.name.indexOf('Webapps') !== -1)
         return;
 
       // If the manifest contains entry points, iterate over them

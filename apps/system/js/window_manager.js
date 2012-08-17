@@ -357,7 +357,7 @@ var WindowManager = (function() {
       'Browser',
       // Requires nested content processes (bug 761935)
 
-      'Everything.me',
+      'Webapps',
       // - Needs Nested Content Process (bug 761935) for OOP
 
       'Camera',
