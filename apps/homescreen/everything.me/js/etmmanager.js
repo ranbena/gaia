@@ -1,7 +1,7 @@
 
 'use strict';
 
-const EverythingMeManager = (function() {
+var EverythingMeManager = (function() {
 
   var footerStyle = document.querySelector('#footer').style;
   var widget = document.querySelector('#etmWidget');
@@ -29,13 +29,13 @@ const EverythingMeManager = (function() {
 
   var connection = document.querySelector('#etmConnection');
 
-  ConnectionManager.onConnection(function(connected) {
+  /*ConnectionManager.onConnection(function(connected) {
     if (connected && !loadedWidget) {
       widget.src = widget.src;
     }
 
-    // connection.style.display = connected ? 'none' : 'block';
-  });
+    connection.style.display = connected ? 'none' : 'block';
+  });*/
 
   var loadedWidget = false;
 
@@ -43,11 +43,7 @@ const EverythingMeManager = (function() {
     loadedWidget = true;
   });
 
-  window.addEventListener('message', function onMessage(e) {
-    if (!e || !e.data) {
-      return;
-    }
-
+  function dispatchEvent(e) {
     if (typeof e.data === 'string' && e.data.indexOf('type') !== -1) {
       var json = JSON.parse(e.data);
       switch (json.type) {
@@ -62,7 +58,7 @@ const EverythingMeManager = (function() {
           break;
       }
     }
-  });
+  }
 
   function openApp(url) {
     new MozActivity({
@@ -94,6 +90,10 @@ const EverythingMeManager = (function() {
         data: { hidden: !visible }
       }), '*');
     }
+  }
+
+  return {
+    dispatchEvent: dispatchEvent
   }
 
 }());

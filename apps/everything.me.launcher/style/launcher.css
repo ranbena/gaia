@@ -47,6 +47,7 @@ menu button {
   background-position: center;
   background-repeat: no-repeat;
   z-index: 1;
+  opacity: 1;
 }
 
 #back-button {
@@ -54,7 +55,7 @@ menu button {
 }
 
 #back-button[data-disabled] {
-  background-image: url("images/back-disabled.png");
+  opacity: .4;
 }
 
 input::-moz-focus-inner {

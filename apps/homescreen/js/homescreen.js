@@ -41,10 +41,11 @@ const Homescreen = (function() {
   }
 
   window.addEventListener('message', function onMessage(e) {
-    switch (e.data) {
-      case 'home':
-        onHomescreenActivity();
-        break;
+    console.log(e.data)
+    if (e.data === 'home') {
+      onHomescreenActivity();
+    } else {
+      EverythingMeManager.dispatchEvent(e);
     }
   });
 

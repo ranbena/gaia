@@ -9,8 +9,12 @@ var Launcher = (function() {
 
 	var back = document.getElementById('back-button');
 
+	var currentURL;
+
 	function mozbrowserlocationchange(evt) {
-		if (evt.detail === 'about:blank') {
+		if (evt.detail.indexOf(currentURL) === -1) {
+			back.dataset.disabled = true;
+			back.removeEventListener('click', goBack);
 			return;
 		}
 
@@ -72,8 +76,12 @@ var Launcher = (function() {
 					loading.hidden = false;
 					iframe.removeEventListener('mozbrowserlocationchange',
 															       mozbrowserlocationchange);
+					back.dataset.disabled = true;
+					back.removeEventListener('click', goBack);
 					clearHistory(function callback() {
-						iframe.src = activity.source.data.url;
+						currentURL = activity.source.data.url;
+						iframe.src = 'about:blank';
+						iframe.src = currentURL;
 						iframe.addEventListener('load', function end() {
 							iframe.removeEventListener('load', end);
 							iframe.addEventListener('mozbrowserlocationchange',
