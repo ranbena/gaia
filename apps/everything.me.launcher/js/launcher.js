@@ -17,11 +17,11 @@ var Launcher = (function() {
 		iframe.getCanGoBack().onsuccess = function(e) {
 			if (e.target.result === true) {
 				if (!backShowed) {
-					back.disabled = false;
+					back.removeAttribute('disabled');
 					backShowed = true;
 				}
 			} else {
-				back.disabled = true;
+				forward.setAttribute('disabled', 'disabled');
 				backShowed = false;
 			}
 		}
@@ -29,12 +29,12 @@ var Launcher = (function() {
 		iframe.getCanGoForward().onsuccess = function(e) {
 			if (e.target.result === true) {
 				if (!forwardShowed) {
-					forward.disabled = false;
+					forward.removeAttribute('disabled');
 					forwardShowed = true;
 				}
 			} else {
 				if (forwardShowed) {
-					forward.disabled = true;
+					forward.setAttribute('disabled', 'disabled');
 					forwardShowed = false;
 				}
 			}
