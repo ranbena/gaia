@@ -5,16 +5,22 @@ var Launcher = (function() {
 
 	var loading = document.getElementById('loading');
 
-	var iframe = undefined;
+	var iframe = document.getElementById('app');
 
 	var back = document.getElementById('back-button');
 
-	function mozbrowserlocationchange() {
+	function mozbrowserlocationchange(evt) {
+		if (evt.detail === 'about:blank') {
+			return;
+		}
+
 		iframe.getCanGoBack().onsuccess = function(e) {
 			if (e.target.result === true) {
 				delete back.dataset.disabled;
+				back.addEventListener('click', goBack);
 			} else {
 				back.dataset.disabled = true;
+				back.removeEventListener('click', goBack);
 			}
 		}
 	}
@@ -27,6 +33,19 @@ var Launcher = (function() {
 		}
 	}
 
+	function clearHistory(callback) {
+		var req = iframe.getCanGoBack();
+		req.onsuccess = function(e) {
+			if (e.target.result === true) {
+				iframe.goBack();
+				clearHistory(callback);
+			} else {
+				callback();
+			}
+		}
+		req.onerror = callback;
+	}
+
 	function mozbrowserloadstart() {
 		loading.hidden = false;
 	}
@@ -35,44 +54,12 @@ var Launcher = (function() {
 		loading.hidden = true;
 	}
 
-	function addFrame(url) {
-		loading.hidden = false;
-
-		if (iframe) {
-			iframe.removeEventListener('mozbrowserloadstart',
-																					mozbrowserloadstart);
-			iframe.removeEventListener('mozbrowserloadend',
-																					mozbrowserloadend);
-			iframe.removeEventListener('mozbrowserlocationchange',
-														mozbrowserlocationchange);
-			document.body.removeChild(iframe);
-			back.dataset.disabled = true;
-			iframe = undefined;
-		} else {
-			back.addEventListener('click', goBack);
-		}
-
-		iframe = document.createElement('iframe');
-		iframe.id = 'app';
-		iframe.setAttribute('remote', 'true');
-		iframe.setAttribute('mozbrowser', 'true');
-		iframe.src = url;
-
-		// Events
-		iframe.addEventListener('mozbrowserloadstart',
-																			mozbrowserloadstart);
-		iframe.addEventListener('mozbrowserloadend',
-																			mozbrowserloadend);
-		iframe.addEventListener('mozbrowserlocationchange',
-														mozbrowserlocationchange);
-
-		document.body.appendChild(iframe);
-	}
-
 	return {
 		init: function l_init() {
 			this.hasLoaded = true;
-      this.waitingActivities.forEach(this.handleActivity, this);
+			iframe.addEventListener('mozbrowserloadstart', mozbrowserloadstart);
+			iframe.addEventListener('mozbrowserloadend', mozbrowserloadend);
+			this.waitingActivities.forEach(this.handleActivity, this);
 		},
 
 		waitingActivities: [],
@@ -82,7 +69,17 @@ var Launcher = (function() {
 		handleActivity: function(activity) {
 			switch (activity.source.data.type) {
 				case 'url':
-					addFrame(activity.source.data.url);
+					loading.hidden = false;
+					iframe.removeEventListener('mozbrowserlocationchange',
+															       mozbrowserlocationchange);
+					clearHistory(function callback() {
+						iframe.src = activity.source.data.url;
+						iframe.addEventListener('load', function end() {
+							iframe.removeEventListener('load', end);
+							iframe.addEventListener('mozbrowserlocationchange',
+															        mozbrowserlocationchange);
+						});
+					});
 					break;
 			}
 		}
