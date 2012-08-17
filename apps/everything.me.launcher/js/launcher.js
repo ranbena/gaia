@@ -6,8 +6,6 @@ var Launcher = (function() {
 	var loading = document.getElementById('loading');
 	var app = document.getElementById('app');
 
-	var backShowed = false, forwardShowed = false;
-
 	var iframe = undefined;
 
 	var back = document.getElementById('back-button');
@@ -16,27 +14,17 @@ var Launcher = (function() {
 	function mozbrowserlocationchange() {
 		iframe.getCanGoBack().onsuccess = function(e) {
 			if (e.target.result === true) {
-				if (!backShowed) {
-					back.removeAttribute('disabled');
-					backShowed = true;
-				}
+				back.removeAttribute('disabled');
 			} else {
 				back.setAttribute('disabled', 'disabled');
-				backShowed = false;
 			}
 		}
 
 		iframe.getCanGoForward().onsuccess = function(e) {
 			if (e.target.result === true) {
-				if (!forwardShowed) {
-					forward.removeAttribute('disabled');
-					forwardShowed = true;
-				}
+				forward.removeAttribute('disabled');
 			} else {
-				if (forwardShowed) {
-					forward.setAttribute('disabled', 'disabled');
-					forwardShowed = false;
-				}
+				forward.setAttribute('disabled', 'disabled');
 			}
 		}
 	}
@@ -77,9 +65,7 @@ var Launcher = (function() {
 														mozbrowserlocationchange);
 			app.removeChild(iframe);
 			iframe = undefined;
-			backShowed = false;
 			back.setAttribute('disabled', 'disabled');
-			forwardShowed = false;
 			forward.setAttribute('disabled', 'disabled');
 		} else {
 			back.addEventListener('click', goBack);
