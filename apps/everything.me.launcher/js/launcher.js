@@ -4,27 +4,17 @@
 var Launcher = (function() {
 
 	var loading = document.getElementById('loading');
-	var app = document.getElementById('app');
 
 	var iframe = undefined;
 
 	var back = document.getElementById('back-button');
-	var forward = document.getElementById('forward-button');
 
 	function mozbrowserlocationchange() {
 		iframe.getCanGoBack().onsuccess = function(e) {
 			if (e.target.result === true) {
-				back.removeAttribute('disabled');
+				delete back.dataset.disabled;
 			} else {
-				back.setAttribute('disabled', 'disabled');
-			}
-		}
-
-		iframe.getCanGoForward().onsuccess = function(e) {
-			if (e.target.result === true) {
-				forward.removeAttribute('disabled');
-			} else {
-				forward.setAttribute('disabled', 'disabled');
+				back.dataset.disabled = true;
 			}
 		}
 	}
@@ -33,14 +23,6 @@ var Launcher = (function() {
 		iframe.getCanGoBack().onsuccess = function(e) {
 			if (e.target.result === true) {
 				iframe.goBack();
-			}
-		}
-	}
-
-	function goForward() {
-		iframe.getCanGoForward().onsuccess = function(e) {
-			if (e.target.result === true) {
-				iframe.goForward();
 			}
 		}
 	}
@@ -63,13 +45,11 @@ var Launcher = (function() {
 																					mozbrowserloadend);
 			iframe.removeEventListener('mozbrowserlocationchange',
 														mozbrowserlocationchange);
-			app.removeChild(iframe);
+			document.body.removeChild(iframe);
+			back.dataset.disabled = true;
 			iframe = undefined;
-			back.setAttribute('disabled', 'disabled');
-			forward.setAttribute('disabled', 'disabled');
 		} else {
 			back.addEventListener('click', goBack);
-			forward.addEventListener('click', goForward);
 		}
 
 		iframe = document.createElement('iframe');
@@ -86,7 +66,7 @@ var Launcher = (function() {
 		iframe.addEventListener('mozbrowserlocationchange',
 														mozbrowserlocationchange);
 
-		app.appendChild(iframe);
+		document.body.appendChild(iframe);
 	}
 
 	return {
