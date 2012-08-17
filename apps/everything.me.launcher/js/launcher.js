@@ -20,11 +20,11 @@ const Launcher = (function() {
 			if (!firstLoaded) {
 				if (e.target.result === true) {
 					if (!backShowed) {
-						back.classList.toggle('nodisplay');
+						back.style.MozTransform = 'translateX(0)';
 						backShowed = true;
 					}
 				} else {
-					back.classList.toggle('nodisplay');
+					back.style.MozTransform = 'translateX(-4.5rem)';
 					backShowed = false;
 				}
 			}
@@ -33,12 +33,12 @@ const Launcher = (function() {
 		iframe.getCanGoForward().onsuccess = function(e) {
 			if (e.target.result === true) {
 				if (!forwardShowed) {
-					forward.classList.toggle('nodisplay');
+					forward.style.MozTransform = 'translateX(0)';
 					forwardShowed = true;
 				}
 			} else {
 				if (forwardShowed) {
-					forward.classList.toggle('nodisplay');
+					forward.style.MozTransform = 'translateX(4.5rem)';
 					forwardShowed = false;
 				}
 			}
