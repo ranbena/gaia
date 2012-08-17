@@ -21,7 +21,7 @@ var Launcher = (function() {
 					backShowed = true;
 				}
 			} else {
-				forward.setAttribute('disabled', 'disabled');
+				back.setAttribute('disabled', 'disabled');
 				backShowed = false;
 			}
 		}
@@ -78,7 +78,9 @@ var Launcher = (function() {
 			app.removeChild(iframe);
 			iframe = undefined;
 			backShowed = false;
+			back.setAttribute('disabled', 'disabled');
 			forwardShowed = false;
+			forward.setAttribute('disabled', 'disabled');
 		} else {
 			back.addEventListener('click', goBack);
 			forward.addEventListener('click', goForward);
