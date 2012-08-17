@@ -11,13 +11,8 @@ const ConnectionManager = (function() {
   if (wifiManager) {
     wifiManager.onstatuschange =
     wifiManager.connectionInfoUpdate = function updateWifi() {
-      if (wifiManager.connection  &&
-          wifiManager.connection.status === 'connected') {
-        wifiConnected = true;
-      } else {
-        wifiConnected = false;
-      }
-
+      wifiConnected = (wifiManager.connection &&
+          wifiManager.connection.status === 'connected') ? true : false;
       observer(dataConnected || wifiConnected);
     }
   }
@@ -26,12 +21,7 @@ const ConnectionManager = (function() {
 
   if (conn) {
     conn.addEventListener('datachange', function updateSignal() {
-      if (conn.data && conn.data.connected) {
-        dataConnected = true;
-      } else {
-        dataConnected = false;
-      }
-
+      dataConnected = (conn.data && conn.data.connected) ? true : false;
       observer(dataConnected || wifiConnected);
     });
   }
@@ -40,6 +30,6 @@ const ConnectionManager = (function() {
     onConnection: function(callback) {
       observer = callback;
     }
-  }
+  };
 
 }());

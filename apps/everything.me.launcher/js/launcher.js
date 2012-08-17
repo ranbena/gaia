@@ -6,7 +6,7 @@ const Launcher = (function() {
 	var iframe = document.getElementById('app');
 	var loading = document.getElementById('loading');
 
-	var firstLoaded = true;
+	var appLoaded = true;
 
 	var backShowed = false;
 	var forwardShowed = false;
@@ -17,16 +17,14 @@ const Launcher = (function() {
 	iframe.addEventListener('mozbrowserlocationchange',
 													function mozbrowserlocationchange() {
 		iframe.getCanGoBack().onsuccess = function(e) {
-			if (!firstLoaded) {
-				if (e.target.result === true) {
-					if (!backShowed) {
-						back.style.MozTransform = 'translateX(0)';
-						backShowed = true;
-					}
-				} else {
-					back.style.MozTransform = 'translateX(-4.5rem)';
-					backShowed = false;
+			if (e.target.result === true) {
+				if (!backShowed) {
+					back.style.MozTransform = 'translateX(0)';
+					backShowed = true;
 				}
+			} else {
+				back.style.MozTransform = 'translateX(-4.5rem)';
+				backShowed = false;
 			}
 		}
 
@@ -44,6 +42,18 @@ const Launcher = (function() {
 			}
 		}
 	});
+
+	iframe.addEventListener('mozbrowserloadstart',
+													function mozbrowserloadstart() {
+		loading.hidden = false;
+	});
+
+	iframe.addEventListener('mozbrowserloadend',
+													function mozbrowserloadend() {
+		if (appLoaded)
+			loading.hidden = true;
+	});
+
 
 	back.addEventListener('click', function(event) {
 		iframe.getCanGoBack().onsuccess = function(e) {
@@ -75,11 +85,12 @@ const Launcher = (function() {
 			switch (activity.source.data.type) {
 				case 'url':
 					loading.hidden = false;
+					appLoaded = false;
 					iframe.src = activity.source.data.url;
 					iframe.addEventListener('load', function end() {
 						iframe.removeEventListener('load', end);
 						loading.hidden = true;
-						firstLoaded = false;
+						appLoaded = true;
 					});
 					break;
 			}
