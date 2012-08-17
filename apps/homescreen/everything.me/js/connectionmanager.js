@@ -1,7 +1,7 @@
 
 'use strict';
 
-const ConnectionManager = (function() {
+var ConnectionManager = (function() {
 
   var dataConnected = false, wifiConnected = false;
   var observer = function() {};
