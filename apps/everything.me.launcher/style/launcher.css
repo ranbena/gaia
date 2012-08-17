@@ -53,10 +53,6 @@ menu button {
   background-image: url("images/back.png");
 }
 
-#back-button:active {
-  background-image: url("images/back-pressed.png");
-}
-
 #back-button[data-disabled] {
   background-image: url("images/back-disabled.png");
 }
