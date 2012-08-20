@@ -81,15 +81,15 @@ var Launcher = (function() {
         return;
       }
 
-      loading.hidden = false;
       iframe.removeEventListener('mozbrowserlocationchange', locChange);
-      locationchange = 0;
-      back.dataset.disabled = true;
-      back.removeEventListener('click', goBack);
       clearHistory(function callback() {
         iframe.src = url = activity.source.data.url;
         iframe.addEventListener('load', function end() {
           iframe.removeEventListener('load', end);
+          loading.hidden = false;
+          locationchange = 0;
+          back.dataset.disabled = true;
+          back.removeEventListener('click', goBack);
           iframe.addEventListener('mozbrowserlocationchange', locChange);
         });
       });
