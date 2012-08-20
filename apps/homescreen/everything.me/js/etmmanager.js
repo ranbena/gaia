@@ -103,6 +103,6 @@ var EverythingMeManager = (function() {
 
   return {
     dispatchEvent: dispatchEvent
-  }
+  };
 
 }());

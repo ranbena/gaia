@@ -3,104 +3,98 @@
 
 var Launcher = (function() {
 
-	var loading = document.getElementById('loading');
+  var loading = document.getElementById('loading');
 
-	var iframe = document.getElementById('app');
+  var iframe = document.getElementById('app');
 
-	var back = document.getElementById('back-button');
+  var back = document.getElementById('back-button');
 
-	var locationchange = 0, url;
+  var locationchange = 0, url;
 
-	function mozbrowserlocationchange(evt) {
-		locationchange++;
+  function locChange(evt) {
+    locationchange++;
 
-		if (locationchange === 0 || evt.detail === url ||
-				evt.detail === url + '/') {
-			locationchange = 0;
-			back.dataset.disabled = true;
-			back.removeEventListener('click', goBack);
-			return;
-		}
+    if (locationchange === 0 || evt.detail === url ||
+        evt.detail === url + '/') {
+      locationchange = 0;
+      back.dataset.disabled = true;
+      back.removeEventListener('click', goBack);
+      return;
+    }
 
-		iframe.getCanGoBack().onsuccess = function(e) {
-			if (e.target.result === true) {
-				delete back.dataset.disabled;
-				back.addEventListener('click', goBack);
-			} else {
-				back.dataset.disabled = true;
-				back.removeEventListener('click', goBack);
-			}
-		}
-	}
+    iframe.getCanGoBack().onsuccess = function(e) {
+      if (e.target.result === true) {
+        delete back.dataset.disabled;
+        back.addEventListener('click', goBack);
+      } else {
+        back.dataset.disabled = true;
+        back.removeEventListener('click', goBack);
+      }
+    }
+  }
 
-	function goBack() {
-		iframe.getCanGoBack().onsuccess = function(e) {
-			if (e.target.result === true) {
-				locationchange -= 2;
-				iframe.goBack();
-			}
-		}
-	}
+  function goBack() {
+    iframe.getCanGoBack().onsuccess = function(e) {
+      if (e.target.result === true) {
+        locationchange -= 2;
+        iframe.goBack();
+      }
+    }
+  }
 
-	function clearHistory(callback) {
-		var req = iframe.getCanGoBack();
-		req.onsuccess = function(e) {
-			if (e.target.result === true) {
-				iframe.goBack();
-				clearHistory(callback);
-			} else {
-				callback();
-			}
-		}
-		req.onerror = callback;
-	}
+  function clearHistory(callback) {
+    var req = iframe.getCanGoBack();
+    req.onsuccess = function(e) {
+      if (e.target.result === true) {
+        iframe.goBack();
+        clearHistory(callback);
+      } else {
+        callback();
+      }
+    }
+    req.onerror = callback;
+  }
 
-	function mozbrowserloadstart() {
-		loading.hidden = false;
-	}
+  function mozbrowserloadstart() {
+    loading.hidden = false;
+  }
 
-	function mozbrowserloadend() {
-		loading.hidden = true;
-	}
+  function mozbrowserloadend() {
+    loading.hidden = true;
+  }
 
-	return {
-		init: function l_init() {
-			this.hasLoaded = true;
-			iframe.addEventListener('mozbrowserloadstart', mozbrowserloadstart);
-			iframe.addEventListener('mozbrowserloadend', mozbrowserloadend);
-			this.waitingActivities.forEach(this.handleActivity, this);
-		},
+  return {
+    init: function l_init() {
+      this.hasLoaded = true;
+      iframe.addEventListener('mozbrowserloadstart', mozbrowserloadstart);
+      iframe.addEventListener('mozbrowserloadend', mozbrowserloadend);
+      this.waitingActivities.forEach(this.handleActivity, this);
+    },
 
-		waitingActivities: [],
+    waitingActivities: [],
 
-		hasLoaded: false,
+    hasLoaded: false,
 
-		handleActivity: function(activity) {
-			switch (activity.source.data.type) {
-				case 'url':
-					if (url === activity.source.data.url) {
-						return;
-					}
+    handleActivity: function(activity) {
+      if (activity.source.data.type !== 'url' ||
+          activity.source.data.url === url) {
+        return;
+      }
 
-					loading.hidden = false;
-					iframe.removeEventListener('mozbrowserlocationchange',
-															       mozbrowserlocationchange);
-					locationchange = 0;
-					back.dataset.disabled = true;
-					back.removeEventListener('click', goBack);
-					clearHistory(function callback() {
-						iframe.src = url = activity.source.data.url;
-						iframe.addEventListener('load', function end() {
-							iframe.removeEventListener('load', end);
-							iframe.addEventListener('mozbrowserlocationchange',
-															        mozbrowserlocationchange);
-						});
-					});
-					break;
-			}
-		}
-	};
-
+      loading.hidden = false;
+      iframe.removeEventListener('mozbrowserlocationchange', locChange);
+      locationchange = 0;
+      back.dataset.disabled = true;
+      back.removeEventListener('click', goBack);
+      clearHistory(function callback() {
+        iframe.src = url = activity.source.data.url;
+        iframe.addEventListener('load', function end() {
+          iframe.removeEventListener('load', end);
+          iframe.addEventListener('mozbrowserlocationchange', locChange);
+        });
+      });
+    }
+  };
 }());
 
 window.addEventListener('load', function launcherOnLoad(evt) {
@@ -109,7 +103,7 @@ window.addEventListener('load', function launcherOnLoad(evt) {
 });
 
 function handleActivity(activity) {
-	if (Launcher.hasLoaded) {
+  if (Launcher.hasLoaded) {
     Launcher.handleActivity(activity);
   } else {
     Launcher.waitingActivities.push(activity);
@@ -118,5 +112,5 @@ function handleActivity(activity) {
 }
 
 if (window.navigator.mozSetMessageHandler) {
-	window.navigator.mozSetMessageHandler('activity', handleActivity);
+  window.navigator.mozSetMessageHandler('activity', handleActivity);
 }
