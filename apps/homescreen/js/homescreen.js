@@ -41,7 +41,6 @@ const Homescreen = (function() {
   }
 
   window.addEventListener('message', function onMessage(e) {
-    console.log(e.data)
     if (e.data === 'home') {
       onHomescreenActivity();
     } else {

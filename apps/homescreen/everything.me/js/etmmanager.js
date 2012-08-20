@@ -27,15 +27,24 @@ var EverythingMeManager = (function() {
     previousPage = currentPage;
   });
 
-  var connection = document.querySelector('#etmConnection');
+  var connectionMsg = document.querySelector('#etmConnection');
 
-  /*ConnectionManager.onConnection(function(connected) {
-    if (connected && !loadedWidget) {
+  var connection = window.navigator.connection ||
+                   window.navigator.mozConnection ||
+                   window.navigator.webkitConnection;
+
+  onConnectionChange();
+  connection.addEventListener('change', onConnectionChange);
+
+  function onConnectionChange() {
+    var offline = connection.bandwidth === 0;
+    console.log('Connection bandwidth: ' + connection.bandwidth);
+    if (!offline && !loadedWidget) {
       widget.src = widget.src;
     }
 
-    connection.style.display = connected ? 'none' : 'block';
-  });*/
+    connectionMsg.style.display = offline ? 'block' : 'none';
+  }
 
   var loadedWidget = false;
 
