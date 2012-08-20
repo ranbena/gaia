@@ -81,8 +81,10 @@ var Launcher = (function() {
         return;
       }
 
+      iframe.setVisible(false);
       iframe.removeEventListener('mozbrowserlocationchange', locChange);
       clearHistory(function callback() {
+        iframe.setVisible(true);
         loading.hidden = false;
         locationchange = 0;
         back.dataset.disabled = true;
