@@ -81,6 +81,10 @@ var Launcher = (function() {
 		handleActivity: function(activity) {
 			switch (activity.source.data.type) {
 				case 'url':
+					if (url === activity.source.data.url) {
+						return;
+					}
+
 					loading.hidden = false;
 					iframe.removeEventListener('mozbrowserlocationchange',
 															       mozbrowserlocationchange);
