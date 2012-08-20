@@ -14,9 +14,6 @@ var Launcher = (function() {
 	function mozbrowserlocationchange(evt) {
 		locationchange++;
 
-		console.log('locationchange: ' + locationchange)
-		console.log('url: ' + evt.detail)
-
 		if (locationchange === 0 || evt.detail === url ||
 				evt.detail === url + '/') {
 			locationchange = 0;
