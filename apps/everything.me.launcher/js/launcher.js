@@ -80,8 +80,8 @@ var Launcher = (function() {
           activity.source.data.url === url) {
         return;
       }
-
       iframe.setVisible(false);
+      iframe.stop();
       iframe.removeEventListener('mozbrowserlocationchange', locChange);
       clearHistory(function callback() {
         iframe.setVisible(true);
