@@ -19,3 +19,7 @@
 	border: 0;
 	position: absolute;
 }
+
+li:active {
+  background-color: transparent !important;
+}
