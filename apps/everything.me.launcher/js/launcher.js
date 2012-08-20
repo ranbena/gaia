@@ -83,13 +83,13 @@ var Launcher = (function() {
 
       iframe.removeEventListener('mozbrowserlocationchange', locChange);
       clearHistory(function callback() {
+        loading.hidden = false;
+        locationchange = 0;
+        back.dataset.disabled = true;
+        back.removeEventListener('click', goBack);
         iframe.src = url = activity.source.data.url;
         iframe.addEventListener('load', function end() {
           iframe.removeEventListener('load', end);
-          loading.hidden = false;
-          locationchange = 0;
-          back.dataset.disabled = true;
-          back.removeEventListener('click', goBack);
           iframe.addEventListener('mozbrowserlocationchange', locChange);
         });
       });
