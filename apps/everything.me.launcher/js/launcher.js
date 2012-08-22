@@ -6,6 +6,7 @@ var Launcher = (function() {
   var loading = document.getElementById('loading');
 
   var iframe = document.getElementById('app');
+  iframe.setVisible(false);
 
   var back = document.getElementById('back-button');
 
@@ -78,9 +79,10 @@ var Launcher = (function() {
     handleActivity: function(activity) {
       if (activity.source.data.type !== 'url' ||
           activity.source.data.url === url) {
+        iframe.setVisible(true);
         return;
       }
-      iframe.setVisible(false);
+      
       iframe.stop();
       iframe.removeEventListener('mozbrowserlocationchange', locChange);
       clearHistory(function callback() {
