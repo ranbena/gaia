@@ -10,6 +10,16 @@ var Launcher = (function() {
 
   var back = document.getElementById('back-button');
 
+  var advertisement = document.getElementById('advertisement');
+  setTimeout(function deleteAdvertisement() {
+    advertisement.style.display = 'none';
+  }, 5000);
+
+  var toolbar = document.getElementById('toolbar');
+  toolbar.addEventListener('click', function toggle() {
+    toolbar.classList.toggle('hidden');
+  });
+
   var locationchange = 0, url;
 
   function locChange(evt) {
@@ -34,7 +44,8 @@ var Launcher = (function() {
     }
   }
 
-  function goBack() {
+  function goBack(evt) {
+    evt.stopPropagation();
     iframe.getCanGoBack().onsuccess = function(e) {
       if (e.target.result === true) {
         locationchange -= 2;
@@ -82,7 +93,7 @@ var Launcher = (function() {
         iframe.setVisible(true);
         return;
       }
-      
+
       iframe.stop();
       iframe.removeEventListener('mozbrowserlocationchange', locChange);
       clearHistory(function callback() {
