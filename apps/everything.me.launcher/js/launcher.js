@@ -11,9 +11,12 @@ var Launcher = (function() {
   var back = document.getElementById('back-button');
 
   var advertisement = document.getElementById('advertisement');
-  setTimeout(function deleteAdvertisement() {
-    advertisement.style.display = 'none';
-  }, 5000);
+
+  function removeAdvertisement() {
+    advertisement.parentNode.removeChild(advertisement);
+  }
+
+  var advTimeout = setTimeout(removeAdvertisement, 5000);
 
   var toolbar = document.getElementById('toolbar');
   toolbar.addEventListener('click', function toggle() {
