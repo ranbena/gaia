@@ -30,6 +30,8 @@ menu[type="toolbar"] {
   height: 4.5rem;
   background-color: #fff;
   background-image: -moz-linear-gradient(#323639, #272b2e);
+  background-repeat: no-repeat, no-repeat;
+  background-position: top center;
   margin: 0;
   padding: 0;
   z-index: 1;
@@ -39,6 +41,7 @@ menu[type="toolbar"] {
 
 menu.hidden {
   -moz-transform: translateY(3.5rem);
+  background-image: url('images/circle.png'), -moz-linear-gradient(#323639, #272b2e);
 }
 
 menu.hidden button {
