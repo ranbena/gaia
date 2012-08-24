@@ -57,7 +57,7 @@ menu button {
   padding: 0;
   width: 80px;
   height: 100%;
-  float: left;
+  float: right;
   background-position: center;
   background-repeat: no-repeat;
   opacity: 1;
@@ -65,6 +65,7 @@ menu button {
 
 #back-button {
   background-image: url("images/back.png");
+  float: left;
 }
 
 #back-button[data-disabled] {
@@ -73,7 +74,10 @@ menu button {
 
 #full-button {
   background-image: url("images/full.png");
-  float: right;
+}
+
+#reload-button {
+  background-image: url("images/reload.png");
 }
 
 input::-moz-focus-inner {
