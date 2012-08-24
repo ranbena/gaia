@@ -16,12 +16,22 @@ var Launcher = (function() {
     advertisement.parentNode.removeChild(advertisement);
   }
 
-  var advTimeout = setTimeout(removeAdvertisement, 5000);
+  setTimeout(removeAdvertisement, 4000);
 
   var toolbar = document.getElementById('toolbar');
-  toolbar.addEventListener('click', function toggle() {
+  var toolbarTimeout;
+
+  var isToolbarDisplayed = false;
+  function toggleToolbar() {
+    clearTimeout(toolbarTimeout);
     toolbar.classList.toggle('hidden');
-  });
+    isToolbarDisplayed = !isToolbarDisplayed;
+    if (isToolbarDisplayed) {
+      toolbarTimeout = setTimeout(toggleToolbar, 3000);
+    }
+  }
+
+  toolbar.addEventListener('click', toggleToolbar);
 
   var inFullScreenMode = false;
   var full = document.getElementById('full-button');
@@ -151,7 +161,6 @@ function handleActivity(activity) {
   } else {
     Launcher.waitingActivities.push(activity);
   }
-  activity.postResult({ status: 'accepted' });
 }
 
 if (window.navigator.mozSetMessageHandler) {

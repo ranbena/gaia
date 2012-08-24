@@ -69,7 +69,7 @@ menu button {
 }
 
 #back-button[data-disabled] {
-  opacity: .4;
+  opacity: .2;
 }
 
 #full-button {
