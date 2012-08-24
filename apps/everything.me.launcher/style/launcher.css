@@ -72,6 +72,11 @@ menu button {
   opacity: .4;
 }
 
+#full-button {
+  background-image: url("images/full.png");
+  float: right;
+}
+
 input::-moz-focus-inner {
   border: 0;
 }

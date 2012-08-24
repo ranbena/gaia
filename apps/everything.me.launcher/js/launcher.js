@@ -23,6 +23,25 @@ var Launcher = (function() {
     toolbar.classList.toggle('hidden');
   });
 
+  var inFullScreenMode = false;
+  var full = document.getElementById('full-button');
+
+  full.addEventListener('click', function toggle(evt) {
+    if (!inFullScreenMode) {
+      iframe.mozRequestFullScreen();
+    }
+  });
+
+  document.addEventListener('mozfullscreenchange', function fullLtr(event) {
+    inFullScreenMode = !inFullScreenMode;
+  });
+
+  iframe.addEventListener('mozbrowsercontextmenu', function ctxmenu(event) {
+    if (inFullScreenMode) {
+      document.mozCancelFullScreen();
+    }
+  });
+
   var locationchange = 0, url;
 
   function locChange(evt) {
