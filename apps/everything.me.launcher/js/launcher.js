@@ -31,12 +31,12 @@ var Launcher = (function() {
     }
   }
 
-  toolbar.addEventListener('click', toggleToolbar);
+  toolbar.addEventListener('mousedown', toggleToolbar);
 
   var inFullScreenMode = false;
   var full = document.getElementById('full-button');
 
-  full.addEventListener('click', function toggle(evt) {
+  full.addEventListener('mousedown', function toggle(evt) {
     if (!inFullScreenMode) {
       iframe.mozRequestFullScreen();
     }
@@ -54,7 +54,7 @@ var Launcher = (function() {
 
   var reload = document.getElementById('reload-button');
 
-  reload.addEventListener('click', function toggle(evt) {
+  reload.addEventListener('mousedown', function toggle(evt) {
     iframe.reload(true);
   });
 
@@ -67,17 +67,17 @@ var Launcher = (function() {
         evt.detail === url + '/') {
       locationchange = 0;
       back.dataset.disabled = true;
-      back.removeEventListener('click', goBack);
+      back.removeEventListener('mousedown', goBack);
       return;
     }
 
     iframe.getCanGoBack().onsuccess = function(e) {
       if (e.target.result === true) {
         delete back.dataset.disabled;
-        back.addEventListener('click', goBack);
+        back.addEventListener('mousedown', goBack);
       } else {
         back.dataset.disabled = true;
-        back.removeEventListener('click', goBack);
+        back.removeEventListener('mousedown', goBack);
       }
     }
   }
@@ -139,7 +139,7 @@ var Launcher = (function() {
         loading.hidden = false;
         locationchange = 0;
         back.dataset.disabled = true;
-        back.removeEventListener('click', goBack);
+        back.removeEventListener('mousedown', goBack);
         iframe.src = url = activity.source.data.url;
         iframe.addEventListener('load', function end() {
           iframe.removeEventListener('load', end);
