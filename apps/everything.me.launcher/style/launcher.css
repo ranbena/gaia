@@ -18,7 +18,7 @@ iframe {
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1;
+  z-index: 1000;
 }
 
 menu[type="toolbar"] {
@@ -34,7 +34,7 @@ menu[type="toolbar"] {
   background-position: top center;
   margin: 0;
   padding: 0;
-  z-index: 1;
+  z-index: 1000;
   -moz-transform: translateY(0);
   -moz-transition: -moz-transform .2s ease-in;
 }
@@ -60,7 +60,6 @@ menu button {
   float: left;
   background-position: center;
   background-repeat: no-repeat;
-  z-index: 2;
   opacity: 1;
 }
 
@@ -91,7 +90,7 @@ input::-moz-focus-inner {
 	-moz-animation-timing-function: ease-in-out;
 	-moz-animation-direction: alternate;
 
-  z-index: 3;
+  z-index: 1001;
   position: fixed;
   bottom: 5rem;
   left: 0;
