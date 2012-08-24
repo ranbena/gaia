@@ -42,6 +42,12 @@ var Launcher = (function() {
     }
   });
 
+  var reload = document.getElementById('reload-button');
+
+  reload.addEventListener('click', function toggle(evt) {
+    iframe.reload(true);
+  });
+
   var locationchange = 0, url;
 
   function locChange(evt) {
