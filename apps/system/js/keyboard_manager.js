@@ -46,7 +46,9 @@ var KeyboardManager = (function() {
       appHeight = currentApp.getBoundingClientRect().height;
 
     } else {
-      appHeight = window.innerHeight;
+      console.error('There is no current application, nor trusted dialog ' +
+                    'nor modal dialog. The resize event is acting on nothing.');
+      return;
     }
 
     var height = appHeight - message.keyboardHeight;
@@ -64,16 +66,14 @@ var KeyboardManager = (function() {
     }
 
     if (!keyboardFrame.classList.contains('hide')) {
-      if (currentApp)
-        currentApp.style.height = height + 'px';
+      currentApp.style.height = height + 'px';
       keyboardOverlay.style.height = (height + StatusBar.height) + 'px';
       keyboardOverlay.hidden = false;
     } else {
       keyboardFrame.classList.remove('hide');
       keyboardFrame.addEventListener('transitionend', function keyboardShown() {
         keyboardFrame.removeEventListener('transitionend', keyboardShown);
-        if (currentApp)
-          currentApp.style.height = height + 'px';
+        currentApp.style.height = height + 'px';
         keyboardOverlay.style.height = (height + StatusBar.height) + 'px';
         keyboardOverlay.hidden = false;
         keyboardFrame.classList.add('visible');
