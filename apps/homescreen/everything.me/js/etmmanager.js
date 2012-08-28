@@ -75,7 +75,7 @@ var EverythingMeManager = (function() {
       name: params.title,
       icon: params.icon
     })).launch();
-    
+
     setVisibilityChange(false);
   }
 
