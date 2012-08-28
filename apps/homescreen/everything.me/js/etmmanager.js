@@ -29,27 +29,26 @@ var EverythingMeManager = (function() {
 
   var connectionMsg = document.querySelector('#etmConnection');
 
-  var connection = window.navigator.connection ||
-                   window.navigator.mozConnection ||
-                   window.navigator.webkitConnection;
-
-  onConnectionChange();
-  connection.addEventListener('change', onConnectionChange);
-
-  function onConnectionChange() {
-    var offline = connection.bandwidth === 0;
-    console.log('Connection bandwidth: ' + connection.bandwidth);
-    if (!offline && !loadedWidget) {
-      widget.src = widget.src;
-    }
-
-    connectionMsg.style.display = offline ? 'block' : 'none';
-  }
+  var goToEverything = document.querySelector('#goToEverything');
+  goToEverything.addEventListener('click', function load() {
+    widget.src = 'http://b2g.everything.me';
+    connectionMsg.style.opacity = 0;
+    connectionMsg.addEventListener('transitionend', function transitionend() {
+      connectionMsg.removeEventListener('transitionend', transitionend);
+      connectionMsg.style.display = 'none';
+    });
+  });
 
   var loadedWidget = false;
 
   widget.addEventListener('load', function loaded() {
     loadedWidget = true;
+  });
+
+  widget.addEventListener('error', function error() {
+    loadedWidget = false;
+    connectionMsg.style.display = 'block';
+    connectionMsg.style.opacity = 1;
   });
 
   function dispatchEvent(e) {
