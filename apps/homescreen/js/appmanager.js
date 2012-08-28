@@ -45,12 +45,9 @@ var Applications = (function() {
     var apps = e.target.result;
     apps.forEach(function parseApp(app) {
       var manifest = app.manifest;
-      if (!manifest || !manifest.icons) {
+      if (!manifest || !manifest.icons || manifest.hidden === 'hidden') {
         return;
       }
-
-      if (app.manifest.name.indexOf('Webapps') !== -1)
-        return;
 
       // If the manifest contains entry points, iterate over them
       // and add a fake app object for each one.

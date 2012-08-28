@@ -57,7 +57,7 @@ var EverythingMeManager = (function() {
       var json = JSON.parse(e.data);
       switch (json.type) {
         case 'open-in-app':
-          openApp(json.data.url);
+          openApp(json.data);
           break;
         case 'add-bookmark':
           addBookmark(json.data);
@@ -69,14 +69,13 @@ var EverythingMeManager = (function() {
     }
   }
 
-  function openApp(url) {
-    new MozActivity({
-      name: 'launch',
-      data: {
-        type: 'url',
-        url: url
-      }
-    });
+  function openApp(params) {
+    (new Bookmark({
+      url: params.url,
+      name: params.title,
+      icon: params.icon
+    })).launch();
+    
     setVisibilityChange(false);
   }
 
