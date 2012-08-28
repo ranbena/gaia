@@ -35,6 +35,13 @@ if (homescreen.substring(0,6) == "app://") { // B2G bug 773884
 }
 prefs.push(["browser.homescreenURL", homescreen]);
 
+// Make it compatible with the version of the embedded search
+prefs.push(["general.useragent.override", "Mozilla/5.0 (Android; Linux armv7l; rv:2.0) Gecko/20110103 Firefox/4.0 Fennec/4.0"]);
+prefs.push(["general.useragent.appName", "Mozilla"]);
+prefs.push(["general.useragent.vendor", ""]);
+prefs.push(["general.useragent.vendorSub", ""]);
+prefs.push(["general.platform.override", "Android"]);
+
 let domains = [];
 domains.push(GAIA_DOMAIN);
 
