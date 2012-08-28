@@ -124,8 +124,13 @@ var Launcher = (function() {
   }
 
   iframe.src = getURL();
-  iframe.addEventListener('load', function load() {
-    iframe.removeEventListener('load', load);
+  var firstTime = 1;
+  iframe.addEventListener('mozbrowserloadend', function loaded() {
+    if (firstTime--) {
+      return;
+    }
+
+    iframe.removeEventListener('mozbrowserloadend', loaded);
     iframe.addEventListener('mozbrowserlocationchange', locChange);
     overlay.style.opacity = 0;
     overlay.addEventListener('transitionend', function transitionend() {
