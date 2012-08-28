@@ -112,13 +112,13 @@ var Launcher = (function() {
   }
 
   function getURL() {
-    var regex = new RegExp("[\\?&]url=([^&#]*)");
+    var regex = new RegExp('[\\?&]url=([^&#]*)');
     var results = regex.exec(window.location.href);
     return decodeURI(results[1]);
   }
 
   function getName() {
-    var regex = new RegExp("[\\?&]name=([^&#]*)");
+    var regex = new RegExp('[\\?&]name=([^&#]*)');
     var results = regex.exec(window.location.href);
     return decodeURI(results[1]);
   }
@@ -131,6 +131,6 @@ var Launcher = (function() {
     overlay.addEventListener('transitionend', function transitionend() {
       overlay.removeEventListener('transitionend', transitionend);
       overlay.parentNode.removeChild(overlay);
-    })
+    });
   });
 }());
