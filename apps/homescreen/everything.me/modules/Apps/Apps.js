@@ -496,7 +496,7 @@ var Apps = new function() {
         function cbButtonClick() {
             EventHandler.trigger(_name, "buttonClick");
         }
-
+        
         function addLoadingIndicator() {
             var opts = {
               "lines": 8,
@@ -511,7 +511,7 @@ var Apps = new function() {
             loading = new Spinner(opts);
         }
     };
-
+    
     this.Indicators = new function() {
         var IDS = {};
         
@@ -520,7 +520,7 @@ var Apps = new function() {
             IDS.error = options.$indicatorError;
             
             IDS.error.find("b").click(function(){
-                window.location.reload();
+                EventHandler.trigger(_name, "errorRetryClick");
             });
         };
         

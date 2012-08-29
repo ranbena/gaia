@@ -622,6 +622,10 @@ var Brain = new function() {
         this.scrollBottom = function() {
             Searcher.loadMoreApps();
         };
+        
+        this.errorRetryClick = function() {
+            
+        };
     };
 
     this.AppsMore = new function() {
