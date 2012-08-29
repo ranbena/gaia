@@ -25,27 +25,6 @@ iframe {
   z-index: 1000;
 }
 
-#overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-	height: 100%;
-  width: 100%;
-  z-index: 999;
-	background-color: #000;
-	color: grey;
-	font-size: 7rem;
-	font-weight: bold;
-	overflow: hidden;
-  word-wrap: break-word;
-	white-space: pre-wrap;
-	padding: 4rem 0 0 0;
-	text-align: center;
-	opacity: .7;
-	-moz-transition: opacity .5s;
-	pointer-events: none;
-}
-
 menu[type="toolbar"] {
   position: fixed;
   bottom: 0;
@@ -135,7 +114,7 @@ input::-moz-focus-inner {
   font-size: 2rem;
 	font-weight: bold;
   display: block;
-	color: #fff;
+	color: #000;
 }
 
 @-moz-keyframes bounce {

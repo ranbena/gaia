@@ -4,8 +4,6 @@
 var Launcher = (function() {
 
   var loading = document.getElementById('loading');
-  var overlay = document.getElementById('overlay');
-  overlay.textContent = getName();
 
   var iframe = document.getElementById('app');
   iframe.addEventListener('mozbrowserloadstart', mozbrowserloadstart);
@@ -117,25 +115,6 @@ var Launcher = (function() {
     return decodeURI(results[1]);
   }
 
-  function getName() {
-    var regex = new RegExp('[\\?&]name=([^&#]*)');
-    var results = regex.exec(window.location.href);
-    return decodeURI(results[1]);
-  }
-
   iframe.src = getURL();
-  var firstTime = 1;
-  iframe.addEventListener('mozbrowserloadend', function loaded() {
-    if (firstTime--) {
-      return;
-    }
-
-    iframe.removeEventListener('mozbrowserloadend', loaded);
-    iframe.addEventListener('mozbrowserlocationchange', locChange);
-    overlay.style.opacity = 0;
-    overlay.addEventListener('transitionend', function transitionend() {
-      overlay.removeEventListener('transitionend', transitionend);
-      overlay.parentNode.removeChild(overlay);
-    });
-  });
+  iframe.addEventListener('mozbrowserlocationchange', locChange);
 }());
