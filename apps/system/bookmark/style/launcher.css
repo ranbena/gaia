@@ -97,7 +97,7 @@ input::-moz-focus-inner {
 	text-align: center;
 	pointer-events: none;
 	-moz-animation-name: bounce;
-	-moz-animation-duration: 0.9s;
+	-moz-animation-duration: 1s;
 	-moz-animation-iteration-count: infinite;
 	-moz-animation-timing-function: ease-in-out;
 	-moz-animation-direction: alternate;
@@ -122,6 +122,6 @@ input::-moz-focus-inner {
 		-moz-transform: translateY(0);
 	}
 	to {
-		-moz-transform: translateY(2rem);
+		-moz-transform: translateY(1rem);
 	}
 }
