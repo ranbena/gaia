@@ -1,17 +1,14 @@
 var Utils = new function() {
-    var _this = this, userAgent = "", platform = "", browser = "", os = "", screen= {}, connection, cssPrefix = "", iconsFormat = null,
+    var _this = this, userAgent = "", connection, cssPrefix = "", iconsFormat = null,
         isKeyboardVisible = false, _title = "Everything", isNewUser, isFFOS = false,
         _parseQuery = parseQuery();
         
-    var env = new Doat_Env();
-    this.Env = env;
-    var envInfo = env.getInfo();
-    
     this.ICONS_FORMATS = {
         "Small": 10,
         "Large": 20
     };
-    var COOKIE_NAME_CREDENTIALS = "credentials",
+    var CONTAINER_ID = "doat-container",
+        COOKIE_NAME_CREDENTIALS = "credentials",
         DYNAMIC_TITLE = false;
     
     this.FFOSMessages = {
@@ -60,28 +57,16 @@ var Utils = new function() {
         }
     };
     
+    this.getID = function() {
+        return CONTAINER_ID;
+    };
+    
     
     this.init = function() {
         userAgent = navigator.userAgent;
         cssPrefix = _getCSSPrefix();
-        platform = _this.getPlatform();
-        browser = _this.getBrowser();
-        os = _this.getOS();
-        screen = _this.getScreen();
-        connection = _this.getConnection();
+        connection = Connection.get();
         isTouch = "ontouchstart" in window;
-    };
-    
-    this.setTitle = function(title) {
-        if (!DYNAMIC_TITLE) return;
-        
-        var sTitle = _title;
-        if (title) {
-            sTitle += " " + title;
-        }
-        window.setTimeout(function(){
-            document.title = sTitle;
-        }, 50);
     };
     
     this.isNewUser = function() {
@@ -90,18 +75,6 @@ var Utils = new function() {
         }
         return isNewUser;
     };
-    
-    this.hasFacebookParam = function() {
-        return Utils.getUrlParam("fb") == "mp";
-    };
-    this.setAuthUser = function() {
-        Storage.set("isUser", true);
-        $("#doat-container").removeClass("not-auth-user").addClass("auth-user");
-    };
-    this.isAuthUser = function() {
-        return Storage.get("isUser");
-    };
-    
     
     this.updateObject = function(configData, groupConfig) {
         if (!groupConfig) return;
@@ -124,55 +97,6 @@ var Utils = new function() {
         return "data:" + image.MIMEType + ";base64," + image.data;
     };
     
-    this.getRoundIcon = function(imageSrc, size, shadowOffset, callback) {
-        // canvas
-        var canvas = document.createElement("canvas"),
-            ctx = canvas.getContext("2d"),
-            radius = size/2;
-        
-        canvas.setAttribute("width", size);
-        canvas.setAttribute("height", size);
-        
-        !shadowOffset && (shadowOffset = 0); 
-        
-        // create clip
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(radius, radius, radius, 0, 2 * Math.PI, false);
-        ctx.clip();
-        
-        // generate image
-        var img = new Image()
-        img.onload = function() {
-            ctx.drawImage(img,0,0, size, size);
-            
-            // send to get shadow
-            var data = canvas.toDataURL();
-            getShadow(data, size, shadowOffset, callback)
-        };
-        img.src = imageSrc;
-    };
-    
-    var getShadow = function(imageSrc, size, shadowOffset, callback) {
-        var canvas = document.createElement("canvas"),
-            ctx = canvas.getContext("2d");
-        
-        canvas.setAttribute("width", size+shadowOffset);
-        canvas.setAttribute("height", size+shadowOffset);    
-    
-        ctx.shadowColor="rgba(0,0,0,0.3)";
-        ctx.shadowOffsetY = shadowOffset;
-        
-        // generate image
-        var img = new Image()
-        img.onload = function() {
-            ctx.drawImage(img,0,0, size, size);
-            var data = canvas.toDataURL();
-            callback(data);
-        };
-        img.src = imageSrc;
-    }
-    
     this.getIconGroup = function() {
         return JSON.parse(JSON.stringify(__config.iconsGroupSettings));
     }
@@ -192,22 +116,6 @@ var Utils = new function() {
         } else {
             $("#doat-container").removeClass("keyboard-visible");
         }
-    };
-    
-    this.needsInputPolling = function() {
-        return (Utils.platform() == "android" && Utils.browser() == "mozilla");
-    };
-
-    this.platform = function() {
-        return envInfo.platform.name;
-    };
-
-    this.browser = function() {
-        return envInfo.browser.name;
-    };
-
-    this.os = function() {
-        return os.name;
     };
     
     this.connection = function(){
@@ -242,19 +150,6 @@ var Utils = new function() {
     }
     
     this.hasFixedPositioning = function(){
-        /*var p = _this.getPlatform().name;
-        var v = _this.getOS().version;
-        
-        // desktop
-        if (p === "desktop"){
-            return true;
-        }
-        // iOS 5+ 
-        else if (p === 'iphone' || p === 'ipad'){
-            return isVersionOrHigher(v, '5');
-        }
-        // android 2.2+ implementation is a joke*/
-        
         return false;
     };
     
@@ -355,95 +250,78 @@ var Utils = new function() {
     };
     
     function _getIconsFormat() {
-        iconsFormat = _this.ICONS_FORMATS.Small;
-        var connection = _this.getConnection();
-        
-        if (
-                (window.devicePixelRatio && window.devicePixelRatio >= 2) || // retina display on iPhone
-                os.name == "android" || // all android phones
-                os.name == "windowsphoneos" || // all windows phones
-                os.name == "firefoxos" || // all windows phones
-                platform.name == "desktop" // desktop
-            ) {
-                
-            if (connection.speed >= connection.SPEED_HIGH) {
-                iconsFormat = _this.ICONS_FORMATS.Large;
-            }
-        }
-        
-        return iconsFormat;
+        return _this.ICONS_FORMATS.Large;
     }
     
     function _getCSSPrefix() {
-        var browser = _this.getBrowser().name;
-        var prefix = (browser === 'webkit' ? '-webkit-' : browser === 'mozilla' ? '-moz-' : browser === 'msie' ? '-ms-' : '');
-        return prefix;
+        return (/webkit/i).test(navigator.appVersion) ? '-webkit-' :
+                (/firefox/i).test(navigator.userAgent) ? '-moz-' :
+                (/msie/i).test(navigator.userAgent) ? '-ms-' :
+                'opera' in window ? '-o-' : '';
     }
-
-    this.getPlatform = function(uaStr){
-        return env.getInfo(uaStr).platform;
-    };
-    
-    this.getBrowser = function(uaStr) {
-        return env.getInfo(uaStr).browser;
-    };
-    
-    this.getOS = function(uaStr){        
-        return env.getInfo(uaStr).os;
-    };
-    
-    this.getScreen = function(uaStr){
-        return env.getScreen(uaStr);
-    };
-    
-    this.getScreenWidth = function(){
-        return env.getScreen().width;
-    };
-    
-    this.setScreen = function(data){
-        env.setScreen(data);
-    };
-    
-    this.clearScreen = function(){
-        env.clearScreen(_this.getOrientation().name);
-    };
-    
-    this.getOrientation = function(uaStr){
-        return env.getInfo(uaStr).orientation;
-    };    
-    
-    this.getConnection = function(){
-        return env.getInfo().connection;
-    };
-    
-    this.getIsTouch = function(){
-        return env.isTouch();
-    };
-    
-    this.setOrientation = function(_orientation){
-        env.setOrientation(_orientation);
-    };
-    
-    this.updateOrientation = function(){
-        env.setOrientation();
-    };
     
     this.getCurrentSearchQuery = function(){
         return Brain.Searcher.getDisplayedQuery();
     };
     
-    this.Campaign = new function(){
-        this.current = {
-            "network": _parseQuery["n"],
-            "creative": _parseQuery["c"]
+    
+    var Connection = new function(){
+        var _this = this,
+            currentIndex,
+            consts = {
+                SPEED_UNKNOWN: 100,
+                SPEED_HIGH: 30,
+                SPEED_MED: 20,
+                SPEED_LOW: 10
+            },
+            types = [
+                {
+                    "name": undefined,
+                    "speed": consts.SPEED_UNKNOWN
+                },
+                {
+                    "name": "etherenet",
+                    "speed": consts.SPEED_HIGH
+                },
+                {
+                    "name": "wifi",
+                    "speed": consts.SPEED_HIGH
+                },
+                {
+                    "name": "2g",
+                    "speed": consts.SPEED_LOW
+                },
+                {
+                    "name": "3g",
+                    "speed": consts.SPEED_MED
+                }
+            ];
+        
+        this.get = function(){
+            return getCurrent();
         };
         
-        this.NETWORK = {
-            "STARTAPP": "StartApp",
-            "DOAT": "doat" 
+        this.set = function(index){
+             currentIndex = index || (navigator.connection && navigator.connection.type) || 0;
+             return getCurrent();
         };
+        
+        function getCurrent(){
+            return aug({}, consts, types[currentIndex]);
+        }
+        
+        function aug(){
+            var main = arguments[0];
+            for (var i=1, len=arguments.length; i<len; i++){
+                for (var k in arguments[i]){ main[k] = arguments[i][k] }
+            };
+            return main;
+        }
+            
+        // init
+        _this.set();        
     };
-
+    
     this.init();
 };
 

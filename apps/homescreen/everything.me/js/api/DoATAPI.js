@@ -892,7 +892,6 @@ var Request = function() {
         (!params["stats"]) && (params["stats"] = {});
         params.stats.retryNum = retryNumber;
         params.stats.firstSession = Utils.isNewUser();
-        params.stats.orientation = (Utils.getOrientation() || {"name": "N/A"}).name || "N/A";
         
         params.stats = JSON.stringify(params.stats);
         

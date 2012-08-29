@@ -4,8 +4,8 @@ var Apps = new function() {
         scroll = null, defaultIconToUse = 0;
     var reportedScrollMove = false, shouldFadeBG = false,
         isSwiping = false,
-        timeoutAppsToDrawLater = null,
-        isPositionCalculated = false, positionCalculatedCallback, positionCalculateRetries = 4;
+        showingFullScreen = false,
+        timeoutAppsToDrawLater = null;
     
     var MORE_BUTTON_ID = "more-apps",
         APP_HEIGHT = "FROM CONFIG",
@@ -51,18 +51,16 @@ var Apps = new function() {
             "$indicatorError": $("#apps-error")
         });
         
-        if (ftr.defaultIconUrl){
-            DEFAULT_ICON_URL = ftr.defaultIconUrl[Utils.ICONS_FORMATS.Large];
-            if (typeof DEFAULT_ICON_URL == "string") {
-                DEFAULT_ICON_URL = [DEFAULT_ICON_URL];
-            }
+        DEFAULT_ICON_URL = options.design.defaultIconUrl[Utils.ICONS_FORMATS.Large];
+        if (typeof DEFAULT_ICON_URL == "string") {
+            DEFAULT_ICON_URL = [DEFAULT_ICON_URL];
         }
         
         $list.bind("touchmove", function(){
             isSwiping = true
         });
-        var TOUCH_END = Utils.isB2G() ? "mouseup" : "touchend";
-        $list.bind(TOUCH_END, function(){
+        
+        $list.bind("mouseup", function(){
             _this.timeoutHold && window.clearTimeout(_this.timeoutHold);
             window.setTimeout(function(){
                 isSwiping = false;
@@ -94,8 +92,8 @@ var Apps = new function() {
             "onTouchEnd": scrollEnd
         }, hasFixedPositioning);
         
-        positionCalculateRetries = {"portrait": positionCalculateRetries, "landscape": positionCalculateRetries};
-
+        _this.calcAppsPositions();
+        
         EventHandler.trigger(_name, "init");
     };
     
@@ -227,75 +225,24 @@ var Apps = new function() {
         }
     };
     
-    this.calcAppsPositions = function(getWidth, orientation, className) {
-        var id = ICONS_STYLE_ID+"-"+orientation,
-            width;
-        var orientationClassName = className ? "."+className+" " : "";
+    this.calcAppsPositions = function() {
+        var width = 320;
         
-        var $prevStyleTag =  $("style#"+id);
+        setAppsPerRow(width);
         
-        // if there's not already a style tag for this orientation OR if it's not "final"
-        if (!$prevStyleTag.get(0) || $prevStyleTag.attr("data-final") !== "1"){
-            // get width
-            width = getWidth instanceof Function ? getWidth() : getWidth;
-            isFinal = 1;
-            
-            // if not determined (according to viewport.getWidth())
-            if (!width){
-                width = DEFAULT_SCREEN_WIDTH[orientation];
-                
-                if (positionCalculateRetries[orientation]){
-                    --positionCalculateRetries[orientation];
-                    setTimeout(function(){
-                        _this.calcAppsPositions(getWidth, orientation, className);
-                    }, 1000);
-                    
-                    isFinal = 0;
-                }
-            }
-
-            positionCalculatedTrigger();
-            
-            if (Utils.isB2G()) {
-                width = Utils.getB2GWidth();
-            }
-            
-            var prefix = Utils.cssPrefix();
-            
-            setAppsPerRow(width);
-            
-            var rules = orientationClassName+"#doat-apps ul li { width: " + 100/APPS_PER_ROW + "%; }\n";
-            for (var i=0; i<MAX_APPS_CLASSES; i++) {
-                var posX = i%APPS_PER_ROW*width/APPS_PER_ROW;
-                var posY = Math.floor(i/APPS_PER_ROW)*APP_HEIGHT;
-                rules += orientationClassName+'#doat-apps ul li.pos' + i + ' { ' + prefix + 'transform: translate(' + posX + 'px, ' + posY + 'px); }\n';
-            }
-            
-            var $currStyle = $('<style type="text/css" id="' + id + '" data-final="' + isFinal + '">' + rules + '</style>');
-            $("head").append($currStyle);
-            
-            $prevStyleTag.get(0) && $prevStyleTag.remove();
+        var prefix = Utils.cssPrefix(),
+            rules = "#doat-apps ul li { width: " + 100/APPS_PER_ROW + "%; }\n";
+        for (var i=0; i<MAX_APPS_CLASSES; i++) {
+            var posX = i%APPS_PER_ROW*width/APPS_PER_ROW;
+            var posY = Math.floor(i/APPS_PER_ROW)*APP_HEIGHT;
+            rules += '#doat-apps ul li.pos' + i + ' { ' + prefix + 'transform: translate(' + posX + 'px, ' + posY + 'px); }\n';
         }
+        
+        var $currStyle = $('<style type="text/css">' + rules + '</style>');
+        $("head").append($currStyle);
         
         _this.refreshScroll();
     };
-    
-    this.onPositionCalculated = function(cb){
-        if (isPositionCalculated){
-            cb.call();
-        }
-        else{
-            positionCalculatedCallback = cb;
-        }
-    };
-    
-    function positionCalculatedTrigger(){
-        isPositionCalculated = true;
-        if (positionCalculatedCallback){
-            positionCalculatedCallback.call();
-            positionCalculatedCallback = undefined;    
-        }
-    }
     
     this.hasSpaceForMoreButton = function(height){
         return height >= MIN_HEIGHT_FOR_MORE_BUTTON;
@@ -324,12 +271,8 @@ var Apps = new function() {
     };
     
     function setAppsPerRow(width) {
-        !width && (width = $("#doat-container").width());
+        !width && (width = $("#" + Utils.getID()).width());
         
-        if (Utils.isB2G()) {
-            width = Utils.getB2GWidth();
-        }
-            
         APPS_PER_ROW = (width>MIN_WIDTH_FOR_FIVE_APPS)? 5 : 4;
     }
     
@@ -362,9 +305,13 @@ var Apps = new function() {
     
     function scrollEnd(data) {
         if (shouldFadeBG && scroll.y > (SCROLL_BEFORE_CALLING_SCROLLTOP+MAX_SCROLL_AREA)) {
+            showingFullScreen = true;
             cbScrolledToTop();
+            window.setTimeout(function(){
+                showingFullScreen = false;
+            }, 1000);
         } else {
-            BackgroundImage.cancelFullScreenFade();
+            !showingFullScreen && BackgroundImage.cancelFullScreenFade();
         }
     }
     
@@ -708,7 +655,7 @@ var IconGroup = new function() {
     this.get = function(ids, callback) {
         var iconIcons = Utils.getIconGroup(),
             needToLoad = iconIcons.length,
-            useShadows = (Utils.os() != "android");
+            useShadows = true;
             
         var el = document.createElement("div");
             el.className = "apps-group";

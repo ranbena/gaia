@@ -42,10 +42,10 @@
                 
                 if (blockScreen) {
                     $elScreen = $('<div class="screen tip-screen" style="opacity: 0;"></div>');
-                    $("#doat-container").append($elScreen);
+                    $("#" + Utils.getID()).append($elScreen);
                 }
                 
-                $("#doat-container").append($el);
+                $("#" + Utils.getID()).append($el);
                 
                 $el.css("margin-top", -($el.height()/2) + "px");
             }

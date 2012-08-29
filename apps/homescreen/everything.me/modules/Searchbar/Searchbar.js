@@ -1,7 +1,7 @@
 var Searchbar = new function() {
     var _name = "Searchbar", _this = this,
         $el = null, $form = null, $clear = null, $defaultText = null,
-        value = "", $elAutocomplete = null, Selection = null,
+        value = "", Selection = null,
         timeoutSearchOnBackspace = null, timeoutPause = null, timeoutIdle = null,
         intervalPolling = null;
         
@@ -13,15 +13,7 @@ var Searchbar = new function() {
         RETURN_KEY_CODE = 13,
         SET_FOCUS_ON_CLEAR = true,
         BACKSPACE_KEY_CODE = 8,
-        DELETE_KEY_CODE = 46,
-        ftr = {
-            "KeyboardEvents": true, // bind to keyup and keydown (false: use interval)
-            "ClearButton": true,    // show clear button inside the searchbox
-            "AutoComplete": true,   // show gray autocomplete over the searchbox (NOT WORKING)
-            "Selection": true,      // show selection around value when focusing on searchbox
-            "Blur": true,           // search on blur
-            "Paste": true           // bind to paste event
-        };
+        DELETE_KEY_CODE = 46;
 
     this.init = function(options) {
         !options && (options = {});
@@ -29,18 +21,9 @@ var Searchbar = new function() {
         $el = options.$el;
         $defaultText = options.$defaultText;
         $form = options.$form;
-        if (options.features){
-            for (var i in options.features) {
-                ftr[i] = options.features[i];
-            }
-        }
         
         if (typeof options.setFocusOnClear == "boolean") {
             SET_FOCUS_ON_CLEAR = options.setFocusOnClear;
-        }
-        
-        if (Utils.needsInputPolling()) {
-            ftr.KeyboardEvents = false;
         }
         
         $form.bind("submit", function(e){
@@ -65,11 +48,7 @@ var Searchbar = new function() {
         TIMEOUT_BEFORE_SENDING_PAUSE_EVENT = options.timeBeforeEventPause;
         TIMEOUT_BEFORE_SENDING_IDLE_EVENT = options.timeBeforeEventIdle;
         
-        ftr.AutoComplete && ($elAutocomplete = options.$elAutocomplete);
-        
-        if (ftr.Selection) {
-            Selection = options.useNativeSelection ? new nativeSelection() : new pseudoSelection();
-        }
+        Selection = new pseudoSelection();
         
         $("#button-clear").html(BUTTON_CLEAR).bind("touchstart", function(e){
             e.preventDefault();
@@ -79,16 +58,9 @@ var Searchbar = new function() {
         
         _this.bindEvents($el, cbFocus, inputKeyDown, inputKeyUp);
             
-        ftr.Paste && $el.bind("paste", pasted);
-        
-        ftr.Blur && $el.bind("blur", cbBlur);
+        $el.bind("blur", cbBlur);
             
-        ftr.Selection && $el.bind("click", Selection.create);
-
-        ftr.AutoComplete && $elAutocomplete && $elAutocomplete.click(function(){
-            $el.focus();
-            ftr.Selection && Selection.create();
-        });
+        $el.bind("click", Selection.create);
 
         EventHandler.trigger(_name, "init");
     };
@@ -106,7 +78,7 @@ var Searchbar = new function() {
     
     this.setValue = function(_value, bPerformSearch, bDontBlur) {
         if (_value != "") {
-            ftr.ClearButton && _this.showClearButton();
+            _this.showClearButton();
         }
         
         if (value !== _value) {
@@ -122,7 +94,7 @@ var Searchbar = new function() {
             }
 
             if (!bDontBlur) {
-                ftr.Blur && _this.blur();
+                _this.blur();
             }
         }
     };
@@ -141,15 +113,7 @@ var Searchbar = new function() {
     this.blur = function(e) {
         $el[0].blur();
         
-        !ftr.Blur && cbBlur(e);
-            
-        // For windows phone- not enough to blur the keyboard, need to move focus
-        if (Utils.os() === "windowsphoneos") {
-            window.focus();
-            window.setTimeout(function() {
-                window.focus();
-            }, 50);
-        }
+        cbBlur(e);
     };
     
     this.getElement = function() {
@@ -168,61 +132,12 @@ var Searchbar = new function() {
         return pending;
     };
     
-    this.updateAutocomplete = function(input) {
-        if (ftr.AutoComplete){
-            var currentCompletion = $elAutocomplete.data("completion");
-            if (currentCompletion) {
-                _this.setAutocomplete(currentCompletion, input);
-            }    
-        }
-    };
-
-    this.setAutocomplete = function(completion, input) {
-        if (ftr.AutoComplete){
-            completion = completion.toLowerCase();
-            input = input.toLowerCase();
-            
-            completion = completion.replace(/[\[\]]/g, "");
-            
-            var html = "";
-            if (input && completion.replace(/ /g, "").indexOf(input.replace(/ /g, "")) == 0) {
-                var suffix = completion.replace($.trim(input), "");
-                suffix = suffix.replace(/</g, "&lt;");
-                html = '<b>' + input + '</b>' + suffix;
-            }
-            $elAutocomplete[0].innerHTML = html;
-            
-            $elAutocomplete.data("completion", completion)
-                           .data("input", input);    
-        }
-    };
-
-    this.clearAutocomplete = function() {
-        ftr.AutoComplete && ($elAutocomplete[0].innerHTML = "");
-    };
-    
     this.hideClearButton = function() {
-        if (ftr.ClearButton) {
-            $("#search-header").removeClass("clear-visible");
-        }
+        $("#search-header").removeClass("clear-visible");
     };
     
     this.showClearButton = function() {
-        if (ftr.ClearButton) {
-            $("#search-header").addClass("clear-visible");
-        }
-    };
-    
-    this.pollValue = function() {
-        _this.stopPollingValue();
-        intervalPolling = window.setInterval(function(){
-            var _value = $el.val();
-            _this.setValue(_value, true, true);
-        }, SEARCHBAR_POLLING_INTERVAL);
-    };
-    
-    this.stopPollingValue = function() {
-        window.clearInterval(intervalPolling);
+        $("#search-header").addClass("clear-visible");
     };
     
     function backButtonClick(e) {
@@ -304,7 +219,7 @@ var Searchbar = new function() {
     }
 
     function clearButtonClick() {
-        ftr.Selection && Selection.cancel();
+        Selection.cancel();
         _this.setValue("", false, true);
         
         if (SET_FOCUS_ON_CLEAR) {
@@ -325,7 +240,7 @@ var Searchbar = new function() {
             return false;
         }
         
-        if (e.keyCode !== RETURN_KEY_CODE && ftr.Selection && Selection.isSelected()) {
+        if (e.keyCode !== RETURN_KEY_CODE && Selection.isSelected()) {
             $el.val("");
             Selection.cancel();
         }
@@ -338,15 +253,13 @@ var Searchbar = new function() {
         var _value = $el.val();
         
         if (_value !== value) {
-            ftr.AutoComplete && _this.updateAutocomplete(_value);
-            
             value = _value;
 
             if (value == "") {
                 timeoutSearchOnBackspace && window.clearTimeout(timeoutSearchOnBackspace);
                 cbEmpty();
             } else {
-                ftr.ClearButton && _this.showClearButton();
+                _this.showClearButton();
                 if (e.keyCode == BACKSPACE_KEY_CODE) {
                     timeoutSearchOnBackspace && window.clearTimeout(timeoutSearchOnBackspace);
                     timeoutSearchOnBackspace = window.setTimeout(function(){
@@ -361,8 +274,6 @@ var Searchbar = new function() {
                 cbReturnPressed(e, value);
             }
         }
-        
-        _this.pollValue();
     }
 
     function pasted(e) {
@@ -387,14 +298,13 @@ var Searchbar = new function() {
     }
     
     function cbEmpty() {
-        ftr.ClearButton && _this.hideClearButton();
+        _this.hideClearButton();
         EventHandler.trigger(_name, "empty", {
             "sourceObjectName": _name
         });
     }
     
     function cbReturnPressed(e, val) {
-        !ftr.Blur && cbBlur(e);
         EventHandler.trigger(_name, "returnPressed", {
             "e": e,
             "value": val
@@ -415,7 +325,7 @@ var Searchbar = new function() {
     }
     
     function cbBlur(e) {
-        ftr.Selection && Selection.cancel();
+        Selection.cancel();
         
         Brain && Brain[_name].onblur({
             "e": e

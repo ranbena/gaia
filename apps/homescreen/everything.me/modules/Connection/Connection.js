@@ -10,7 +10,7 @@ var Connection = new function() {
     this.init = function(options) {
         !options && (options = {});
         
-        $parent = $("#doat-container");
+        $parent = $("#" + Utils.getID());
         
         DEFAULT_MESSAGE = "You need to be connected to the internet to use this app";
         

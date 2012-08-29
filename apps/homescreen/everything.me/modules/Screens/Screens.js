@@ -9,7 +9,7 @@ var Screens = new function() {
     this.init = function(options) {
         !options && (options = {});
         
-        $body = $($("#doat-container "));
+        $body = $("#" + Utils.getID());
         $screens = options.$screens;
         $elTabs = $("#tabs");
         $tabs = $elTabs.find("td:not(.main)");

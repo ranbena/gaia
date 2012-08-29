@@ -26,27 +26,8 @@ var Shortcuts = new function() {
         scrollPage = new Scroll($("#page-category")[0], {
             "hScroll": false,
             "checkDOMChanges": false,
-            "useTransform": Utils.platform() !== "android",
             "onBeforeScrollStart": function() {}
         });
-        
-        // should prevent false clicks on categories when swiping to home
-        if (Utils.isLauncher()) {
-            $list.bind("touchstart", function(){
-                timeStartedSwiping = new Date().getTime();
-                isSwiping = true;
-            });
-            $list.bind("touchmove", function(){
-                timeStartedSwiping = 0;
-            });
-            $list.bind("touchend", function(){
-                var timeFinishedSwiping = new Date().getTime();
-                
-                if (timeFinishedSwiping - timeStartedSwiping > 80) {
-                    isSwiping = false;
-                }
-            });
-        }
         
         EventHandler.trigger(_name, "init");
     };
@@ -227,9 +208,9 @@ var Shortcuts = new function() {
         $("#category-options").html(html);
         
         $("#category-options input").bind("focus", function(e) {
-            $($("#doat-container ")).addClass("mode-edit");
+            $("#" + Utils.getID()).addClass("mode-edit");
         }).bind("blur", function(e) {
-            $($("#doat-container ")).removeClass("mode-edit");
+            $("#" + Utils.getID()).removeClass("mode-edit");
         });
         $("#category-options form").bind("submit", function(e) {
             e.preventDefault();
@@ -381,19 +362,12 @@ var Shortcuts = new function() {
     function setShortcutsDesign() {
         if (setDesign) return;
         
-        var ppr = itemsDesign.itemsPerRow_portrait,
-            lpr = itemsDesign.itemsPerRow_landscape,
-            widthPortrait = 100/ppr,
-            widthLandscape = 100/lpr;
-        
-        var style = ".orientation-portrait .shortcut { width: " + widthPortrait + "%; } \n" +
-                    ".orientation-portrait .shortcut:nth-child(" + ppr + "n+" + ppr + ") .thumb { right: -2px; } \n" +
-                    ".orientation-landscape .shortcut { width: " + widthLandscape + "%; } \n" +
-                    ".orientation-landscape .shortcut:nth-child(" + lpr + "n+" + lpr + ") .thumb { right: -2px; } \n";
+        var style = "#" + Utils.getID() + " .shortcut { width: " + 100/itemsDesign.itemsPerRow + "%; } \n" +
+                    "#" + Utils.getID() + " .shortcut:nth-child(" + itemsDesign.itemsPerRow + "n+" + itemsDesign.itemsPerRow + ") .thumb { right: -2px; } \n";
         
         var $style = $('<style type="text/css">' + style + '</style>');
-                            
-        $("#doat-container").append($style);
+        
+        $("#" + Utils.getID()).append($style);
         setDesign = true;
     }
     

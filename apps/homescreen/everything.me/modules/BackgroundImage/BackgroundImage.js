@@ -68,10 +68,19 @@ var BackgroundImage = new function() {
     };
     
     this.cancelFullScreenFade = function() {
-        for (var i=0; i<$fullScreenFade.length; i++) {
-            var el = $fullScreenFade[i];
-            el.style.cssText = el.style.cssText.replace(/opacity: .*;/, "");
-        }
+        $fullScreenFade.addClass("animate");
+        
+        window.setTimeout(function(){
+            for (var i=0; i<$fullScreenFade.length; i++) {
+                var el = $fullScreenFade[i];
+                el.style.cssText = el.style.cssText.replace(/opacity: .*;/, "");
+            }
+            
+            window.setTimeout(function(){
+                $fullScreenFade.removeClass("animate");
+            }, 500);
+        }, 0);
+        
     };
 
     this.showFullScreen = function() {
@@ -80,7 +89,10 @@ var BackgroundImage = new function() {
             $elFullScreen = null;
         }
         
-        $fullScreenFade.css("opacity", 0);
+        $fullScreenFade.addClass("animate");
+        window.setTimeout(function(){
+            $fullScreenFade.css("opacity", 0);
+        }, 0);
         $elFullScreen = $('<div id="bgimage-overlay">' +
                                 '<div class="img" style="background-image: url(' + currentImage.image + ')"></div>' +
                                 '<div class="content">' +

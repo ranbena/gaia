@@ -29,9 +29,9 @@
 }
 #doat-container #location-selector .tiparrow {
     left: auto;
-    right: 14px;
+    right: 34px;
 }
-#doat-container.location-visible #location-selector .tiparrow {
+#doat-container.location-visible:not(.empty-query) #location-selector .tiparrow {
     right: 88px;
 }
 #doat-container #location-selector .options div {

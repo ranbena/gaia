@@ -29,8 +29,8 @@ var Brain = new function() {
     
     this.init = function(options) {
         EventHandler && EventHandler.bind(catchCallback);
-        $body = $("#doat-container");
-        $container = $("#doat-container");
+        $body = $("#" + Utils.getID());
+        $container = $("#" + Utils.getID());
         
         _config = options;
         
@@ -43,8 +43,6 @@ var Brain = new function() {
         // Tips
         TIPS = _config.tips;
         TIMEOUT_BEFORE_ALLOWING_DIALOG_REMOVE = _config.timeBeforeAllowingDialogsRemoval;
-        
-        APPS_REPOSITION_DELAY = (Utils.platform() == "android")? 500 : 0;
         
         SEARCH_SOURCES = _config.searchSources;
         PAGEVIEW_SOURCES = _config.pageViewSources;
@@ -69,80 +67,11 @@ var Brain = new function() {
             Searcher.empty();
             Searchbar.clear();
             Brain.Searchbar.setEmptyClass();
-            window.setTimeout(Viewport.hideAddressBar, 100);
-            Apps.calcAppsPositions(Utils.getScreenWidth, Utils.getOrientation().name);
-            
-            Utils.Env.addEventListener("orientationchange", _this.onresize);
-            
-            $(window).bind("hashchange", function(e){
-                window.clearTimeout(timeoutHashChange);
-                window.clearTimeout(timeoutSetUrlAsActive);
-                timeoutHashChange = window.setTimeout(urlChanged, TIME_BEFORE_INVOKING_HASH_CHANGE);
-            });
             
             $body.removeClass("loading_content");
             
-            if (Utils.isFFOS() || Utils.isLauncher()) {
-                Swiper.init();
-            }
+            Swiper.init();
         };
-        
-        this.onresize = function() {
-            window.setTimeout(function(){
-                Viewport.setHeight({
-                    "callback": function(){
-                        setTimeout(function(){
-                            Helper.refreshIScroll();
-                            
-                            var o = Utils.getOrientation().name;
-                            
-                            Apps.calcAppsPositions(Utils.getScreenWidth, o, "orientation-"+o);
-                            
-                            Shortcuts.refreshScroll();
-                        }, APPS_REPOSITION_DELAY);
-                    }
-                });
-            }, 0);
-        };
-        
-        function urlChanged() {
-            Viewport.hideAddressBar();
-            
-            // if user is viewing fullscreen image- just close it
-            if (BackgroundImage.isFullScreen()) {
-                BackgroundImage.closeFullScreen();
-                Brain.Searcher.setUrl();
-                return;
-            }
-            
-            // when we manually called Url.goTo - we don't do anything
-            if (!Url.activate) {
-                window.clearTimeout(timeoutSetUrlAsActive);
-                timeoutSetUrlAsActive = window.setTimeout(function(){
-                    Url.activate = true;
-                }, 100);
-                return;
-            }
-            
-            if (Brain.App.isLoadingApp()) {
-                Brain.Searcher.setUrl();
-                window.location.reload();
-                return;
-            }
-            
-            
-            if (Utils.isLauncher() && Searchbar.getValue() == "") {
-                window.location.reload();
-                return;
-            }
-            
-            Searcher.empty();
-            Searchbar.clear();
-            Helper.hideTitle();
-            Brain.Helper.showDefault();
-            BackgroundImage.loadDefault();
-            Brain.Searchbar.setEmptyClass();
-        }
         
         var Swiper = new function() {
             var $els = $("#doat-apps, #shortcuts"),
@@ -220,9 +149,7 @@ var Brain = new function() {
                 Helper.showTip();
             }
             
-            Viewport.hideAddressBar();
             Location.hideButton();
-            Url.goTo(Url.PAGES.Search, Searchbar.getValue());
             
             Helper.disableCloseAnimation();
             Helper.hideTitle();
@@ -249,7 +176,6 @@ var Brain = new function() {
             
             Utils.setKeyboardVisibility(false);
             Location.showButton();
-            Viewport.hideAddressBar();
             Apps.refreshScroll();
             
             if (Searchbar.getValue() == "") {
@@ -270,14 +196,12 @@ var Brain = new function() {
             Searcher.cancelRequests();
             _this.emptySource = (data && data.pageviewSource) || (data.sourceObjectName === "Searchbar" && PAGEVIEW_SOURCES.CLEAR);
             Searcher.empty();
-            Searchbar.clearAutocomplete();
             _this.setEmptyClass();
             
             Shortcuts.show();
         };
 
         this.clear = function(e) {
-            Url.goTo(Url.PAGES.Search, "");
             Searcher.cancelRequests();
             Apps.clear();
             Helper.setTitle();
@@ -545,13 +469,7 @@ var Brain = new function() {
             e && e.stopPropagation();
             e && e.preventDefault();
             
-            if (Utils.platform() === "android"){
-                // android hack. Bug: clicking $clear continues to the suggestions that replace the history list
-                // and clicks the underlying item and therefore searches automatically for that item
-                setTimeout(callback, TIMEOUT_ANDROID_BEFORE_HELPER_CLICK);
-            } else {
-                callback();
-            }
+            setTimeout(callback, TIMEOUT_ANDROID_BEFORE_HELPER_CLICK);
         }
     };
     
@@ -665,17 +583,6 @@ var Brain = new function() {
         this.close = function() {
             $body.removeClass("location-input-visible");
             Location.hideDialog();
-        };
-    };
-    
-    this.Viewport = new function(){
-        var retries = 1;
-        
-        this.heightSet = function(data){
-            if (Screens.first() === "homepage" && retries && data.source === Viewport.DETECTED){
-                Viewport.shouldRecalculate(true);
-                retries--;
-            }
         };
     };
     
@@ -834,8 +741,6 @@ var Brain = new function() {
                 "icon": data.data.icon
             };
             
-            Searcher.setUrl();
-            
             loadingApp = data.app;
             loadingAppId = data.data.id;
             bNeedsLocation = data.data.requiresLocation && !DoATAPI.hasLocation() && !Location.userClickedDoItLater();
@@ -969,14 +874,7 @@ var Brain = new function() {
             if (loadingApp) {
                 loadingApp = null;
                 
-                Viewport.hideAddressBar();
-                
-                if (Utils.isB2G()) {
-                    $(window).unbind("visibilitychange", returnFromOutside);
-                } else {
-                    $(window).unbind("pageshow", returnFromOutside)
-                             .unbind("focus", returnFromOutside);
-                }
+                $(window).unbind("visibilitychange", returnFromOutside);
                 
                 bNeedsLocation = false;
                 loadingAppAnalyticsData = null;
@@ -988,9 +886,7 @@ var Brain = new function() {
                 $container.css("background", "#000");
                 $body.removeClass("loading-app");
                 
-                Utils.updateOrientation();
                 Brain.Core.onresize();
-                Viewport.hideAddressBar();
                 
                 if (Storage.get(STORAGE_KEY_CLOSE_WHEN_RETURNIG)) {
                     Searcher.searchAgain();
@@ -1066,7 +962,7 @@ var Brain = new function() {
                 
                 TIPS.APP_EXPLAIN.ignoreStorage = true;
                 new Tip(TIPS.APP_EXPLAIN, function(tip) {
-                    $("#doat-container").bind("touchstart", tip.hide);
+                    $("#" + Utils.getID()).bind("touchstart", tip.hide);
                 }).show();
                 
                 
@@ -1154,9 +1050,6 @@ var Brain = new function() {
         
         this.click = function(data) {
             if (!data || !data.data || !data.data.query) {
-                ErrorHandler && ErrorHandler.add({
-                    "message": "Shortcut click with no data or query (" + JSON.stringify(data) + ")"
-                });
                 return;
             }
             
@@ -1293,7 +1186,7 @@ var Brain = new function() {
                 }, true);
                 
                 new Tip(TIPS.SHORTCUTS_FAVORITES_DONE, function(tip) {
-                    $("#doat-container").bind("touchstart", tip.hide);
+                    $("#" + Utils.getID()).bind("touchstart", tip.hide);
                 }).show();
             });
         };
@@ -1475,15 +1368,12 @@ var Brain = new function() {
                 window.clearTimeout(timeoutHideHelper);
                 
                 if (!onlyDidYouMean) {
-                    Utils.setTitle(query);
-                    
                     if (!options.automaticSearch) {
                         var urlOffset = appsCurrentOffset+NUMBER_OF_APPS_TO_LOAD;
                         if (urlOffset == NUMBER_OF_APPS_TO_LOAD && NUMBER_OF_APPS_TO_LOAD == DEFAULT_NUMBER_OF_APPS_TO_LOAD) {
                             urlOffset = 0;
                         }
                         
-                        Url.goTo(Url.PAGES.Search, query, type, urlOffset);
                         SearchHistory.save(query, type);
                     }
                     
@@ -1518,12 +1408,10 @@ var Brain = new function() {
                 "prevQuery": prevQuery,
                 "_NOCACHE": _NOCACHE
             }, function(data) {
-                Apps.onPositionCalculated(function(){
-                    getAppsComplete(data, options);   
-                    
-                    requestSearch = null;
-                    NUMBER_OF_APPS_TO_LOAD = DEFAULT_NUMBER_OF_APPS_TO_LOAD;
-                });
+                getAppsComplete(data, options);   
+                
+                requestSearch = null;
+                NUMBER_OF_APPS_TO_LOAD = DEFAULT_NUMBER_OF_APPS_TO_LOAD;
             }, removeSession);
         };
 
@@ -1591,10 +1479,6 @@ var Brain = new function() {
                 }
             }
             
-            if (!isExactMatch && suggestions && suggestions.length > 0 && appsCurrentOffset == 0) {
-                Searchbar.setAutocomplete(suggestions[0], _query);
-            }
-            
             lastSearch.exact = isExactMatch && !onlyDidYouMean;
             
             if (isMore || !bSameQuery) {
@@ -1602,8 +1486,6 @@ var Brain = new function() {
                     lastSearch.query = query;
                     lastSearch.source = _source;
                     lastSearch.type = _type;
-                    
-                    Utils.setTitle(query);
                     
                     Apps.More.hide();
                     
@@ -1630,9 +1512,7 @@ var Brain = new function() {
                             "isExact": isExactMatch
                         };
                         
-                        if (Apps.hasSpaceForMoreButton(Viewport.getHeight().value) && apps.length <= NUMBER_OF_APPS_TO_LOAD){
-                            Apps.More.showButton();
-                        }
+                        Apps.More.showButton();
                     }
                 }
             }
@@ -1691,12 +1571,6 @@ var Brain = new function() {
             
             setTimeoutForShowingDefaultImage();
             
-            var screen = Utils.getScreen();
-            
-            if (Viewport.shouldRecalculate()){
-                screen["height"] = Viewport.getTestHeight(Utils.getOrientation().name);
-            }
-
             requestImage && requestImage.abort();
             requestImage = DoATAPI.bgimage({
                 "query": query,
@@ -1827,14 +1701,12 @@ var Brain = new function() {
             if (!Searchbar.getValue()) {
                 Helper.clear();
             }
-            
-            Utils.setTitle();
         };
 
         this.nextAppsPage = function(query, type, exact) {
             appsCurrentOffset += NUMBER_OF_APPS_TO_LOAD;
             lastSearch.offset = appsCurrentOffset;
-            Url.goTo(Url.PAGES.Search, query, type, appsCurrentOffset + NUMBER_OF_APPS_TO_LOAD);
+            
             Searcher.getApps({
                 "query": query,
                 "type": type,
@@ -1866,7 +1738,6 @@ var Brain = new function() {
             if (query) {
                 Helper.reset();
                 Searchbar.setValue(query, false);
-                Searchbar.clearAutocomplete();
                 
                 Screens.Search.show();
                 
@@ -1880,8 +1751,6 @@ var Brain = new function() {
                     
                     Searcher.searchExact(query, source, index, type, offset);
                 } else {
-                    Url.goTo(Url.PAGES.Search, query, type, bShowAll);
-                    
                     Helper.enableCloseAnimation();
                     
                     Helper.setTitle(query);
@@ -1892,8 +1761,6 @@ var Brain = new function() {
                 window.setTimeout(function(){
                     Brain.Searchbar.cancelBlur();
                 }, 0);
-            } else {
-                Url.goTo(Url.PAGES.Search);
             }
             
             Brain.Searchbar.setEmptyClass();
@@ -1902,7 +1769,6 @@ var Brain = new function() {
         this.searchExact = function(query, source, index, type, offset, automaticSearch) {
             Searcher.cancelRequests();
             appsCurrentOffset = 0;
-            Searchbar.clearAutocomplete();
             
             if (!automaticSearch) {
                 Searchbar.setValue(query, false, true);
@@ -1927,7 +1793,6 @@ var Brain = new function() {
             resetLastSearch(true);
             cancelSearch();
             appsCurrentOffset = 0;
-            Searchbar.clearAutocomplete();
             
             var options = {
                 "query": query,
@@ -1944,8 +1809,6 @@ var Brain = new function() {
         
         this.searchAsYouType = function(query, source){
             appsCurrentOffset = 0;
-            
-            Searcher.getAutocomplete(query);
             
             var searchOptions = {
                 "query": query,
@@ -1989,11 +1852,6 @@ var Brain = new function() {
         this.setLastQuery = function() {
             Searchbar.setValue(lastSearch.query, false, true);
             Helper.setTitle(lastSearch.query, lastSearch.type);
-            Searcher.setUrl();
-        };
-        
-        this.setUrl = function() {
-            Url.goTo(Url.PAGES.Search, lastSearch.query, lastSearch.type, lastSearch.offset);
         };
         
         this.getDisplayedQuery = function() {

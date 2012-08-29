@@ -97,7 +97,7 @@ var Dialog = function(_id) {
         isBlackout = options.blackout;
         timeoutBeforeClickThrough = options.timeoutBeforeClickThrough;
         
-        var $container = options.$container || $("#doat-container");
+        var $container = options.$container || $("#" + Utils.getID());
         $container.append($el);
         
         if (isBlackout) {
@@ -245,7 +245,7 @@ var Prompt = function(_options) {
         
         window.setTimeout(function(){
             $el.addClass("visible");
-            $("#doat-container ").addClass("prompt-visible");
+            $container.addClass("prompt-visible");
             cbShow();
         }, 50);
         
@@ -254,7 +254,7 @@ var Prompt = function(_options) {
     
     this.hide = function(fireCallback) {
         $el.removeClass("visible");
-        $("#doat-container ").removeClass("prompt-visible");
+        $container.removeClass("prompt-visible");
         window.setTimeout(function(){
             $el && $el.remove();
         }, 500);

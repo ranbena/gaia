@@ -261,20 +261,13 @@ var Location = new function() {
                       Viewport.hideAddressBar();
                   });
             
-            if (!Utils.needsInputPolling()) {
-                $input.bind("keyup", checkValue);
-            }
+            $input.bind("keyup", checkValue);
             
             EventHandler.trigger(_name, "init");
         };
         
         this.show = function() {
             $input.focus();
-            
-            if (Utils.needsInputPolling()) {
-                stopPolling();
-                intervalPolling = window.setInterval(checkValue, 300);
-            }
             
             cbShow();
         };
@@ -528,21 +521,9 @@ var Location = new function() {
             e.stopPropagation();
         });
         
-        if (Utils.needsInputPolling()) {
-            intervalPolling = window.setInterval(function(){
-                var $input = $("#location-zip");
-                if (!$input || $input.length == 0) {
-                    window.clearInterval(intervalPolling);
-                    return;
-                }
-                
-                zipKeyUp(null, dialog);
-            }, 300);
-        } else {
-            $input.bind("keyup", function(e){
-                zipKeyUp(e, dialog);
-            });
-        }
+        $input.bind("keyup", function(e){
+            zipKeyUp(e, dialog);
+        });
         
         $input[0].focus();
     }

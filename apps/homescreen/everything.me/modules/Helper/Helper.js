@@ -46,10 +46,6 @@ var Helper = new function() {
 
         // iscroll options
         var iscrollOptions = {"vScroll": false};
-        // fix for keyboard hide bug
-        if (Utils.platform() === "android") {
-            iscrollOptions["onBeforeScrollStart"] = null;
-        }
         
         iscroll = new iScroll($el[0], iscrollOptions);
         

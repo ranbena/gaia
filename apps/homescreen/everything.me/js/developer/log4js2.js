@@ -235,6 +235,7 @@ Log.WARN        = 3;
 Log.ERROR       = 4;
 Log.FATAL       = 5;
 Log.NONE        = 6;
+CONSOLE_ENABLED = false;
 
 /**
  * Static alert logger method.  This logger will display a javascript alert (messagebox) with the message.
@@ -263,6 +264,8 @@ Log.writeLogger = function(level,obj,msgArr) {
  * @param {Log} obj The originating {@link Log} object.
  */
 Log.consoleLogger = function(level,obj,msgArr) {
+    if (!CONSOLE_ENABLED) return;
+    
     if (window.console) {
         try{
             window.console[level.toLowerCase()].apply(window.console, msgArr);

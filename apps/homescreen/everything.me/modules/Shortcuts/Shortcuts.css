@@ -4,6 +4,23 @@
                  0 1px 1px rgba(0, 0, 0, 0.6),
                  0 1px 2px rgba(0, 0, 0, 0.7);
 }
+
+#doat-container #shortcuts {
+    background: transparent;
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    -moz-transition: opacity .2s linear;
+    -webkit-transition: opacity .2s linear;
+    -ms-transition: opacity .2s linear;
+    transition: opacity .2s linear;
+}
+
     #doat-container #shortcuts-loading {
         position: absolute;
         top: 50%;
@@ -146,6 +163,9 @@
             margin-top: 12px;
             text-transform: capitalize;
             z-index: 50;
+            color: #fff;
+            text-shadow: 0 1px 3px #000000,
+                         0 1px 1px #000000;
         }
            
            
@@ -163,59 +183,8 @@
             -ms-transform: scale(.7) !important;
             transform: scale(.7) !important;
         }
-
-    #doat-container #shortcuts-page .header li {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        opacity: 0;
-        pointer-events: none;
-        -moz-transition: all .2s linear;
-        -webkit-transition: all .2s linear;
-        -ms-transition: all .2s linear;
-        transition: all .2s linear;
-    }
-    #doat-container #shortcuts-page .header li#header-category {
-        padding-left: 34px;
-    }
-    #doat-container #shortcuts-page .header li.active {
-        opacity: 1;
-        pointer-events: inherit;
-    }
-    #doat-container #shortcuts-page .header b {
-        position: absolute;
-        top: 50%;
-        left: 0;
-        width: 26px;
-        height: 26px;
-        border: 1px solid #70345d;
-        margin-top: -14px;
-        border-radius: 14px;
-        cursor: pointer;
-        background: -moz-linear-gradient(center top, #a8548d 0, #89366e 100%);
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #a8548d), color-stop(1, #89366e));
-        -moz-box-shadow: 0 1px 0 0 rgba(255, 255, 255, .2) inset;
-        -webkit-box-shadow: 0 1px 0 0 rgba(255, 255, 255, .2) inset;
-        -ms-box-shadow: 0 1px 0 0 rgba(255, 255, 255, .2) inset;
-        box-shadow: 0 1px 0 0 rgba(255, 255, 255, .2) inset;
-    }
-    #doat-container #shortcuts-page .header b:before {
-        content: "";
-        position: absolute;
-        top: 8px;
-        left: 9px;
-        width: 6px;
-        height: 6px;
-        border-top: 4px solid #fff;
-        border-left: 4px solid #fff;
-        -moz-transform: rotate(-45deg);
-        -webkit-transform: rotate(-45deg);
-        -ms-transform: rotate(-45deg);
-        transform: rotate(-45deg);
-    }
-    #doat-container #shortcuts-page .header .customize {
+        
+    #doat-container #shortcuts .header {
         display: none;
     }
     
@@ -223,6 +192,22 @@
         text-transform: capitalize;
     }
     
+#doat-container #category-page-screen {
+    position: absolute;
+    top: -80px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, .5);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 80;
+}
+#doat-container .page-category #category-page-screen {
+    opacity: 1;
+    pointer-events: inherit;
+}
+
 #doat-container .pages {
     position: absolute;
     top: 44px;
@@ -236,33 +221,32 @@
         bottom: 0;
         left: 0;
         right: 0;
-        -moz-transition: all .3s ease;
-        -webkit-transition: all .3s ease;
-        -ms-transition: all .3s ease;
-        transition: all .3s ease;
-    }
-    #doat-container .pages > .page.left:not(.active) {
-        -moz-transform: translateX(-100%);
-        -webkit-transform: translateX(-100%);
-        -ms-transform: translateX(-100%);
-        transform: translateX(-100%);
-    }
-    #doat-container .pages > .page.right:not(.active) {
-        -moz-transform: translateX(100%);
-        -webkit-transform: translateX(100%);
-        -ms-transform: translateX(100%);
-        transform: translateX(100%);
-    }
-    #doat-container .pages > .page.active {
-        pointer-events: inherit;
-        -moz-transform: translateX(0);
-        -webkit-transform: translateX(0);
-        -ms-transform: translateX(0);
-        transform: translateX(0);
+        -moz-transform: translate(0, 0) !important;
+        -webkit-transform: translate(0, 0) !important;
+        -ms-transform: translate(0, 0) !important;
+        transform: translate(0, 0) !important;
     }
     
 #doat-container #page-category {
     font-size: 15px;
+    opacity: 0;
+    pointer-events: none;
+    top: -25px;
+    left: 22px;
+    right: 22px;
+    bottom: 91px;
+    padding-top: 15px;
+    background: #c9c5cb;
+    border-radius: 6px;
+    z-index: 100;
+}
+    #doat-container #page-category .category-scroll {
+        padding: 0 20px;
+    }
+    
+#doat-container .pages > #page-category.active {
+    opacity: 1;
+    pointer-events: inherit;
 }
 
 #doat-container #page-category > * {
@@ -270,29 +254,53 @@
 }
 #doat-container #page-category .continue {
     position: relative;
-    padding: 19px 20px;
+    padding: 19px 0;
 }
 #doat-container #page-category .category-item {
     font-size: 15px;
     position: relative;
-    padding: 19px 72px 19px 35px;
+    padding: 8px 44px 19px 0;
     margin-bottom: 1px;
-    -moz-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .4) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
-    -webkit-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .4) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
-    -ms-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .4) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
-    box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .4) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
+    -moz-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .25) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
+    -webkit-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .25) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
+    -ms-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .25) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
+    box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .25) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
 }
+    #doat-container #page-category.one-option .category-item {
+        padding-top: 30px;
+        padding-bottom: 30px;
+    }
+    #doat-container #page-category .category-item:before {
+        content: "OR";
+        background: #c9c5cb;
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        width: 30px;
+        height: 20px;
+        color: #8c8a8e;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 1);
+        line-height: 20px;
+        margin-left: -15px;
+        text-align: center;
+    }
     #doat-container #page-category .continue .arrow-next {
         position: absolute;
         top: 50%;
-        right: 38px;
+        right: 8px;
         margin-top: -12px;
         pointer-events: none;
     }
     #doat-container #page-category .category-item .arrow-next {
         position: absolute;
         bottom: 21px;
-        right: 38px;
+        right: 8px;
+    }
+    #doat-container #page-category.one-option .continue {
+        padding-top: 30px;
+    }
+    #doat-container #page-category.one-option .category-item .arrow-next {
+        bottom: 31px;
     }
     
     #doat-container #page-category .category-item label {
@@ -329,3 +337,42 @@
         box-sizing: border-box;
         margin: 0;
     }
+    
+#doat-container #close-category {
+    background-position: 0 -220px;
+    position: absolute;
+    top: -34px;
+    right: 16px;
+    width: 29px;
+    height: 35px;
+    cursor: pointer;
+    z-index: 120;
+    opacity: 0;
+    pointer-events: none;
+}
+#doat-container .page-category #close-category {
+    opacity: 1;
+    pointer-events: inherit;
+}
+
+#doat-container #shortcuts #shortcuts-custom-title {
+    color: #ffffff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
+    opacity: .7;
+}
+#doat-container #shortcuts .pages {
+    top: 0;
+}
+
+#doat-container.empty-query:not(.keyboard-visible) #shortcuts {
+    opacity: 1;
+    pointer-events: inherit;
+}
+
+#doat-container #shortcuts-customize {
+    display: none;
+}
+#doat-container #shortcuts #shortcuts-list ul {
+    padding-top: 5px;
+    padding-bottom: 0;
+}

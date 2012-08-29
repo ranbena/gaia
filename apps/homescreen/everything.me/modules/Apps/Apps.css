@@ -300,20 +300,3 @@ body:not(.istouch) #doat-apps ul li:nth-child(5n+1) {
         -ms-transition: all .4s ease;
         transition: all .4s ease;
     }
-
-/* Landscape */
-@media screen and (min-width: 400px) {
-    #doat-apps ul {
-        
-    }
-    #doat-apps ul li {
-        width: 20%;
-        padding-bottom: 5px;
-    }
-    #doat-apps ul li:nth-child(4n+1) {
-        clear: none;
-    }
-    #doat-apps ul li:nth-child(5n+1) {
-        clear: both;
-    }
-}

@@ -123,3 +123,10 @@
 .fullscreen-bgimage #search-header {
     display: none;
 }
+
+#doat-container #background-image .default-image.visible {
+    opacity: 0;
+}
+#doat-container #background-image.default .default-image.visible {
+    opacity: 1;
+}
