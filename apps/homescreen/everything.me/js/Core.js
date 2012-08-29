@@ -14,7 +14,7 @@ var Core = new function() {
             "fullscreen": Utils.isB2G() ? false : true
         });
         
-        document.getElementById("doat-container").addEventListener("touchmove", function(e) {
+        document.getElementById("doat-container").addEventListener("mousemove", function(e) {
             e.preventDefault();
             e.stopPropagation();
         }, true);
