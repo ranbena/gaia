@@ -72,26 +72,8 @@ var Core = new function() {
             "authCookieName": data.authCookieName
         });
         
-        initSession(function() {
-            initObjects(data);
-        }, true);        
+        initObjects(data);
     };
-
-    function initSession(callback, activated) {
-        var shouldInit = DoATAPI.Session.shouldInit()
-        if (shouldInit.should) {
-            DoATAPI.initSession({
-                "cachedIcons": Utils.convertIconsToAPIFormat(IconManager.get()),
-                "cause": shouldInit.cause,
-                "source": "Core.initSession"
-            }, function(){
-                callback();
-                EventHandler.trigger("DoATAPI", "sessionInitOnPageLoad");
-            });
-        } else {
-            callback();
-        }
-    }
     
     function initObjects(data) {
         Connection.init({
@@ -117,7 +99,8 @@ var Core = new function() {
             "$el": $("#shortcuts"),
             "$loading": $("#shortcuts-loading"),
             "design": data.design.shortcuts,
-            "shortcutsFavorites": data.texts.shortcutsFavorites
+            "shortcutsFavorites": data.texts.shortcutsFavorites,
+            "defaultShortcuts": data._defaultShortcuts
         });
         
         ShortcutsCustomize.init({

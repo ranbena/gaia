@@ -2,7 +2,9 @@ var Shortcuts = new function() {
     var _name = "Shortcuts", _this = this, scroll = null, scrollPage = null, itemsDesign = "FROM CONFIG", setDesign = false,
         $el = null, $list = null, $header = null, $loading = null,
         shortcuts = [], visible = false, isSwiping = false, swiped = false, customizing = false, enabled = true,
-        categoryPageData = {};
+        defaultShortcuts = null, categoryPageData = {};
+    
+    var KEY_USER_SHORTCUTS = "userShortcuts";
     
     this.init = function(options) {
         !options && (options = {});
@@ -11,6 +13,8 @@ var Shortcuts = new function() {
         $list = $el.find("#shortcuts-items");
         $loading = options.$loading;
         itemsDesign = options.design;
+        
+        defaultShortcuts = Storage.get(KEY_USER_SHORTCUTS) || options.defaultShortcuts;
         
         $header = $("#shortcuts-header");
         
@@ -31,11 +35,17 @@ var Shortcuts = new function() {
         
         EventHandler.trigger(_name, "init");
     };
+    
+    this.loadDefault = function() {
+        _this.load(defaultShortcuts);
+    };
 
     this.load = function(data, cbLoadSuccess, cbLoadError) {
         if (!data || !("shortcuts" in data)){
             cbLoadError && cbLoadError(data);
         } else {
+            Storage.set(KEY_USER_SHORTCUTS, data);
+            
             var shortcuts = data.shortcuts,
                 icons = data.icons;
                 
