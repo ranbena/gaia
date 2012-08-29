@@ -70,11 +70,10 @@ var Brain = new function() {
             Searchbar.clear();
             Brain.Searchbar.setEmptyClass();
             
-            new Tip(TIPS.APP_EXPLAIN, function(tip) {
-                $(document.body).bind("touchstart", tip.hide);
-            }).show();
-            
             Swiper.init();
+            
+            Shortcuts.loadDefault();
+            Shortcuts.show();
         };
         
         var Swiper = new function() {
@@ -920,10 +919,8 @@ var Brain = new function() {
     
     this.Shortcuts = new function() {
         var _this = this,
-            showFavoritesEdit = true,
             customizeInited = false,
             timeoutShowLoading = null,
-            visible = false,
             $screen = null,
             clickedCustomizeHandle = false,
             loadingCustomization = false;
@@ -933,12 +930,6 @@ var Brain = new function() {
         var SHOW_FAVORITES_SHORTCUTS_SELECTION_SCREEN_STORAGE_KEY = "shrtFav";
             
         this.init = function() {
-            showFavoritesEdit = Storage.enabled() && !Storage.get(SHOW_FAVORITES_SHORTCUTS_SELECTION_SCREEN_STORAGE_KEY);
-            
-            window.setTimeout(function(){
-                Shortcuts.show();
-            }, 100);
-            
             $screen = $('<div id="category-page-screen"></div>');
             $("#shortcuts-page .pages").append($screen);
             
@@ -952,34 +943,15 @@ var Brain = new function() {
         };
         
         this.show = function() {
-            if (ENABLE_FAVORITES_SHORTCUTS_SCREEN && showFavoritesEdit) {
-                // don't show customize screen again
-                showFavoritesEdit = false;
-                Storage.set(SHOW_FAVORITES_SHORTCUTS_SELECTION_SCREEN_STORAGE_KEY, true)
-                
-                
-                TIPS.APP_EXPLAIN.ignoreStorage = true;
-                new Tip(TIPS.APP_EXPLAIN, function(tip) {
-                    $("#" + Utils.getID()).bind("touchstart", tip.hide);
-                }).show();
-                
-                
-                ShortcutsCustomize.show(true);
-            } else {
-                visible = true;
-                
-                Brain.Searchbar.hideKeyboardTip();
-                
-                _this.loadFromAPI(function(){
-                    Brain.ShortcutsCustomize.addCustomizeButton();
-                });
-                
-                // this is a HACK and should be discussed
-                EventHandler.trigger("Screens", "tabClick", {
-                    "page": "shortcuts",
-                    "source": "clear"
-                });
-            }
+            new Tip(TIPS.APP_EXPLAIN, function(tip) {
+                $(document.body).bind("touchstart", tip.hide);
+            }).show();
+            
+            Brain.Searchbar.hideKeyboardTip();
+            
+            _this.loadFromAPI(function(){
+                Brain.ShortcutsCustomize.addCustomizeButton();
+            });
         };
         
         this.closeCategoryPage = function() {
@@ -1039,7 +1011,7 @@ var Brain = new function() {
         }
         
         this.hide = function() {
-            visible = false;
+            
         };
         
         this.handleCustomizeClick = function() {
@@ -1119,10 +1091,6 @@ var Brain = new function() {
             _this.loaded = true;
         };
         
-        this.visible = function() {
-            return visible;
-        };
-        
         this.dragStart = function(data) {
             if (Shortcuts.customizing()) {
                 ShortcutsCustomize.Dragger.start(data.e, data.shortcut);
@@ -1183,9 +1151,9 @@ var Brain = new function() {
                     ShortcutsCustomize.hide();
                 }, true);
                 
-                new Tip(TIPS.SHORTCUTS_FAVORITES_DONE, function(tip) {
-                    $("#" + Utils.getID()).bind("touchstart", tip.hide);
-                }).show();
+                //new Tip(TIPS.SHORTCUTS_FAVORITES_DONE, function(tip) {
+                //    $("#" + Utils.getID()).bind("touchstart", tip.hide);
+                //}).show();
             });
         };
         
