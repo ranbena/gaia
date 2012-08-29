@@ -6,7 +6,7 @@ var Core = new function() {
     this.shouldSearchOnInputBlur = true;
    
     this.init = function() {
-        document.getElementById(Utils.getID()).addEventListener("touchmove", function(e) {
+        document.getElementById(Utils.getID()).addEventListener("mousemove", function(e) {
             e.preventDefault();
             e.stopPropagation();
         });
