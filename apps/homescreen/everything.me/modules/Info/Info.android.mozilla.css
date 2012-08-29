@@ -1,0 +1,11 @@
+#info .buttons .button[data-page=add], #info .buttons .button[data-page=tell] {
+    pointer-events: none;
+    opacity: .7;
+    color: #666;
+}
+#info #info-page .menu {
+    height: 112px;
+}
+#info #info-page .menu .buttons {
+    display: none;
+}

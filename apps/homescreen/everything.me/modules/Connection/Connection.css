@@ -1,0 +1,41 @@
+#connection-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 224px;
+    padding-top: 81px;
+    margin: -50px 0 0 -112px;
+    color: #fff;
+    text-shadow: 0 2px 3px rgba(0, 0, 0, .5);
+    font-size: 15px;
+    text-align: center;
+    z-index: 500;
+    opacity: 0;
+    pointer-events: none;
+    -moz-transition: opacity .3s linear;
+    -webkit-transition: opacity .3s linear;
+    transition: opacity .3s linear;
+}
+    #connection-message:before {
+        background: transparent url('/images/connection.png') 50% 50% no-repeat;
+        background-size: 81px 91px;
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 81px;
+        height: 91px;
+        margin-left: -40px;
+    }
+
+.connection-error #connection-message {
+    opacity: 1;
+    pointer-events: inherit;
+}
+#doat-container.connection-error {
+    pointer-events: none;
+}
+#doat-container.connection-error #shortcuts, #doat-container.connection-error .connection-error #apps {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}

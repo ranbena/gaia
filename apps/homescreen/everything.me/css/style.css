@@ -1,0 +1,216 @@
+#button-back {
+    display: none;
+}
+#search-rapper {
+    left: 0;
+}
+#search-header, #header {
+    -moz-transition: all .2s linear;
+    -webkit-transition: all .2s linear;
+    -ms-transition: all .2s linear;
+    transition: all .2s linear;
+}
+
+.pages > .page {
+    -moz-transform: translate(0, 0) !important;
+    -webkit-transform: translate(0, 0) !important;
+    -ms-transform: translate(0, 0) !important;
+    transform: translate(0, 0) !important;
+}
+
+.pages > #page-category {
+    opacity: 0;
+    pointer-events: none;
+    top: -25px;
+    left: 22px;
+    right: 22px;
+    bottom: 91px;
+    padding-top: 15px;
+    background: #c9c5cb;
+    border-radius: 6px;
+    z-index: 100;
+}
+.pages > #page-category.active {
+    opacity: 1;
+    pointer-events: inherit;
+}
+.textinput:-webkit-input-placeholder {
+    color: #999999;
+}
+.textinput:-moz-placeholder {
+    color: #999999;
+}
+    #page-category .continue {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    #page-category {
+        padding: 0 20px;
+    }
+        #page-category .category-item {
+            position: relative;
+            padding-left: 0;
+            padding-right: 44px;
+            padding-top: 8px;
+            -moz-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .25) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
+            -webkit-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .25) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
+            -ms-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .25) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
+            box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .25) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
+        }
+            #page-category .category-item:before {
+                content: "OR";
+                background: #c9c5cb;
+                position: absolute;
+                bottom: -10px;
+                left: 50%;
+                width: 30px;
+                height: 20px;
+                color: #8c8a8e;
+                text-shadow: 0 1px 0 rgba(255, 255, 255, 1);
+                line-height: 20px;
+                margin-left: -15px;
+                text-align: center;
+            }
+            #page-category .category-item label {
+                margin-bottom: 4px;
+            }
+            #page-category .category-item .arrow-next {
+                right: 8px;
+            }
+            #page-category .continue .arrow-next {
+                right: 8px;
+            }
+            
+            #page-category.one-option .category-item {
+                padding-top: 30px;
+                padding-bottom: 30px;
+            }
+            #page-category.one-option .category-item .arrow-next {
+                bottom: 31px;
+            }
+            #page-category.one-option .continue {
+                padding-top: 30px;
+            }
+#category-page-screen {
+    position: absolute;
+    top: -80px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, .5);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 80;
+}
+.page-category #category-page-screen {
+    opacity: 1;
+    pointer-events: inherit;
+}
+#close-category {
+    background-position: 0 -220px;
+    position: absolute;
+    top: -34px;
+    right: 16px;
+    width: 29px;
+    height: 35px;
+    cursor: pointer;
+    z-index: 120;
+    opacity: 0;
+    pointer-events: none;
+}
+.page-category #close-category {
+    opacity: 1;
+    pointer-events: inherit;
+}
+
+#shortcuts {
+    background: transparent;
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    -moz-transition: opacity .2s linear;
+    -webkit-transition: opacity .2s linear;
+    -ms-transition: opacity .2s linear;
+    transition: opacity .2s linear;
+}
+
+#shortcuts .header {
+    display: none;
+}
+#shortcuts #shortcuts-custom-title {
+    color: #ffffff;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
+    opacity: .7;
+}
+#shortcuts .pages {
+    top: 0;
+}
+.shortcut b {
+    color: #fff;
+    text-shadow: 0 1px 3px #000000,
+                 0 1px 1px #000000;
+}
+
+.empty-query:not(.keyboard-visible) #shortcuts {
+    opacity: 1;
+    pointer-events: inherit;
+}
+
+#shortcuts .header {
+    position: relative;
+    z-index: 50;
+    margin: 0 11px;
+    height: 49px;
+    line-height: 49px;
+    font-size: 15px;
+    font-weight: normal;
+    color: #96288f;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
+}
+
+#background-image {
+    
+}
+    #background-image .default-image.visible {
+        opacity: 0;
+    }
+    #background-image.default .default-image.visible {
+        opacity: 1;
+    }
+
+
+#shortcuts-customize {
+    display: none;
+}
+#shortcuts #shortcuts-list ul {
+    padding-top: 5px;
+    padding-bottom: 0;
+}
+#shortcuts #shortcuts-list, .shortcuts-customize #shortcuts #shortcuts-list {
+    -webkit-mask-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, rgba(0, 0, 0, 0)), color-stop(3%, rgba(0, 0, 0, 1)), color-stop(80%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0, 0, 0)));
+}
+
+.shortcuts-customize #shortcuts {
+    top: 0;
+}
+.shortcuts-customize #shortcuts {
+    top: 0;
+}
+.shortcuts-customize #shortcuts #shortcuts-list {
+    top: 43px;
+    bottom: 130px;
+}
+.shortcuts-customize #search-header, .shortcuts-customize #header {
+    -moz-transform: translateY(-80px);
+    -webkit-transform: translateY(-80px);
+    -ms-transform: translateY(-80px);
+    transform: translateY(-80px);
+}
+.shortcuts-customize #shortcuts .header {
+    display: block;
+}

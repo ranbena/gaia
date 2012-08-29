@@ -4,7 +4,7 @@
 var EverythingMeManager = (function() {
 
   var footerStyle = document.querySelector('#footer').style;
-  var widget = document.querySelector('#etmWidget');
+  var widget = document.querySelector('#doat-container');
 
   var previousPage = GridManager.landingPageIndex;
   var everythingMeIndex = 0;
