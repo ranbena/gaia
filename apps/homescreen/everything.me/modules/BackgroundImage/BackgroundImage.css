@@ -19,7 +19,7 @@
         background-size: cover;
         
     }
-    body:not(.env-android) #background-image .img {
+    #background-image .img {
         -moz-transition: opacity .7s linear;
         -webkit-transition: opacity .7s linear;
         -ms-transition: opacity .7s linear;

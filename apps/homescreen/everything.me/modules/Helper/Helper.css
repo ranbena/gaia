@@ -279,10 +279,3 @@
         #helper ul li.link.strong {
             font-weight: bold !important;
         }
-        
-body:not(.istouch) #search #header {
-    position: absolute !important;
-    top: 0;
-    left: 0;
-    right: 0;
-}

@@ -1,6 +1,8 @@
 // http://HOST/#!/(homepage|search)/{query}/(type|all)/all
 var Url = new function() {
     var _name = "Url", _this = this, prefix = "#!";
+    
+    var URL_ENABLED = false;
 
     this.activate = true;
     this.PREFIX = prefix;
@@ -11,6 +13,8 @@ var Url = new function() {
     };
 
     this.goTo = function(page, query, type, paging) {
+        if (!URL_ENABLED) return;
+        
         var currentUrl = _this.get(), urlChanged = false;
         
         var url = "/" + page;
@@ -44,13 +48,15 @@ var Url = new function() {
     };
 
     this.get = function() {
-        var url = window.location.hash || "";
+        if (!URL_ENABLED) return;
+        
         var obj = {
             "page": "",
             "query": "",
             "type": "",
             "paging": 0
         };
+        var url = window.location.hash || "";
 
         url = url.split("/");
 

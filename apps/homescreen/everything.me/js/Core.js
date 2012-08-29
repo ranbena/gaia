@@ -13,83 +13,24 @@ var Core = new function() {
             "$container": $("#doat-container"),
             "fullscreen": Utils.isB2G() ? false : true
         });
-       
+        
+        document.getElementById("doat-container").addEventListener("touchmove", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }, true);
+        
         Viewport.setHeight();
         
         // Add classes according to platform
         addPlatformClasses($("#doat-container"));
         
-        if (Utils.isB2G()) {
-            var DEBUG = false;
-            
-            window.alert = function(m) {
-                if (!DEBUG) return;
-                
-                try {
-                    $("#btglog").append('<div>' + m + '</div>');
-                } catch(ex) {
-                    $("#logo").html(ex.message);
-                }
-            };
-            
-            if (DEBUG) {
-                var $refresh = $('<div id="btgrefresh" style="position: absolute; text-align: center; top: 5px; right: 55px; z-index: 1000; width: 80px; padding: 12px 3px; background: rgba(255, 255, 255, 1); border-radius: 5px; border: 1px solid #000; color: #000; font-size: 16px;">Refresh</div>');
-                $refresh.bind("touchstart", function() {
-                    window.location.reload();
-                });
-                $("#doat-container").append($refresh);
-                
-                var $log = $('<div id="btglog" class="big" style="height: 43px; overflow: hidden; position: absolute; top: 5px; left: 5px; z-index: 1000; width: 100px; padding: 3px; background: rgba(255, 255, 255, .5); color: #000; font-size: 16px;"></div>');
-                $log.bind("touchstart", function(){
-                    if ($(this).hasClass("big")) {
-                        $(this).removeClass("big").css({
-                            "height": "43px",
-                            "width": "100px",
-                            "background": "rgba(255, 255, 255, .5)"
-                        });
-                    } else {
-                        $(this).addClass("big").css({
-                            "height": "auto",
-                            "width": "350px",
-                            "background": "rgba(255, 255, 255, .9)"
-                        });
-                    }
-                });
-                $("#doat-container").append($log);
-            }
-            
-            if (Utils.isB2G()){
-                alert("Loaded B2G");
-                alert("window inner: " + window.innerWidth + "," + window.innerHeight);
-                alert("screen: " + screen.width + "," + screen.height);
-                
-                alert("Orientation: " + Utils.getOrientation().name);
-                $("#doat-container").css("height", Utils.getB2GHeight() + "px");
-                alert("Pixel Ratio: " + window.devicePixelRatio);
-                
-                alert("mozSettings: "+navigator.mozSettings.homescreen);
-                
-                alert("<br/>Getting installation state...");
-                var requestInstalled = navigator.mozApps.getSelf();
-                requestInstalled.onerror = function(e) {
-                    alert("Error calling getInstalled: " + requestInstalled.error.name);  
-                };
-                requestInstalled.onsuccess = function() {
-                    if (requestInstalled && requestInstalled.result) {
-                        alert("Already installed, toda!");
-                    } else {
-                        var request = navigator.mozApps.install("http://10.0.0.16/mozilla-manifest.php?ref=b2g");
-                        request.onsuccess = function() {  
-                            alert("Installed! Thanks.");
-                        };
-                        
-                        request.onerror = function() {  
-                            alert("Not installed... (" + this.error.name + ")");
-                        };
-                    }
-                } 
-            }            
-        }        
+        if (false) {
+            var $refresh = $('<div id="btgrefresh" style="position: absolute; text-align: center; top: 5px; right: 55px; z-index: 1000; width: 80px; padding: 12px 3px; background: rgba(255, 255, 255, 1); border-radius: 5px; border: 1px solid #000; color: #000; font-size: 16px;">Refresh</div>');
+            $refresh.bind("touchstart", function() {
+                window.location.reload();
+            });
+            $("#doat-container").append($refresh);
+        }
         
         window.setTimeout(function(){
             _this.initWithConfig(__config);
@@ -261,7 +202,7 @@ var Core = new function() {
                 "name": "Apps",
                 "type": "module",
                 "config": {
-                    "$el": $("#apps"),
+                    "$el": $("#doat-apps"),
                     "$buttonMore": $("#button-more"),
                     "$header": $("#search #header"),
                     "texts": data.texts.apps,
@@ -280,7 +221,7 @@ var Core = new function() {
                 "type": "module",
                 "config": {
                     "$el": $("#background-image"),
-                    "$elementsToFade": $("#apps, #header, #search-header"),
+                    "$elementsToFade": $("#doat-apps, #header, #search-header"),
                     "defaultImage": data.defaultBGImage,
                     "texts": data.texts.backgroundImage
                 }

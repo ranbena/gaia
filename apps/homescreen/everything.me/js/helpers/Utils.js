@@ -96,7 +96,7 @@ var Utils = new function() {
     };
     this.setAuthUser = function() {
         Storage.set("isUser", true);
-        $(document.body).removeClass("not-auth-user").addClass("auth-user");
+        $("#doat-container").removeClass("not-auth-user").addClass("auth-user");
     };
     this.isAuthUser = function() {
         return Storage.get("isUser");
@@ -188,9 +188,9 @@ var Utils = new function() {
     this.setKeyboardVisibility = function(value){
         isKeyboardVisible = value;
         if (isKeyboardVisible) {
-            $(document.body).addClass("keyboard-visible");
+            $("#doat-container").addClass("keyboard-visible");
         } else {
-            $(document.body).removeClass("keyboard-visible");
+            $("#doat-container").removeClass("keyboard-visible");
         }
     };
     

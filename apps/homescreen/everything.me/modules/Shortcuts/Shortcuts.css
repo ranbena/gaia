@@ -146,22 +146,22 @@
         }
            
            
-        .shortcuts-customize #shortcuts #shortcuts-list {
+        #doat-container.shortcuts-customize #shortcuts #shortcuts-list {
             -webkit-mask-image: none;
         }
-        .shortcuts-customize #shortcuts .shortcut.add {
+        #doat-container.shortcuts-customize #shortcuts .shortcut.add {
             opacity: 0;
             pointer-events: none;
             display: none;
         }
-        .shortcuts-customize #shortcuts .apps-group span {
+        #doat-container.shortcuts-customize #shortcuts .apps-group span {
             -moz-transform: scale(.7) !important;
             -webkit-transform: scale(.7) !important;
             -ms-transform: scale(.7) !important;
             transform: scale(.7) !important;
         }
 
-    #shortcuts-page .header li {
+    #doat-container #shortcuts-page .header li {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -174,14 +174,14 @@
         -ms-transition: all .2s linear;
         transition: all .2s linear;
     }
-    #shortcuts-page .header li#header-category {
+    #doat-container #shortcuts-page .header li#header-category {
         padding-left: 34px;
     }
-    #shortcuts-page .header li.active {
+    #doat-container #shortcuts-page .header li.active {
         opacity: 1;
         pointer-events: inherit;
     }
-    #shortcuts-page .header b {
+    #doat-container #shortcuts-page .header b {
         position: absolute;
         top: 50%;
         left: 0;
@@ -198,13 +198,7 @@
         -ms-box-shadow: 0 1px 0 0 rgba(255, 255, 255, .2) inset;
         box-shadow: 0 1px 0 0 rgba(255, 255, 255, .2) inset;
     }
-    .env-android #shortcuts-page .header b {
-        -moz-box-shadow: 0 1px 1px 0 rgba(255, 255, 255, .2) inset;
-        -webkit-box-shadow: 0 1px 1px 0 rgba(255, 255, 255, .2) inset;
-        -ms-box-shadow: 0 1px 1px 0 rgba(255, 255, 255, .2) inset;
-        box-shadow: 0 1px 1px 0 rgba(255, 255, 255, .2) inset;
-    }
-    #shortcuts-page .header b:before {
+    #doat-container #shortcuts-page .header b:before {
         content: "";
         position: absolute;
         top: 8px;
@@ -218,23 +212,22 @@
         -ms-transform: rotate(-45deg);
         transform: rotate(-45deg);
     }
-    #shortcuts-page .header .customize {
+    #doat-container #shortcuts-page .header .customize {
         display: none;
     }
     
-    
-    #category-page-name {
+    #doat-container #category-page-name {
         text-transform: capitalize;
     }
     
-.pages {
+#doat-container .pages {
     position: absolute;
     top: 44px;
     bottom: 0;
     left: 0;
     right: 0;
 }
-    .pages > .page {
+    #doat-container .pages > .page {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -245,19 +238,19 @@
         -ms-transition: all .3s ease;
         transition: all .3s ease;
     }
-    .pages > .page.left:not(.active) {
+    #doat-container .pages > .page.left:not(.active) {
         -moz-transform: translateX(-100%);
         -webkit-transform: translateX(-100%);
         -ms-transform: translateX(-100%);
         transform: translateX(-100%);
     }
-    .pages > .page.right:not(.active) {
+    #doat-container .pages > .page.right:not(.active) {
         -moz-transform: translateX(100%);
         -webkit-transform: translateX(100%);
         -ms-transform: translateX(100%);
         transform: translateX(100%);
     }
-    .pages > .page.active {
+    #doat-container .pages > .page.active {
         pointer-events: inherit;
         -moz-transform: translateX(0);
         -webkit-transform: translateX(0);
@@ -265,18 +258,18 @@
         transform: translateX(0);
     }
     
-#page-category {
+#doat-container #page-category {
     font-size: 15px;
 }
 
-#page-category > * {
+#doat-container #page-category > * {
     right: 0;
 }
-#page-category .continue {
+#doat-container #page-category .continue {
     position: relative;
     padding: 19px 20px;
 }
-#page-category .category-item {
+#doat-container #page-category .category-item {
     font-size: 15px;
     position: relative;
     padding: 19px 72px 19px 35px;
@@ -286,32 +279,26 @@
     -ms-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .4) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
     box-shadow: 0 -1px 0 0 rgba(0, 0, 0, .4) inset, 0 1px 0 0 rgba(255, 255, 255, .4);
 }
-.env-android #page-category .category-item {
-    -moz-box-shadow: 0 -1px 1px 0 rgba(0, 0, 0, .2) inset, 0 1px 1px 0 rgba(255, 255, 255, .4);
-    -webkit-box-shadow: 0 -1px 1px 0 rgba(0, 0, 0, .2) inset, 0 1px 1px 0 rgba(255, 255, 255, .4);
-    -ms-box-shadow: 0 -1px 1px 0 rgba(0, 0, 0, .2) inset, 0 1px 1px 0 rgba(255, 255, 255, .4);
-    box-shadow: 0 -1px 1px 0 rgba(0, 0, 0, .2) inset, 0 1px 1px 0 rgba(255, 255, 255, .4);
-}
-    #page-category .continue .arrow-next {
+    #doat-container #page-category .continue .arrow-next {
         position: absolute;
         top: 50%;
         right: 38px;
         margin-top: -12px;
         pointer-events: none;
     }
-    #page-category .category-item .arrow-next {
+    #doat-container #page-category .category-item .arrow-next {
         position: absolute;
         bottom: 21px;
         right: 38px;
     }
     
-    #page-category .category-item label {
+    #doat-container #page-category .category-item label {
         display: block;
         margin-bottom: 4px;
         font-weight: bold;
         text-shadow: 0 1px 0 rgba(255, 255, 255, .7);
     }
-    #page-category .continue b {
+    #doat-container #page-category .continue b {
         display: none;
         height: 53px;
         line-height: 53px;
@@ -329,10 +316,10 @@
         background: -moz-linear-gradient(center top, #efefef 0, #d6d6d6 100%);
         background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #efefef), color-stop(1, #d6d6d6));
     }
-    #page-category .continue b.visible {
+    #doat-container #page-category .continue b.visible {
         display: block;
     }
-    #page-category .textinput {
+    #doat-container #page-category .textinput {
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
         -ms-box-sizing: border-box;

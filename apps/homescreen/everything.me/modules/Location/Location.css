@@ -1,4 +1,4 @@
-#location-selector {
+#doat-container #location-selector {
     position: absolute;
     top: 39px;
     left: auto;
@@ -9,32 +9,32 @@
     padding-top: 0;
     padding-bottom: 0;
 }
-#location-selector.visible {
+#doat-container #location-selector.visible {
     z-index: 800;
     opacity: 1;
     display: block;
 }
-#location-selector>div {
+#doat-container #location-selector > div {
     display: none;
 }
-#location-selector.options .options,
-#location-selector.manual .manual {
+#doat-container #location-selector.options .options,
+#doat-container #location-selector.manual .manual {
     display: block;
 }
-#location-selector.manual {
+#doat-container #location-selector.manual {
     width: auto;
     top: 5px;
     left: 10px;
     right: 10px;
 }
-#location-selector .tiparrow {
+#doat-container #location-selector .tiparrow {
     left: auto;
     right: 14px;
 }
-.location-visible #location-selector .tiparrow {
+#doat-container .location-visible #location-selector .tiparrow {
     right: 34px;
 }
-#location-selector .options div {
+#doat-container #location-selector .options div {
     position: relative;
     height: 44px;
     line-height: 44px;
@@ -44,10 +44,10 @@
     border-top: 1px solid #333;
 }
 
-#location-selector .options div:first-child {
+#doat-container #location-selector .options div:first-child {
     border-top-width: 0;
 }
-#location-selector .options div:before {
+#doat-container #location-selector .options div:before {
     content: "";
     background-repeat: no-repeat;
     position: absolute;
@@ -56,26 +56,26 @@
     width: 18px;
     height: 100%;
 }
-#location-selector .options div#locate-me:before {
+#doat-container #location-selector .options div#locate-me:before {
     background-position: -22px 10px;
 }
-#location-selector .options div#enter-location:before {
+#doat-container #location-selector .options div#enter-location:before {
     background-position: 3px 9px;
 }
-#location-selector .options div#later:before {
+#doat-container #location-selector .options div#later:before {
     background-position: -48px 14px;
 }
 
-#location-selector .options div.title {
+#doat-container #location-selector .options div.title {
     cursor: default;
     padding-left: 0;
     font-size: 19px;
 }
-#location-selector .options div.title:before {
+#doat-container #location-selector .options div.title:before {
     display: none;
 }
 
-#location-selector .close {
+#doat-container #location-selector .close {
     background-position: -1px -73px;
     position: absolute;
     top: -6px;
@@ -85,39 +85,39 @@
     cursor: pointer;
     
 }
-#location-selector .manual {
+#doat-container #location-selector .manual {
     padding: 0;
     overflow: hidden;
 }
-#location-selector .manual h2 {
+#doat-container #location-selector .manual h2 {
     height: 33px;
     line-height: 33px;
     font-size: 20px;
     font-weight: bold;
 }
-#location-selector .manual .search {
+#doat-container #location-selector .manual .search {
     position: relative;
     margin: 0 24px 0 4px;
     text-align: center;
 }
-    #location-selector .manual .search input {
+    #doat-container #location-selector .manual .search input {
         padding: 0 24px 0 4px;
         margin: 0 -24px 0 -4px;
         
     }
-#location-selector .manual ul {
+#doat-container #location-selector .manual ul {
     list-style-type: none;
     min-height: 112px;
 }
-#location-selector .manual li {
+#doat-container #location-selector .manual li {
     padding: 7px 0;
     cursor: pointer;
     border-top: 1px solid #333;
 }
-#location-selector .manual li:first-child {
+#doat-container #location-selector .manual li:first-child {
     border-top-width: 0;
 }
-#location-selector-screen {
+#doat-container #location-selector-screen {
     background: rgba(255, 255, 255, 0);
     position: absolute;
     top: 0;
@@ -127,10 +127,10 @@
     z-index: 780;
 }
 
-    #dialog_location .tiparrow {
+    #doat-container #dialog_location .tiparrow {
         display: none;
     }
-    #dialog_location .button .loading {
+    #doat-container #dialog_location .button .loading {
         position: relative;
         display: inline-block;
         width: 14px;
@@ -139,18 +139,10 @@
         top: 1px;
     }
     
-#dialog_location_error {
-}
-.orientation-landscape #dialog_location_error, .orientation-landscape #dialog_location {
-    top: 5px;
-    left: 50%;
-    margin-left: -149px;
-}
-
-    #dialog_location_error .content .zip-wrapper {
+    #doat-container #dialog_location_error .content .zip-wrapper {
         position: relative;
     }
-    #dialog_location_error .content #location-zip-name {
+    #doat-container #dialog_location_error .content #location-zip-name {
         -moz-user-select: none;
         color: #0485AF;
         font-size: 13px;
@@ -170,54 +162,35 @@
         max-width: 150px;
         z-index: 90;
     }
-    #dialog_location_error label {
+    #doat-container #dialog_location_error label {
         vertical-align: middle;
         position: relative;
         top: -5px;
     }
-    #dialog_location_error .textinput {
+    #doat-container #dialog_location_error .textinput {
         width: 260px;
         padding: 0 4px; 
         margin: 4px 0 0 0;
     }
-    #dialog_location_error .buttons {
+    #doat-container #dialog_location_error .buttons {
         padding-top: 10px;
     }
     
-#dialog_location_os_error {
+#doat-container #dialog_location_os_error {
     top: 40px;
     left: auto;
     right: 13px;
 }
-.orientation-landscape #dialog_location_os_error {
-    top: 2px;
-    right: 120px;
-    padding: 6px 13px;
-}
-.orientation-landscape.location-visible #dialog_location_os_error {
-    right: 112px;
-}
-.orientation-landscape #dialog_location_os_error h2 {
-    padding: 2px 0;
-}
-#dialog_location_os_error .tiparrow {
+#doat-container #dialog_location_os_error .tiparrow {
     left: auto;
     right: 24px;
 }
-.orientation-landscape #dialog_location_os_error .tiparrow {
-    top: 9px;
-    right: -18px;
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    transform: rotate(90deg);
-}
-#dialog_location_os_error .content {
+#doat-container #dialog_location_os_error .content {
     position: relative;
     padding-top: 5px;
     padding-bottom: 120px;
 }
-#dialog_location_os_error .content:before {
+#doat-container #dialog_location_os_error .content:before {
     background: transparent url('/images/location/location-settings-iphone.png') 0 0 no-repeat;
     content: "";
     position: absolute;

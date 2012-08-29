@@ -1,4 +1,4 @@
-#apps {
+#doat-container #doat-apps {
     position: absolute;
     top: 81px;
     left: 0;
@@ -7,14 +7,15 @@
     z-index: 50;
     overflow: hidden;
 }
-body:not(.env-android) #apps {
+#doat-container #doat-apps {
     -webkit-mask-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, rgba(0, 0, 0, 1)), color-stop(97%, rgba(0, 0, 0, 1)), color-stop(100%, rgba(0, 0, 0, 0)));
 }
-.loading-app #apps {
+#doat-container.loading-app #doat-apps {
     pointer-events: none;
 }
 
-#apps-loading, #apps-error {
+#doat-container #apps-loading,
+#doat-container #apps-error {
     position: absolute;
     top: 50%;
     left: 0;
@@ -27,7 +28,8 @@ body:not(.env-android) #apps {
     text-align: center;
     display: none;
 }
-    #apps-loading > div, #apps-error > div {
+    #doat-container #apps-loading > div,
+    #doat-container #apps-error > div {
         position: relative;
         display: inline-block;
         vertical-align: middle;
@@ -36,26 +38,29 @@ body:not(.env-android) #apps {
         margin-right: 11px;
         top: -2px;
     }
-    #apps-error #apps-error-retry {
+    #doat-container #apps-error #apps-error-retry {
         position: absolute;
         top: 20px;
         left: 50%;
         width: 30px;
         margin-left: -23px;
     }
-#apps-loading.visible, #apps-error.visible {
+    
+#doat-container #apps-loading.visible,
+#doat-container #apps-error.visible {
     display: block;
 }
 
-#apps ul {
+#doat-container #doat-apps ul {
     position: relative;
     width: 100%;
     padding-bottom: 30px;
 }
-.location-input-visible #apps ul {
+#doat-container.location-input-visible #doat-apps ul {
     -webkit-transform: none !important;
 }
-    #apps ul li, .apps ul li {
+    #doat-container #doat-apps ul li,
+    #doat-container .apps ul li {
         position: absolute;
         left: 0;
         width: 25%;
@@ -68,13 +73,15 @@ body:not(.env-android) #apps {
         -ms-transition: -ms-transform .2s linear;
         transition: transform .2s linear;
     }
-    #apps ul li.new, .apps ul li.new {
+    #doat-container #doat-apps ul li.new,
+    #doat-container .apps ul li.new {
         -moz-transition: none;
         -webkit-transition: none;
         -ms-transition: none;
         transition: none;
     }
-    #apps ul #button-more, .apps ul #button-more {
+    #doat-container #doat-apps ul #button-more,
+    #doat-container .apps ul #button-more {
         position: absolute;
         top: auto;
         bottom: 15px;
@@ -89,19 +96,24 @@ body:not(.env-android) #apps {
         opacity: 0;
         margin-top: 30px;
     }
-    #apps ul #button-more.visible, .apps ul #button-more.visible {
+    #doat-container #doat-apps ul #button-more.visible,
+    #doat-container .apps ul #button-more.visible {
         opacity: 1;
     }
    
-    #apps ul li:nth-child(4n+1), .apps ul li:nth-child(4n+1) {
+    #doat-container #doat-apps ul li:nth-child(4n+1),
+    #doat-container .apps ul li:nth-child(4n+1) {
         clear: both;
     }
-    #apps ul li .c, .apps ul li .c {
+    #doat-container #doat-apps ul li .c,
+    #doat-container .apps ul li .c {
         position: relative;
         display: block;
         padding: 44px 2px 0 2px;
     }
-        #apps ul li .thumb, .apps ul li .thumb, .app-icon {
+        #doat-container #doat-apps ul li .thumb,
+        #doat-container .apps ul li .thumb,
+        #doat-container .app-icon {
             position: absolute;
             top: 0;
             left: 50%;
@@ -125,14 +137,17 @@ body:not(.env-android) #apps {
             -o-transition: -o-transform .2s linear;
             transition: transform .2s linear;
         }
-        #apps ul li.new .thumb, .apps ul li.new .thumb {
+        #doat-container #doat-apps ul li.new .thumb,
+        #doat-container .apps ul li.new .thumb {
             -moz-transform: scale(0);
             -webkit-transform: scale(0);
             -ms-transform: scale(0);
             -o-transform: scale(0);
             transform: scale(0);
         }
-        #apps ul li .thumb:after, .apps ul li .thumb:after, .app-icon:after {
+        #doat-container #doat-apps ul li .thumb:after,
+        #doat-container .apps ul li .thumb:after,
+        #doat-container .app-icon:after {
             content: "";
             background-position: -1px -24px;
             position: absolute;
@@ -142,12 +157,15 @@ body:not(.env-android) #apps {
             height: 50px;
             z-index: 10;
         }
-        #apps ul li .thumb.noicon, .apps ul li .thumb.noicon {
+        #doat-container #doat-apps ul li .thumb.noicon,
+        #doat-container .apps ul li .thumb.noicon {
             background: transparent;
         }
-        #apps ul li .thumb.noicon:after, .apps ul li .thumb.noicon:after {
+        #doat-container #doat-apps ul li .thumb.noicon:after,
+        #doat-container .apps ul li .thumb.noicon:after {
         }
-        #apps ul li b, .apps ul li b {
+        #doat-container #doat-apps ul li b,
+        #doat-container .apps ul li b {
             display: inline-block;
             font-size: 11px;
             font-weight: bold;
@@ -162,11 +180,13 @@ body:not(.env-android) #apps {
             padding: 2px;
             color: #fff;
         }
-            #apps ul li b em, .apps ul li b em {
+            #doat-container #doat-apps ul li b em,
+            #doat-container .apps ul li b em {
                 font-style: normal;
             }
         
-        #apps ul li .close, .apps ul li .close {
+        #doat-container #doat-apps ul li .close,
+        #doat-container .apps ul li .close {
             position: absolute;
             top: -4px;
             left: 50%;
@@ -192,7 +212,8 @@ body:not(.env-android) #apps {
             -o-transition: opacity .2s linear;
             transition: opacity .2s linear;
         }
-    #apps ul li#more-apps, .apps ul li#more-apps {
+    #doat-container #doat-apps ul li#more-apps,
+    #doat-container .apps ul li#more-apps {
         position: absolute;
         left: 0;
         right: 0;
@@ -216,7 +237,8 @@ body:not(.env-android) #apps {
         -o-transition: none;
         transition: none;
     }
-    #apps ul li#more-apps span, .apps ul li#more-apps span {
+    #doat-container #doat-apps ul li#more-apps span,
+    #doat-container .apps ul li#more-apps span {
         position: relative;
         display: inline-block;
         width: 20px;
@@ -227,24 +249,25 @@ body:not(.env-android) #apps {
     }
     
     
-body:not(.istouch) #apps {
+body:not(.istouch) #doat-apps {
     
 }
-body:not(.istouch) #apps ul {
+body:not(.istouch) #doat-apps ul {
     overflow: hidden;
 }
-body:not(.istouch) #apps ul li:nth-child(4n+1) {
+body:not(.istouch) #doat-apps ul li:nth-child(4n+1) {
     clear: both;
 }
-body:not(.istouch) #apps ul li:nth-child(5n+1) {
+body:not(.istouch) #doat-apps ul li:nth-child(5n+1) {
     clear: none;
 }
 
 /* Loading an app */
-.loading-app #apps ul li, .loading-app #apps ul #button-more.visible {
+.loading-app #doat-apps ul li,
+.loading-app #doat-apps ul #button-more.visible {
     opacity: 0;
 }
-.loading-app #apps ul li.inplace {
+.loading-app #doat-apps ul li.inplace {
     position: absolute;
     opacity: 1;
     overflow: visible;
@@ -255,7 +278,7 @@ body:not(.istouch) #apps ul li:nth-child(5n+1) {
     -o-transition: -o-transform .2s linear;
     transition: transform .2s linear;
 }
-.loading-app #apps ul li.inplace .doat-loading {
+.loading-app #doat-apps ul li.inplace .doat-loading {
     position: absolute;
     top: -8px;
     left: 50%;
@@ -280,17 +303,17 @@ body:not(.istouch) #apps ul li:nth-child(5n+1) {
 
 /* Landscape */
 @media screen and (min-width: 400px) {
-    #apps ul {
+    #doat-apps ul {
         
     }
-    #apps ul li {
+    #doat-apps ul li {
         width: 20%;
         padding-bottom: 5px;
     }
-    #apps ul li:nth-child(4n+1) {
+    #doat-apps ul li:nth-child(4n+1) {
         clear: none;
     }
-    #apps ul li:nth-child(5n+1) {
+    #doat-apps ul li:nth-child(5n+1) {
         clear: both;
     }
 }

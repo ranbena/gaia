@@ -72,8 +72,6 @@ var Brain = new function() {
             window.setTimeout(Viewport.hideAddressBar, 100);
             Apps.calcAppsPositions(Utils.getScreenWidth, Utils.getOrientation().name);
             
-            pageLoad();
-            
             Utils.Env.addEventListener("orientationchange", _this.onresize);
             
             $(window).bind("hashchange", function(e){
@@ -144,26 +142,6 @@ var Brain = new function() {
             Brain.Helper.showDefault();
             BackgroundImage.loadDefault();
             Brain.Searchbar.setEmptyClass();
-        }
-        
-        function pageLoad() {
-            var url = Url.get();
-                eventHandlerData = { "source": PAGEVIEW_SOURCES.URL };
-            
-            if (url.page == Url.PAGES.Search) {
-                var query = url.query;
-                var type = url.type;
-                var pageOffset = url.paging;
-                
-                if (query !== "") {
-                    Searcher.searchExactFromOutside(query, SEARCH_SOURCES.URL, undefined, type, pageOffset, true);
-                    eventHandlerData.query = query;
-                }
-                EventHandler.trigger("Core", "searchOnPageLoad", eventHandlerData);
-            } else {
-                eventHandlerData.page = url.page;
-                EventHandler.trigger("Core", "firstPageLoad", eventHandlerData);
-            }
         }
         
         var Swiper = new function() {

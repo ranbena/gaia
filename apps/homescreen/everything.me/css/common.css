@@ -10,7 +10,7 @@ fieldset {
     overflow: hidden;
     margin: 0;
     padding: 0;
-    background: #000 url('/images/content_bg.jpg') 0 0 no-repeat;
+    background: #000 url('/everything.me/images/content_bg.jpg') 0 0 no-repeat;
     -moz-background-size: 100% 100%;
     -webkit-background-size: 100% 100%;
     -o-background-size: 100% 100%;
@@ -49,7 +49,7 @@ fieldset {
 
 
 #doat-container .textpage {
-    background: #833068 url('/images/bgpattern.jpg') 0 0 repeat;
+    background: #833068 url('/everything.me/images/bgpattern.jpg') 0 0 repeat;
     background-size: 36px 36px;
     font-family: 'Open Sans';
     font-size: 15px;
@@ -183,7 +183,7 @@ fieldset {
 #shortcuts-favorites li.on:before,
 #close-category
 {
-    background-image: url('/images/sprite.png?14');
+    background-image: url('/everything.me/images/sprite.png?14');
     background-repeat: no-repeat;
     -moz-background-size: 131px 250px !important;
     -webkit-background-size: 131px 250px !important;
@@ -192,7 +192,7 @@ fieldset {
 }
 #location-selector .options div:before,
 #dialog_location .content:before {
-    background-image: url('/images/location/location_sprite.png?1');
+    background-image: url('/everything.me/images/location/location_sprite.png?1');
     -moz-background-size: 64px 106px !important;
     -webkit-background-size: 64px 106px !important;
     -o-background-size: 64px 106px !important;
