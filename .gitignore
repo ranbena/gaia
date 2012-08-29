@@ -29,3 +29,4 @@ manifest.appcache
 /custom-prefs.js
 /local.mk
 /.project
+/tools/xpcwindow/vendor/

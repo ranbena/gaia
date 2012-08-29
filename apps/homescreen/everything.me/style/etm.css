@@ -1,32 +1,43 @@
-#etmConnection {
+#etmSplash {
 	z-index: 1;
 	text-align: center;
 	background: #742d5d url('logo.png') center 5% no-repeat;
-	opacity: .8;
-	-moz-transition: opacity 4s;
+	opacity: .95;
+	-moz-transition: -moz-transform 2s, opacity 1s 1s;
 }
 
-#etmConnection span {
+#etmSplash img {
+	visibility: hidden;
+	border-radius: 1.5px;
+}
+
+#etmSplash span {
 	color: #fff;
 	font-size: -moz-calc(10 * 0.226rem); /* 10pt */
 	margin: 12rem .5rem .5rem .5rem;
 	display: block;
 }
 
-#etmConnection button {
+#etmSplash button {
 	background: #fff;
-	font-size: -moz-calc(13 * 0.226rem); /* 12pt */
+	font-size: -moz-calc(13 * 0.226rem); /* 13pt */
 	display: block;
 	border-radius: .6rem;
 	margin: 0 auto;
-	margin-top: 3rem;
+	margin-top: 5rem;
 	box-shadow: 2px 2px 7px rgba(000,000,000,0.5), inset 0px 0px 1px rgba(255,255,255,0.7);
 	border: .1rem solid #a810a8;
 	color: #050505;
 	padding: .5rem 1rem;
 	font-weight: bold;
 }
-
+#etmSplash button[disabled] {
+	-moz-appearance: none;
+	border: 0;
+	color: #fff;
+	background: transparent;
+	box-shadow: none;
+}
 #doat-container{
 	top: 0;
 	left: 0;
@@ -34,9 +45,6 @@
 	position: absolute;
 }
 
-li:active {
-  background-color: transparent !important;
-}
 li:active {
   background-color: transparent !important;
 }

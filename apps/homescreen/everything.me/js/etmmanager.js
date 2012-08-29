@@ -3,6 +3,8 @@
 
 var EverythingMeManager = (function() {
 
+  var URI = 'http://b2g.everything.me';
+
   var footerStyle = document.querySelector('#footer').style;
   var widget = document.querySelector('#doat-container');
 
@@ -27,7 +29,39 @@ var EverythingMeManager = (function() {
     previousPage = currentPage;
   });
 
-  var loadedWidget = true;
+  var etmSplash = document.querySelector('#etmSplash');
+
+  var etmLoading = document.querySelector('#etmLoading');
+  var goToEverything = document.querySelector('#goToEverything');
+
+  goToEverything.addEventListener('click', function click() {
+    goToEverything.disabled = true;
+    goToEverything.textContent = 'Loading...';
+    etmLoading.style.visibility = 'visible';
+    etmSplash.children[0].textContent = 'Find the things you love';
+    widget.src = URI;
+  });
+
+  widget.addEventListener('load', function loaded() {
+    if (widget.src === 'about:blank') {
+      return;
+    }
+
+    goToEverything.textContent = '';
+    etmLoading.style.visibility = 'hidden';
+    var style = etmSplash.style;
+    style.MozTransform = 'rotateY(180deg)';
+    style.opacity = 0;
+    etmSplash.addEventListener('transitionend', function transitionend() {
+      etmSplash.removeEventListener('transitionend', transitionend);
+      etmSplash.style.display = 'none';
+    });
+  });
+
+  widget.addEventListener('error', function error() {
+    goToEverything.disabled = false;
+    goToEverything.textContent = 'Try again';
+  });
 
   function dispatchEvent(e) {
     if (typeof e.data === 'string' && e.data.indexOf('type') !== -1) {
@@ -47,7 +81,7 @@ var EverythingMeManager = (function() {
   }
 
   function openApp(params) {
-    (new Bookmark({
+    (new EvmeApp({
       url: params.url,
       name: params.title,
       icon: params.icon
@@ -80,3 +114,10 @@ var EverythingMeManager = (function() {
   };
 
 }());
+
+var EvmeApp = function createEvmeApp(params) {
+  Bookmark.call(this, params);
+  this.manifest.launchedFrom = 'everything.me';
+};
+
+extend(EvmeApp, Bookmark);

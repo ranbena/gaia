@@ -484,18 +484,17 @@ var WindowManager = (function() {
         if (isRunning(origin)) {
           // If the app is in foreground, it's too risky to change it's
           // URL. We'll ignore this request.
-          if (displayedApp === origin)
-            return;
+          if (displayedApp !== origin) {
+            var frame = getAppFrame(origin);
 
-          var frame = getAppFrame(origin);
-
-          // If the app is opened and it is loaded to the correct page,
-          // then there is nothing to do.
-          if (frame.src !== e.detail.url) {
-            // Rewrite the URL of the app frame to the requested URL.
-            // XXX: We could ended opening URls not for the app frame
-            // in the app frame. But we don't care.
-            frame.src = e.detail.url;
+            // If the app is opened and it is loaded to the correct page,
+            // then there is nothing to do.
+            if (frame.src !== e.detail.url) {
+              // Rewrite the URL of the app frame to the requested URL.
+              // XXX: We could ended opening URls not for the app frame
+              // in the app frame. But we don't care.
+              frame.src = e.detail.url;
+            }
           }
         } else {
           // XXX: We could ended opening URls not for the app frame
@@ -518,17 +517,26 @@ var WindowManager = (function() {
 
             evt.stopImmediatePropagation();
 
-            var url = detail.url, manifest;
-            try {
-              manifest = JSON.parse(detail.name);
-            } catch (e) {
-              manifest = {name: url};
-            }
-
+            var url = detail.url;
             if (isRunning(url)) {
               if (displayedApp === url)
                 return;
             } else {
+              var manifest;
+              try {
+                manifest = JSON.parse(detail.name);
+              } catch (e) {
+                manifest = {name: url};
+              }
+              
+              if (manifest.launchedFrom === 'everything.me') {
+                var lastEvmeApp = frame.dataset.lastEvmeApp;
+                if (lastEvmeApp && lastEvmeApp !== url) {
+                  kill(lastEvmeApp);
+                }
+                frame.dataset.lastEvmeApp = url;
+              }
+
               appendFrame(url, url, manifest.name, manifest, null);
             }
 
