@@ -5,7 +5,7 @@ const Homescreen = (function() {
   // Initialize the search page
   var host = document.location.host;
   var domain = host.replace(/(^[\w\d]+\.)?([\w\d]+\.[a-z]+)/, '$2');
-  //Search.init(domain);
+  Search.init(domain);
 
   var mode = 'normal';
 
