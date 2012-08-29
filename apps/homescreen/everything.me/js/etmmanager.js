@@ -3,8 +3,6 @@
 
 var EverythingMeManager = (function() {
 
-  var URI = 'http://b2g.everything.me';
-
   var footerStyle = document.querySelector('#footer').style;
   var widget = document.querySelector('#doat-container');
 
@@ -27,40 +25,6 @@ var EverythingMeManager = (function() {
     }
 
     previousPage = currentPage;
-  });
-
-  var etmSplash = document.querySelector('#etmSplash');
-
-  var etmLoading = document.querySelector('#etmLoading');
-  var goToEverything = document.querySelector('#goToEverything');
-
-  goToEverything.addEventListener('click', function click() {
-    goToEverything.disabled = true;
-    goToEverything.textContent = 'Loading...';
-    etmLoading.style.visibility = 'visible';
-    etmSplash.children[0].textContent = 'Find the things you love';
-    widget.src = URI;
-  });
-
-  widget.addEventListener('load', function loaded() {
-    if (widget.src === 'about:blank') {
-      return;
-    }
-
-    goToEverything.textContent = '';
-    etmLoading.style.visibility = 'hidden';
-    var style = etmSplash.style;
-    style.MozTransform = 'rotateY(180deg)';
-    style.opacity = 0;
-    etmSplash.addEventListener('transitionend', function transitionend() {
-      etmSplash.removeEventListener('transitionend', transitionend);
-      etmSplash.style.display = 'none';
-    });
-  });
-
-  widget.addEventListener('error', function error() {
-    goToEverything.disabled = false;
-    goToEverything.textContent = 'Try again';
   });
 
   function dispatchEvent(e) {
