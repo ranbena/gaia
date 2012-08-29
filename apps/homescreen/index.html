@@ -24,7 +24,7 @@
     <script type="text/javascript" defer src="js/dock.js"></script>
     <script type="text/javascript" defer src="js/grid.js"></script>
     <script type="text/javascript" defer src="js/dragdrop.js"></script>
-    <script type="text/javascript" defer src="js/search.js"></script>
+    <!--script type="text/javascript" defer src="js/search.js"></script-->
     <script type="text/javascript" defer src="everything.me/js/etmmanager.js"></script>
     <script type="text/javascript" defer src="js/homescreen.js"></script>
   </head>
@@ -38,16 +38,41 @@
 
     <div id="icongrid" class="apps" role="main">
       <div id="etmPage">
-        <div id="etmConnection">
-          <span>Do you have connection?</span>
-          <button id="goToEverything">Enjoy it</button>
+        <div id="etmWidget">
+            <div id="etmInstApp">imdb</div>
         </div>
-        <iframe id="etmWidget" src="about:blank"></iframe>
-      </div>
-      <div id="search" data-current-page="true">
-        <img id="searchAction" src="resources/images/search/icon.png"></img>
       </div>
     </div>
+    
+    <style>
+        #etmWidget {
+            padding: 20px;
+        }
+        #etmInstApp{
+            border-radius: 50%;
+            color: white;
+            background: blue;
+            width: 44px;
+            height: 44px;
+            line-height: 44px;
+            text-align: center;
+        }
+    </style>
+    
+    <script>
+        var etmInstApp = document.getElementById("etmInstApp");
+        etmInstApp.addEventListener("click", function() {
+            var data = JSON.stringify({
+                "type": "add-bookmark",
+                "data": {
+                    "url": "http://imdb.com",
+                    "title": "imdb",
+                    "icon": "whatever.jpg"
+                }
+            });
+            window.top.postMessage(data, "*");
+        }, false);
+    </script>
 
     <footer id="footer">
       <div class="dockWrapper"></div>

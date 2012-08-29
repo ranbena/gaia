@@ -27,29 +27,7 @@ var EverythingMeManager = (function() {
     previousPage = currentPage;
   });
 
-  var connectionMsg = document.querySelector('#etmConnection');
-
-  var goToEverything = document.querySelector('#goToEverything');
-  goToEverything.addEventListener('click', function load() {
-    widget.src = 'http://b2g.everything.me';
-    connectionMsg.style.opacity = 0;
-    connectionMsg.addEventListener('transitionend', function transitionend() {
-      connectionMsg.removeEventListener('transitionend', transitionend);
-      connectionMsg.style.display = 'none';
-    });
-  });
-
-  var loadedWidget = false;
-
-  widget.addEventListener('load', function loaded() {
-    loadedWidget = true;
-  });
-
-  widget.addEventListener('error', function error() {
-    loadedWidget = false;
-    connectionMsg.style.display = 'block';
-    connectionMsg.style.opacity = 1;
-  });
+  var loadedWidget = true;
 
   function dispatchEvent(e) {
     if (typeof e.data === 'string' && e.data.indexOf('type') !== -1) {
@@ -91,12 +69,10 @@ var EverythingMeManager = (function() {
   }
 
   function setVisibilityChange(visible) {
-    if (widget.contentWindow) {
-      widget.contentWindow.postMessage(JSON.stringify({
+      window.postMessage(JSON.stringify({
         type: 'visibilitychange',
         data: { hidden: !visible }
-      }), '*');
-    }
+      }), '*');    
   }
 
   return {
