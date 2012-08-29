@@ -5,7 +5,7 @@ var DoATAPI = new function() {
     var deviceId = getDeviceId(),
         NUMBER_OF_RETRIES = 3,                          // number of retries before returning error
         RETRY_TIMEOUT = {"from": 1000, "to": 3000},     // timeout before retrying a failed request
-        MAX_REQUEST_TIME = 20000,                       // timeout before declaring a request as failed (if server isn't responding)
+        MAX_REQUEST_TIME = 5000,                        // timeout before declaring a request as failed (if server isn't responding)
         MAX_ITEMS_IN_CACHE = 20,                        // maximum number of calls to save in the user's cache
         CACHE_EXPIRATION_IN_MINUTES = 30,
         STORAGE_KEY_CREDS = "credentials",
@@ -821,7 +821,7 @@ var DoATAPI = new function() {
         // if it's an authentication error
         // return false so the request won't automatically retry
         // and do a sessionInit, and retry at the end of it
-        if (data && data.errorCode == DoATAPI.ERROR_CODES.AUTH && !manualCredentials) {
+        if ((data && data.errorCode == DoATAPI.ERROR_CODES.AUTH && !manualCredentials) || (methodNamespace == "Session" && method == "init")) {
             _this.initSession({
                 "cause": DoATAPI.Session.INIT_CAUSE.AUTH_ERROR,
                 "source": "DoATAPI.cbError"
@@ -956,7 +956,7 @@ var Request = function() {
         
         cbError(methodNamespace, methodName, "", params, retryNumber, data, callback);
         
-        if (retryNumber > 0) {
+        if (retryNumber >= 0) {
             retry();
         }
         
