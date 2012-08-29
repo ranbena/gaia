@@ -174,7 +174,8 @@ var WindowManager = (function() {
       setTimeout(openCallback);
     } else if (classes.contains('faded') && prop === 'opacity') {
 
-      openFrame.setVisible(true);
+      if (openFrame.setVisible)
+        openFrame.setVisible(true);
       openFrame.focus();
 
       // Dispatch a 'appopen' event,
@@ -328,7 +329,6 @@ var WindowManager = (function() {
     frame.setAttribute('mozallowfullscreen', 'true');
     frame.dataset.frameType = 'window';
     frame.dataset.frameOrigin = origin;
-    frame.src = url;
 
     // Note that we don't set the frame size here.  That will happen
     // when we display the app in setDisplayedApp()
@@ -337,7 +337,12 @@ var WindowManager = (function() {
     // They also need to be marked as 'mozapp' to be recognized as apps by the
     // platform.
     frame.setAttribute('mozbrowser', 'true');
-    frame.setAttribute('mozapp', manifestURL);
+    if (manifestURL) {
+      frame.setAttribute('mozapp', manifestURL);
+      frame.src = url;
+    } else {
+      frame.src = 'bookmark/launcher.html?url=' + url + '&name=' + name;
+    }
 
     // These apps currently have bugs preventing them from being
     // run out of process. All other apps will be run OOP.
@@ -503,7 +508,33 @@ var WindowManager = (function() {
         // as the homescreen.
         if (!homescreen) {
           homescreen = origin;
+
           var frame = runningApps[homescreen].frame;
+          frame.dataset.zIndexLevel = 'homescreen';
+          frame.addEventListener('mozbrowseropenwindow', function(evt) {
+            var detail = evt.detail;
+            if (!detail.name)
+              return;
+
+            evt.stopImmediatePropagation();
+
+            var url = detail.url, manifest;
+            try {
+              manifest = JSON.parse(detail.name);
+            } catch (e) {
+              manifest = {name: url};
+            }
+
+            if (isRunning(url)) {
+              if (displayedApp === url)
+                return;
+            } else {
+              appendFrame(url, url, manifest.name, manifest, null);
+            }
+
+            setDisplayedApp(url);
+          });
+
           return;
         }
 

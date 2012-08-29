@@ -14,7 +14,7 @@ const GridManager = (function() {
   var opacityMax = .7;
 
   var pages = [];
-  var landingPageIndex = 0;
+  var landingPageIndex = 1;
   var currentPage = landingPageIndex;
 
   // Limits for changing pages during dragging
