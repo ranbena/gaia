@@ -1,5 +1,5 @@
     #infoclose-link {
-        background: transparent url('/images/sprite_info.png') 0 -37px no-repeat;
+        background: transparent url('/everything.me/images/sprite_info.png') 0 -37px no-repeat;
         position: absolute;
         top: 11px;
         right: 10px;
@@ -36,7 +36,7 @@
             #info .logo:before {
                 content: "";
                 display: inline-block;
-                background: transparent url('/images/sprite_info.png') 0 0 no-repeat;
+                background: transparent url('/everything.me/images/sprite_info.png') 0 0 no-repeat;
                 width: 158px;
                 height: 23px;
                 vertical-align: middle;
@@ -189,7 +189,7 @@
                     opacity: .4;
                 }
             #info-page .header .back {
-                background: transparent url('/images/sprite_info.png') -66px -37px no-repeat;
+                background: transparent url('/everything.me/images/sprite_info.png') -66px -37px no-repeat;
                 position: absolute;
                 top: 12px;
                 left: 18px;
@@ -311,7 +311,7 @@
                         padding-left: 50px;
                     }
                         #info-page #info-page-tell li a:before {
-                            background: transparent url('/images/sprite_info.png') 0 0 no-repeat;
+                            background: transparent url('/everything.me/images/sprite_info.png') 0 0 no-repeat;
                             content: "";
                             position: absolute;
                             top: 1px;
@@ -353,7 +353,7 @@
                 margin-bottom: 10px;
             }
             #info-page-add p .tap {
-                background: transparent url('/images/sprite_info.png') -67px -80px no-repeat;
+                background: transparent url('/everything.me/images/sprite_info.png') -67px -80px no-repeat;
                 display: inline-block;
                 vertical-align: middle;
                 width: 22px;
@@ -376,7 +376,7 @@
             }
                 #info-page-add .icon:before {
                     content: "";
-                    background: transparent url('/images/sprite_info.png') -60px -127px no-repeat;
+                    background: transparent url('/everything.me/images/sprite_info.png') -60px -127px no-repeat;
                     position: absolute;
                     top: 0;
                     left: 50%;
@@ -385,7 +385,7 @@
                     margin-left: -39px;
                 }
             #info-page-add .arrow {
-                background: transparent url('/images/sprite_info.png') -119px -37px no-repeat;
+                background: transparent url('/everything.me/images/sprite_info.png') -119px -37px no-repeat;
                 position: absolute;
                 bottom: 6px;
                 left: 50%;
@@ -509,7 +509,7 @@
 }
 
     .env-android #info-page .menu-button {
-        background: transparent url('/images/sprite_info_android.png') 0 0 no-repeat;
+        background: transparent url('/everything.me/images/sprite_info_android.png') 0 0 no-repeat;
         background-size: 219px 300px;
         display: inline-block;
         width: 30px;
@@ -527,7 +527,7 @@
     }
     .env-android #info-page-tell div:after {
         content: "";
-        background: transparent url('/images/sprite_info_android.png') 0 -130px no-repeat;
+        background: transparent url('/everything.me/images/sprite_info_android.png') 0 -130px no-repeat;
         background-size: 219px 300px;
         display: block;
         width: 218px;
@@ -560,7 +560,7 @@
     }
         .env-android #info-page-add .icon:before {
             content: "";
-            background: transparent url('/images/sprite_info_android.png') 0 -33px no-repeat;
+            background: transparent url('/everything.me/images/sprite_info_android.png') 0 -33px no-repeat;
             background-size: 219px 300px;
             position: absolute;
             top: 0;
@@ -627,7 +627,7 @@
 #info-page-add p .tap, #info-page-add .arrow,
 #info-page-add .icon:before,
 #info-page #info-page-tell li a:before {
-    background-image: url('/images/sprite_info.png');
+    background-image: url('/everything.me/images/sprite_info.png');
     background-repeat: no-repeat;
     -moz-background-size: 158px 217px;
     -webkit-background-size: 158px 217px;

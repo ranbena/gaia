@@ -44,7 +44,10 @@
         cursor: pointer;
         -webkit-backface-visibility: hidden;
     }
-    .shortcut, .shortcut .thumb, .shortcut .remove, .shortcut b {
+    #doat-container .shortcut,
+    #doat-container .shortcut .thumb,
+    #doat-container .shortcut .remove,
+    #doat-container .shortcut b {
         -moz-transition: all .15s ease;
         -webkit-transition: all .15s ease;
         -ms-transition: all .15s ease;

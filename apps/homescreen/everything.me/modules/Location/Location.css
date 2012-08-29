@@ -31,8 +31,8 @@
     left: auto;
     right: 14px;
 }
-#doat-container .location-visible #location-selector .tiparrow {
-    right: 34px;
+#doat-container.location-visible #location-selector .tiparrow {
+    right: 88px;
 }
 #doat-container #location-selector .options div {
     position: relative;
@@ -191,7 +191,7 @@
     padding-bottom: 120px;
 }
 #doat-container #dialog_location_os_error .content:before {
-    background: transparent url('/images/location/location-settings-iphone.png') 0 0 no-repeat;
+    background: transparent url('/everything.me/images/location/location-settings-iphone.png') 0 0 no-repeat;
     content: "";
     position: absolute;
     bottom: 0;

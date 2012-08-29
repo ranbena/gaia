@@ -145,7 +145,7 @@ var Brain = new function() {
         }
         
         var Swiper = new function() {
-            var $els = $("#apps, #shortcuts"),
+            var $els = $("#doat-apps, #shortcuts"),
                 startPoint = null, movePoint = null;
             
             var DISTANCE_TO_COUNT_AS_SWIPE = window.innerWidth/2;
@@ -239,7 +239,7 @@ var Brain = new function() {
 
         this.blur = function(data) {
             // Gaia bug workaround because of this http://b2g.everything.me/tests/input-blur.html
-            data.stopPropagation()
+            data && data.stopPropagation && data.stopPropagation();
             
             if (Brain.Dialog.isActive()) {
                 return;
@@ -840,7 +840,7 @@ var Brain = new function() {
             loadingAppId = data.data.id;
             bNeedsLocation = data.data.requiresLocation && !DoATAPI.hasLocation() && !Location.userClickedDoItLater();
             
-            var $apps = $("#apps");
+            var $apps = $("#doat-apps");
             var oldPos = {
                 "top": $app[0].offsetTop,
                 "left": $app[0].offsetLeft

@@ -17,7 +17,7 @@
     transition: opacity .3s linear;
 }
     #connection-message:before {
-        background: transparent url('/images/connection.png') 50% 50% no-repeat;
+        background: transparent url('/everything.me/images/connection.png') 50% 50% no-repeat;
         background-size: 81px 91px;
         content: "";
         position: absolute;
@@ -35,7 +35,7 @@
 #doat-container.connection-error {
     pointer-events: none;
 }
-#doat-container.connection-error #shortcuts, #doat-container.connection-error .connection-error #apps {
+#doat-container.connection-error #shortcuts, #doat-container.connection-error .connection-error #doat-apps {
     opacity: 0 !important;
     pointer-events: none !important;
 }

@@ -45,7 +45,7 @@
         padding-left: 0;
         padding-right: 0;
     }
-    #doat-container #page-category {
+    #doat-container #page-category .category-scroll {
         padding: 0 20px;
     }
         #doat-container #page-category .category-item {

@@ -139,7 +139,7 @@
 }
 #doat-container .ptip,
 #doat-container .ptip .tiparrow:before {
-    background: #833068 url('/images/bgpattern.jpg') bottom left repeat;
+    background: #833068 url('/everything.me/images/bgpattern.jpg') bottom left repeat;
     background-size: 36px 36px;
     border: 2px solid #a6528f;
 }
@@ -168,7 +168,7 @@
     }
     #doat-container #dialog_searchpage-tip .content:before {
         content: "";
-        background: transparent url('/images/temp/welcome-icons.jpg') bottom left no-repeat;
+        background: transparent url('/everything.me/images/temp/welcome-icons.jpg') bottom left no-repeat;
         background-size: 256px 99px;
         position: absolute;
         bottom: -30px;

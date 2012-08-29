@@ -118,6 +118,6 @@
 #feed-content .add-intro:before,
 #feed-content .for-iphone:before,
 #feed-content .for-android li .menu {
-    background-image: url('/images/sprite_info.png?2');
+    background-image: url('/everything.me/images/sprite_info.png?2');
     background-size: 100px 400px;
 }
