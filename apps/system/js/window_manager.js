@@ -517,17 +517,26 @@ var WindowManager = (function() {
 
             evt.stopImmediatePropagation();
 
-            var url = detail.url, manifest;
-            try {
-              manifest = JSON.parse(detail.name);
-            } catch (e) {
-              manifest = {name: url};
-            }
-
+            var url = detail.url;
             if (isRunning(url)) {
               if (displayedApp === url)
                 return;
             } else {
+              var manifest;
+              try {
+                manifest = JSON.parse(detail.name);
+              } catch (e) {
+                manifest = {name: url};
+              }
+              
+              if (manifest.launchedFrom === 'everything.me') {
+                var lastEvmeApp = frame.dataset.lastEvmeApp;
+                if (lastEvmeApp && lastEvmeApp !== url) {
+                  kill(lastEvmeApp);
+                }
+                frame.dataset.lastEvmeApp = url;
+              }
+
               appendFrame(url, url, manifest.name, manifest, null);
             }
 

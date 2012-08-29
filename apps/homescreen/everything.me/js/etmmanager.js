@@ -81,7 +81,7 @@ var EverythingMeManager = (function() {
   }
 
   function openApp(params) {
-    (new Bookmark({
+    (new EvmeApp({
       url: params.url,
       name: params.title,
       icon: params.icon
@@ -116,3 +116,10 @@ var EverythingMeManager = (function() {
   };
 
 }());
+
+var EvmeApp = function createEvmeApp(params) {
+  Bookmark.call(this, params);
+  this.manifest.launchedFrom = 'everything.me';
+};
+
+extend(EvmeApp, Bookmark);
