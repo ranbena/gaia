@@ -8,10 +8,12 @@ var Brain = new function() {
         TIME_BEFORE_INVOKING_HASH_CHANGE = 200,
         TIMEOUT_BEFORE_ALLOWING_DIALOG_REMOVE = "FROM CONFIG",
         MINIMUM_LETTERS_TO_SEARCH = 1,
-        ENABLE_FAVORITES_SHORTCUTS_SCREEN = true,
         SEARCH_SOURCES = {},
         PAGEVIEW_SOURCES = {},
         TIPS = {},
+        
+        // whether to show shortcuts customize on startup or not
+        ENABLE_FAVORITES_SHORTCUTS_SCREEN = false,
         
         HISTORY_CLEAR_TEXT = "FROM CONFIG",
         REFINE_DISMISS_TEXT = "FROM CONFIG",
@@ -68,7 +70,9 @@ var Brain = new function() {
             Searchbar.clear();
             Brain.Searchbar.setEmptyClass();
             
-            $body.removeClass("loading_content");
+            new Tip(TIPS.APP_EXPLAIN, function(tip) {
+                $(document.body).bind("touchstart", tip.hide);
+            }).show();
             
             Swiper.init();
         };
@@ -648,8 +652,6 @@ var Brain = new function() {
         };
         
         this.hold = function(data) {
-            if (!Utils.isFFOS()) return;
-            
             Apps.disableScroll();
             
             var tip = new Tip({
@@ -852,20 +854,16 @@ var Brain = new function() {
         };
         
         this.appRedirectExecute = function(appUrl, data){
-            if (Utils.isFFOS()) {
-                var appIcon = Utils.formatImageData(data.icon);
-                    
-               Utils.getRoundIcon(appIcon, 58, 2, function(appIcon) {
-                    // bookmark in ffos
-                    Utils.sendToFFOS(Utils.FFOSMessages.APP_CLICK, {
-                        "url": appUrl,
-                        "title": data.name,
-                        "icon": appIcon
-                    });    
-                });
-            } else {
-                window.location.href = appUrl;
-            }
+           var appIcon = Utils.formatImageData(data.icon);
+           
+           Utils.getRoundIcon(appIcon, 58, 2, function(appIcon) {
+                // bookmark in ffos
+                Utils.sendToFFOS(Utils.FFOSMessages.APP_CLICK, {
+                    "url": appUrl,
+                    "title": data.name,
+                    "icon": appIcon
+                });    
+            });
         };
         
         function returnFromOutside() {

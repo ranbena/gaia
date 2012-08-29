@@ -1,6 +1,6 @@
 var Utils = new function() {
     var _this = this, userAgent = "", connection, cssPrefix = "", iconsFormat = null,
-        isKeyboardVisible = false, _title = "Everything", isNewUser, isFFOS = false,
+        isKeyboardVisible = false, _title = "Everything", isNewUser,
         _parseQuery = parseQuery();
         
     this.ICONS_FORMATS = {
@@ -32,12 +32,6 @@ var Utils = new function() {
     this.B2GCalc = function(x) {
         return window.innerWidth > 320 ?  x*2/3 : x;
     };
-    this.isFFOS = function() {
-        return isFFOS
-    };
-    this.setIsFFOS = function(val) {
-        isFFOS = val;
-    };
     this.sendToFFOS = function(type, data) {
         if (!type) return;
         
@@ -61,6 +55,54 @@ var Utils = new function() {
         return CONTAINER_ID;
     };
     
+    this.getRoundIcon = function(imageSrc, size, shadowOffset, callback) {
+        // canvas
+        var canvas = document.createElement("canvas"),
+            ctx = canvas.getContext("2d"),
+            radius = size/2;
+        
+        canvas.setAttribute("width", size);
+        canvas.setAttribute("height", size);
+        
+        !shadowOffset && (shadowOffset = 0); 
+        
+        // create clip
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(radius, radius, radius, 0, 2 * Math.PI, false);
+        ctx.clip();
+        
+        // generate image
+        var img = new Image()
+        img.onload = function() {
+            ctx.drawImage(img,0,0, size, size);
+            
+            // send to get shadow
+            var data = canvas.toDataURL();
+            getShadow(data, size, shadowOffset, callback)
+        };
+        img.src = imageSrc;
+    };
+    
+    var getShadow = function(imageSrc, size, shadowOffset, callback) {
+        var canvas = document.createElement("canvas"),
+            ctx = canvas.getContext("2d");
+        
+        canvas.setAttribute("width", size+shadowOffset);
+        canvas.setAttribute("height", size+shadowOffset);    
+    
+        ctx.shadowColor="rgba(0,0,0,0.3)";
+        ctx.shadowOffsetY = shadowOffset;
+        
+        // generate image
+        var img = new Image()
+        img.onload = function() {
+            ctx.drawImage(img,0,0, size, size);
+            var data = canvas.toDataURL();
+            callback(data);
+        };
+        img.src = imageSrc;
+    }
     
     this.init = function() {
         userAgent = navigator.userAgent;
