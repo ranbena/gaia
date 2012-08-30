@@ -1278,7 +1278,11 @@ var Brain = new function() {
     
     this.DoATAPI = new function() {
         this.cantSendRequest = function() {
-            Connection.show();
+            var message;
+            if (Searchbar.getValue()) {
+                message = "To get apps for \""+Searchbar.getValue()+"\" please connect to the internet";    
+            }
+            Connection.show(message);
         };
     };
     
