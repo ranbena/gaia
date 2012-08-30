@@ -208,6 +208,9 @@ var Brain = new function() {
             Apps.clear();
             Helper.setTitle();
             Brain.Helper.showDefault();
+            
+            DoATAPI.cancelQueue();
+            Connection.hide();
         };
         
         this.returnPressed = function(data) {

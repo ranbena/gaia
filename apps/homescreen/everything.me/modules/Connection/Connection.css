@@ -31,10 +31,16 @@
     opacity: 1;
     pointer-events: inherit;
 }
-#doat-container.connection-error {
+
+#doat-container.connection-error #shortcuts,
+#doat-container.connection-error #doat-apps {
+    opacity: 0 !important;
     pointer-events: none;
 }
-#doat-container.connection-error #shortcuts, #doat-container.connection-error #doat-apps {
-    opacity: 0 !important;
-    pointer-events: none !important;
+#doat-container.connection-error #helper-header,
+#doat-container.connection-error #search-header > * {
+    pointer-events: none;
+}
+#doat-container.connection-error #search-header #button-clear {
+    pointer-events: inherit;
 }

@@ -557,6 +557,14 @@ var DoATAPI = new function() {
         }
     };
     
+    this.cancelQueue = function() {
+        for (var i=0; i<requestsToPerformOnOnline.length; i++) {
+            requestsToPerformOnOnline[i].abort();
+        }
+        
+        requestsToPerformOnOnline = [];
+    };
+    
     this.backOnline = function() {
         if (requestsToPerformOnOnline.length == 0) return;
         
@@ -593,7 +601,7 @@ var DoATAPI = new function() {
         var useCache = requestsToCache[methodNamespace+"."+methodName];
         
         var shouldInit = DoATAPI.Session.shouldInit();
-        if (shouldInit.should && !doesntNeedSession[methodNamespace+"." + methodName] && !manualCredentials && !dontRetryIfNoSession) {
+        if (requestsToPerformOnOnline.length != 0 && shouldInit.should && !doesntNeedSession[methodNamespace+"." + methodName] && !manualCredentials && !dontRetryIfNoSession) {
             requestsQueue[JSON.stringify(options)] = options;
             reInitSession(shouldInit.cause);
             return;
