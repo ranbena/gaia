@@ -5,7 +5,7 @@ var DoATAPI = new function() {
     var deviceId = getDeviceId(),
         NUMBER_OF_RETRIES = 3,                          // number of retries before returning error
         RETRY_TIMEOUT = {"from": 1000, "to": 3000},     // timeout before retrying a failed request
-        MAX_REQUEST_TIME = 5000,                        // timeout before declaring a request as failed (if server isn't responding)
+        MAX_REQUEST_TIME = 10000,                       // timeout before declaring a request as failed (if server isn't responding)
         MAX_ITEMS_IN_CACHE = 20,                        // maximum number of calls to save in the user's cache
         CACHE_EXPIRATION_IN_MINUTES = 30,
         STORAGE_KEY_CREDS = "credentials",
@@ -18,6 +18,7 @@ var DoATAPI = new function() {
         requestingSession = false,
         
         requestsQueue = {},
+        requestsToPerformOnOnline = [],
         sessionInitRequest = null;
         
     var requestsToCache = {
@@ -25,6 +26,10 @@ var DoATAPI = new function() {
             "Search.bgimage": true,
             "Shortcuts.get": 60*24*2,
             "Search.trending": true
+        },
+        requestsThatDontNeedConnection = {
+            "Search.suggestions": true,
+            "App.icons": true
         },
         paramsToCleanFromCacheKey = ["cachedIcons", "idx", "feature", "sid", "credentials"],
         doesntNeedSession = {
@@ -552,6 +557,16 @@ var DoATAPI = new function() {
         }
     };
     
+    this.backOnline = function() {
+        if (requestsToPerformOnOnline.length == 0) return;
+        
+        for (var i=0; i<requestsToPerformOnOnline.length; i++) {
+            requestsToPerformOnOnline[i].request();
+        }
+        
+        requestsToPerformOnOnline = [];
+    };
+    
     // set locale and timezone cookies
     function setClientInfoCookie() {
         var locale = navigator.language || "",
@@ -627,7 +642,6 @@ var DoATAPI = new function() {
         }
         /* ---------------- */
        
-        
         var _request = new Request();
         _request.init({
             "methodNamespace": methodNamespace,
@@ -644,7 +658,24 @@ var DoATAPI = new function() {
             "clientError": cbClientError,
             "cacheKey": cacheKey,
             "cacheTTL": (typeof useCache == "number")? useCache : CACHE_EXPIRATION_IN_MINUTES
-        }).request();
+        });
+        
+        if (requestsThatDontNeedConnection[methodNamespace+"."+methodName]) {
+            _request.request();
+        } else {
+            Utils.isOnline(function(isOnline){
+                if (isOnline) {
+                    _request.request();
+                } else {
+                    requestsToPerformOnOnline.push(_request);
+                    
+                    EventHandler.trigger(_name, "cantSendRequest", {
+                        "request": request,
+                        "queue": requestsToPerformOnOnline
+                    });
+                }
+            });
+        }
         
         return _request;
     }
@@ -849,6 +880,7 @@ var Request = function() {
         timeoutBetweenRetries = 0,
         
         request = null,
+        aborted = false,
         cacheKey = "",
         cacheTTL = 0,
         
@@ -884,6 +916,8 @@ var Request = function() {
     };
     
     this.request = function() {
+        if (aborted) return;
+        
         requestSentTime = (new Date()).getTime();
         
         cbRequest(methodNamespace, methodName, params, retryNumber);
@@ -903,6 +937,7 @@ var Request = function() {
     };
     
     this.abort = function() {
+        aborted = true;
         clearTimeouts();
         request && request.abort();
     };

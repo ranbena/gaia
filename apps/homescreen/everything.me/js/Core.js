@@ -76,7 +76,10 @@ var Core = new function() {
     };
     
     function initObjects(data) {
+        var $container = $("#" + Utils.getID());
+        
         Connection.init({
+            "$parent": $container,
             "texts": data.texts.connection
         });
         
@@ -104,7 +107,7 @@ var Core = new function() {
         });
         
         ShortcutsCustomize.init({
-            "$parent": $("#" + Utils.getID()),
+            "$parent": $container,
             "texts": data.texts.shortcutsFavorites
         });
         
