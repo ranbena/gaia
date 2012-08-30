@@ -36,6 +36,7 @@ var EverythingMeManager = (function() {
           openApp(json.data);
           break;
         case 'add-bookmark':
+          evmeStyle.left = '-100%';
           addBookmark(json.data);
           break;
         case 'home':
