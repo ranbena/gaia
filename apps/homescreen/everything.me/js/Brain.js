@@ -77,13 +77,13 @@ var Brain = new function() {
         };
         
         var Swiper = new function() {
-            var $els = $("#doat-apps, #shortcuts"),
+            var $els = $("#doat-apps, #shortcuts,#connection-message"),
                 startPoint = null, movePoint = null;
             
-            var DISTANCE_TO_COUNT_AS_SWIPE = window.innerWidth/2;
+            var DISTANCE_TO_COUNT_AS_SWIPE;
             
             this.init = function() {
-                DISTANCE_TO_COUNT_AS_SWIPE = $els.width()/2;
+                DISTANCE_TO_COUNT_AS_SWIPE = window.innerWidth/4;
                 
                 $els.bind("touchstart", start);
             };
