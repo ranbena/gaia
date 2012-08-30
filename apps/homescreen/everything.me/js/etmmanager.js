@@ -15,7 +15,7 @@ var EverythingMeManager = (function() {
 
     if (previousPage !== currentPage) {
       if (currentPage === everythingMeIndex) {
-        evmeStyle.left = '0';
+        showEvme();
         footerStyle.MozTransform = 'translateY(7.5rem)';
         setVisibilityChange(true);
       } else {
@@ -28,6 +28,14 @@ var EverythingMeManager = (function() {
     previousPage = currentPage;
   });
 
+  function hideEvme() {
+    evmeStyle.left = '-100%';
+  }
+
+  function showEvme() {
+    evmeStyle.left = '0';
+  }
+
   function dispatchEvent(e) {
     if (typeof e.data === 'string' && e.data.indexOf('type') !== -1) {
       var json = JSON.parse(e.data);
@@ -36,11 +44,11 @@ var EverythingMeManager = (function() {
           openApp(json.data);
           break;
         case 'add-bookmark':
-          evmeStyle.left = '-100%';
+          hideEvme();
           addBookmark(json.data);
           break;
         case 'home':
-          evmeStyle.left = '-100%';
+          hideEvme();
           GridManager.goToPage(GridManager.landingPageIndex);
           break;
       }
@@ -77,7 +85,9 @@ var EverythingMeManager = (function() {
   }
 
   return {
-    dispatchEvent: dispatchEvent
+    dispatchEvent: dispatchEvent,
+
+    hide: hideEvme
   };
 
 }());
