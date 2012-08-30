@@ -81,4 +81,3 @@ var KeyboardManager = (function() {
     }
   });
 })();
-

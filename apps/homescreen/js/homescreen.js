@@ -34,17 +34,22 @@ const Homescreen = (function() {
       GridManager.saveState();
       DockManager.saveState();
       Permissions.hide();
-    } else if (GridManager.pageHelper.getCurrentPageNumber() !==
-                 GridManager.landingPageIndex) {
-      GridManager.goToPage(GridManager.landingPageIndex);
+    } else {
+      var current = GridManager.pageHelper.getCurrentPageNumber();
+      if (current !== GridManager.landingPageIndex) {
+        if (current === 0) {
+          EverythingMeManager.hide();
+        }
+        GridManager.goToPage(GridManager.landingPageIndex);
+      }
     }
   }
 
   window.addEventListener('message', function onMessage(e) {
-    switch (e.data) {
-      case 'home':
-        onHomescreenActivity();
-        break;
+    if (e.data === 'home') {
+      onHomescreenActivity();
+    } else {
+      EverythingMeManager.dispatchEvent(e);
     }
   });
 
