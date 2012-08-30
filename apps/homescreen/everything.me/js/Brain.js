@@ -130,7 +130,6 @@ var Brain = new function() {
         }
     };
     
-    
     this.Searchbar = new function() {
         var _this = this,
             timeoutBlur = null,
@@ -1264,6 +1263,24 @@ var Brain = new function() {
         };
     };
     
+    this.Connection = new function() {
+        this.online = function() {
+            Connection.hide();
+            DoATAPI.backOnline();
+        };
+        this.offline = function() {
+        };
+        this.show = function() {
+        };
+        this.hide = function() {
+        };
+    };
+    
+    this.DoATAPI = new function() {
+        this.cantSendRequest = function() {
+            Connection.show();
+        };
+    };
     
     this.Searcher = new function() {
         var appsCurrentOffset = 0,
@@ -1274,7 +1291,7 @@ var Brain = new function() {
             autocompleteCache = {},
             timeoutShowExactTip = null;
             
-        var requestSearch = null,
+            requestSearch = null,
             requestImage = null,
             requestIcons = null,
             requestAutocomplete = null,
@@ -1285,17 +1302,14 @@ var Brain = new function() {
             timeoutSearch = null,
             timeoutSearchWhileTyping = null,
             timeoutAutocomplete = null,
-            timeoutAppsLoading = null;
             
-        var TIMEOUT_BEFORE_REQUESTING_APPS_AGAIN = 500,
+            TIMEOUT_BEFORE_REQUESTING_APPS_AGAIN = 500,
             TIMEOUT_BEFORE_SHOWING_DEFAULT_IMAGE = 3000,
             TIMEOUT_BEFORE_SHOWING_HELPER = 3000,
             TIMEOUT_BEFORE_RENDERING_AC = 200,
             TIMEOUT_BEFORE_RUNNING_APPS_SEARCH = 200,
             TIMEOUT_BEFORE_RUNNING_IMAGE_SEARCH = 500,
-            TIMEOUT_BEFORE_AUTO_RENDERING_MORE_APPS = 200,
-            TIMEOUT_BEFORE_SHOWING_APPS_LOADING = 4000,
-            TIMEOUT_BEFORE_SHOWING_APPS_RETRY = 4000;
+            TIMEOUT_BEFORE_AUTO_RENDERING_MORE_APPS = 200;
         
         function resetLastSearch(bKeepImageQuery) {
             lastSearch = {
@@ -1328,7 +1342,6 @@ var Brain = new function() {
                 onlyDidYouMean = options.onlyDidYouMean;
             
             Searchbar.startRequest();
-            removeAppsIndicators();
             
             var removeSession = reloadingIcons;
             var prevQuery = removeSession? "" : lastSearch.query;
@@ -1349,8 +1362,6 @@ var Brain = new function() {
                     
                     timeoutHideHelper = window.setTimeout(Helper.showTitle, TIMEOUT_BEFORE_SHOWING_HELPER);
                 }
-                
-                timeoutAppsLoading = window.setTimeout(showAppsLoading, TIMEOUT_BEFORE_SHOWING_APPS_LOADING);
             }
             
             iconsFormat = (appsCurrentOffset == 0)? Utils.ICONS_FORMATS.Small : Utils.getIconsFormat();
@@ -1399,8 +1410,6 @@ var Brain = new function() {
             if (data.errorCode !== DoATAPI.ERROR_CODES.SUCCESS) {
                 return false;
             }
-            
-            removeAppsIndicators();
             
             window.clearTimeout(timeoutHideHelper);
             
@@ -1506,26 +1515,6 @@ var Brain = new function() {
             Searchbar.endRequest();
 
             return true;
-        }
-        
-        function showAppsLoading() {
-            window.clearTimeout(timeoutAppsLoading);
-            Apps.clear();
-            Apps.Indicators.loading.show();
-            
-            timeoutAppsLoading = window.setTimeout(showAppsError, TIMEOUT_BEFORE_SHOWING_APPS_RETRY);
-        }
-        
-        function showAppsError() {
-            window.clearTimeout(timeoutAppsLoading);
-            Apps.Indicators.loading.hide();
-            Apps.Indicators.error.show();
-        }
-        
-        function removeAppsIndicators() {
-            window.clearTimeout(timeoutAppsLoading);
-            Apps.Indicators.loading.hide();
-            Apps.Indicators.error.hide();
         }
         
         this.getBackgroundImage = function(options) {
@@ -1779,6 +1768,8 @@ var Brain = new function() {
         
         this.searchAsYouType = function(query, source){
             appsCurrentOffset = 0;
+            
+            Searcher.getAutocomplete(query);
             
             var searchOptions = {
                 "query": query,

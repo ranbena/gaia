@@ -130,6 +130,9 @@ var __config = {
             "errorCantLocateTitle": "Still can’t locate you :(",
             "errorCantLocateText": "Please allow location services in your Settings screen.",
             "errorCantLocateButton": "Continue..."
+        },
+        "connection": {
+            "defaultMessage": "You need to be connected to the internet to use this app"
         }
     },
     "iconsGroupSettings": [

@@ -1,11 +1,10 @@
 #doat-container, input {
-    font: normal 12px 'Helvetica Neue', Helvetica, Arial, Sans-Serif;
+    font-size: 12px;
 }
 fieldset {
     border-width: 0;
 }
 #doat-container {
-    font: normal 12px 'Helvetica Neue', Helvetica, Arial, Sans-Serif;
     position: relative;
     overflow: hidden;
     margin: 0;

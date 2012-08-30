@@ -1,7 +1,6 @@
 var Connection = new function() {
     var _name = "Connection", _this = this,
-            $el = null,
-            hasConnection = true;
+            $el = null;
             
     var EL_ID = "connection-message",
         CLASS_NO_CONNECTION = "connection-error",
@@ -10,37 +9,42 @@ var Connection = new function() {
     this.init = function(options) {
         !options && (options = {});
         
-        $parent = $("#" + Utils.getID());
+        $parent = options.$parent;
         
-        DEFAULT_MESSAGE = "You need to be connected to the internet to use this app";
+        DEFAULT_MESSAGE = options.texts.defaultMessage;
+        
+        window.addEventListener(Utils.CONNECTION.EVENT_ONLINE, function(){
+            EventHandler.trigger(_name, "online");
+        });
+        window.addEventListener(Utils.CONNECTION.EVENT_OFFLINE, function(){
+            EventHandler.trigger(_name, "offline");
+        });
         
         EventHandler.trigger(_name, "init");
     };
     
-    this.on = function() {
-        return hasConnection;
-    };
-    
     this.show = function(message) {
-        !message && (message = DEFAULT_MESSAGE);
+        if ($el) return;
         
-        if (!$el) {
-            $el = $('<div id="' + EL_ID + '"></div>');
-            $parent.append($el);
-        }
-        
-        $el.html(message);
+        $el = $('<div id="' + EL_ID + '">' + (message || DEFAULT_MESSAGE) + '</div>');
+        $parent.append($el);
         $el.css("margin-top", -$el.height()/2 + "px");
         
-        hasConnection = false;
-        $parent.addClass(CLASS_NO_CONNECTION);
-        EventHandler.trigger(_name, "show");
+        window.setTimeout(function(){
+            $parent.addClass(CLASS_NO_CONNECTION);
+            EventHandler.trigger(_name, "show");
+        }, 0);
     };
     
     this.hide = function() {
-        $el && $el.remove();
-        hasConnection = true;
+        if (!$el) return;
+        
         $parent.removeClass(CLASS_NO_CONNECTION);
-        EventHandler.trigger(_name, "hide");
+        
+        window.setTimeout(function(){
+            $el.remove();
+            $el = null;
+            EventHandler.trigger(_name, "hide");
+        }, 0);
     };
 };
