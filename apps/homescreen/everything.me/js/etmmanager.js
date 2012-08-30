@@ -4,7 +4,7 @@
 var EverythingMeManager = (function() {
 
   var footerStyle = document.querySelector('#footer').style;
-  var widget = document.querySelector('#doat-container');
+  var evmeStyle = document.querySelector('#evme').style;
 
   var previousPage = GridManager.landingPageIndex;
   var everythingMeIndex = 0;
@@ -15,6 +15,7 @@ var EverythingMeManager = (function() {
 
     if (previousPage !== currentPage) {
       if (currentPage === everythingMeIndex) {
+        evmeStyle.left = '0';
         footerStyle.MozTransform = 'translateY(7.5rem)';
         setVisibilityChange(true);
       } else {
@@ -38,6 +39,7 @@ var EverythingMeManager = (function() {
           addBookmark(json.data);
           break;
         case 'home':
+          evmeStyle.left = '-100%';
           GridManager.goToPage(GridManager.landingPageIndex);
           break;
       }
@@ -70,7 +72,7 @@ var EverythingMeManager = (function() {
       window.postMessage(JSON.stringify({
         type: 'visibilitychange',
         data: { hidden: !visible }
-      }), '*');    
+      }), '*');
   }
 
   return {
