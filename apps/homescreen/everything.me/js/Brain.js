@@ -1148,13 +1148,18 @@ var Brain = new function() {
         };
         
         this.done = function(data) {
+            // temporary fix for removeing api dependency
+            Shortcuts.show();
+            _this.addCustomizeButton();
+            ShortcutsCustomize.hide();
+            
             DoATAPI.Shortcuts.set({
                 "shortcuts": JSON.stringify(data.shortcuts)
             }, function(data){
                 Brain.Shortcuts.loadFromAPI(function(){
-                    Shortcuts.show();
-                    _this.addCustomizeButton();
-                    ShortcutsCustomize.hide();
+                    //Shortcuts.show();
+                    //_this.addCustomizeButton();
+                    //ShortcutsCustomize.hide();
                 }, true);
                 
                 //new Tip(TIPS.SHORTCUTS_FAVORITES_DONE, function(tip) {
