@@ -399,6 +399,8 @@ var WindowManager = (function() {
 
   // Switch to a different app
   function setDisplayedApp(origin, callback, disposition) {
+    if (origin == null)
+      origin = homescreen;
     var currentApp = displayedApp, newApp = origin;
     disposition = disposition || 'window';
 
