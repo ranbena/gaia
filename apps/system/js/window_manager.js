@@ -210,7 +210,6 @@ var WindowManager = (function() {
           return;
 
         setTimeout(closeCallback);
->>>>>>> b11beda3106f21c324633c03b82e57ad9ee7cba8
 
         sprite.style.background = '';
         sprite.className = '';
