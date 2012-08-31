@@ -22,14 +22,18 @@ var EverythingMeManager = (function() {
         footerStyle.MozTransform = 'translateY(0)';
         setVisibilityChange(false);
       }
-      footerStyle.MozTransition = '-moz-transform .3s ease';
+      footerStyle.MozTransition = '-moz-transform .2s ease';
     }
 
     previousPage = currentPage;
   });
 
-  function hideEvme() {
+  function hideEvme(callback, param) {
     evmeStyle.left = '-100%';
+    window.addEventListener('MozAfterPaint', function map() {
+      window.removeEventListener('MozAfterPaint', map);
+      callback(param);
+    });
   }
 
   function showEvme() {
@@ -44,12 +48,12 @@ var EverythingMeManager = (function() {
           openApp(json.data);
           break;
         case 'add-bookmark':
-          hideEvme();
-          addBookmark(json.data);
+          hideEvme(addBookmark, json.data);
+
           break;
         case 'home':
-          hideEvme();
-          GridManager.goToPage(GridManager.landingPageIndex);
+          hideEvme(GridManager.goToPage, GridManager.landingPageIndex);
+
           break;
       }
     }

@@ -12,10 +12,12 @@ const Homescreen = (function() {
   // Initialize the pagination scroller
   PaginationBar.init('.paginationScroller');
 
+  var landingPageIndex = GridManager.landingPageIndex;
+
   function initUI() {
     setLocale();
     GridManager.init('.apps', function gm_init() {
-      GridManager.goToPage(GridManager.landingPageIndex);
+      GridManager.goToPage(landingPageIndex);
       DockManager.init(document.querySelector('#footer .dockWrapper'));
       PaginationBar.show();
       DragDropManager.init();
@@ -36,11 +38,12 @@ const Homescreen = (function() {
       Permissions.hide();
     } else {
       var current = GridManager.pageHelper.getCurrentPageNumber();
-      if (current !== GridManager.landingPageIndex) {
+      if (current !== landingPageIndex) {
         if (current === 0) {
-          EverythingMeManager.hide();
+          EverythingMeManager.hide(GridManager.goToPage, landingPageIndex);
+        } else {
+          GridManager.goToPage(landingPageIndex);
         }
-        GridManager.goToPage(GridManager.landingPageIndex);
       }
     }
   }
