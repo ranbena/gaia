@@ -17,7 +17,7 @@
     right: 6px;
     height: 31px;
     z-index: 51;
-    padding-top: 4px;
+    padding-top: 9px;
 }
 #doat-container #search-header.animate,
 #doat-container #header.animate {
@@ -28,20 +28,20 @@
 }
     #search-rapper {
         position: absolute;
-        top: 4px;
+        top: 9px;
         left: 0;
         right: 0;
         z-index: 25;
         vertical-align: middle;
-        height: 29px;
-        line-height: 29px;
+        height: 28px;
+        line-height: 28px;
     }
     
     .clear-visible #search-rapper {
         right: 60px;
     }
     .clear-visible #button-location {
-        right: 64px;
+        right: 62px;
     }
     .location-visible #search-q-bg {
         padding-right: 86px;
@@ -49,7 +49,7 @@
     
     #search-q, #search-q-bg, #search-selection {
         position: relative;
-        font-size: 16px;
+        font-size: 15px;
         vertical-align: middle;
         padding: 0 4px;
         text-transform: lowercase;
@@ -58,28 +58,33 @@
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
     }
+    #search-header fieldset {
+        height: 100%;
+    }
     #search-q {
         -webkit-appearance: none;
-        background: transparent;
         border: none;
         z-index: 10;
         padding-left: 0;
+        padding-right: 18px;
         width: 100%;
         height: auto;
         top: -2px;
+        background: transparent;
     }
     #search-q-bg {
-        -moz-border-radius: 4px;
-        -webkit-border-radius: 4px;
-        border-radius: 4px;
-        -moz-box-shadow: 0 2px 5px 0 #aaa inset, 0 0 0 1px #000;
-        -webkit-box-shadow: 0 2px 5px 0 #aaa inset, 0 0 0 1px #000;
-        box-shadow: 0 2px 5px 0 #aaa inset, 0 0 0 1px #000;
+        border-radius: 2px;
+        -moz-box-shadow: 1px 1px 0 0 #ccc inset, 0 0 0 1px rgba(0, 0, 0, .3);
+        -webkit-box-shadow: 1px 1px 0 0 #ccc inset, 0 0 0 1px rgba(0, 0, 0, .3);
+        box-shadow: 1px 1px 0 0 #ccc inset, 0 0 0 1px rgba(0, 0, 0, .3);
         background: #fff;
         border: none;
         z-index: 5;
         width: 100%;
-        top: 2px;
+        top: 0;
+        background-image: url('/images/search-icon.png');
+        background-repeat: no-repeat;
+        background-position: 98% 7px;
     }
     #search-q:focus {
         outline: none;
@@ -113,21 +118,22 @@
         
     #button-clear {
         position: absolute;
-        top: 6px;
+        top: 9px;
         right: 0;
         z-index: 20;
         width: 52px;
-        height: 27px;
-        line-height: 27px;
+        height: 28px;
+        line-height: 26px;
         text-align: center;
         cursor: pointer;
-        color: #ffffff;
-        border: 1px solid #387395;
-        border-radius: 5px;
-        text-shadow: 0 -1px 0 rgba(0, 0, 0, .3);
-        background: #489ccb;
-        background: -moz-linear-gradient(center top, #69add4 0%, #2a8bc2 100%);
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #69add4), color-stop(100%, #2a8bc2));
+        color: #666;
+        font-size: 14px;
+        border-radius: 2px;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, .3);
+        font-weight: 600;
+        background: #1ac6ea;
+        background: -moz-linear-gradient(center top, #1ac6ea 0%, #12a8e0 100%);
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #1ac6ea), color-stop(100%, #12a8e0));
         -moz-user-select: none;
         -webkit-user-select: none;
         user-select: none;
@@ -139,17 +145,17 @@
     
     #button-location {
         position: absolute;
-        top: 10px;
-        right: 4px;
+        top: 11px;
+        right: 2px;
         z-index: 90;
         color: #43474a;
         text-shadow: 0 1px 0 rgba(255, 255, 255, .8);
         text-align: center;
         font-size: 11px;
-        font-weight: bold;
+        font-weight: 600;
         width: 72px;
         padding: 0 2px;
-        height: 20px;
+        height: 22px;
         line-height: 20px;
         cursor: pointer;
         border-radius: 4px;
@@ -178,9 +184,6 @@
     }
     #button-location .doat-loading {
         margin-left: 4px;
-    }
-    .empty-query #button-location {
-        right: 6px;
     }
     #default-text {
         position: absolute;

@@ -9,12 +9,16 @@
     text-shadow: 0 2px 3px rgba(0, 0, 0, .5);
     font-size: 16px;
     text-align: center;
-    z-index: 500;
+    z-index: 600;
     opacity: 0;
     pointer-events: none;
     -moz-transition: opacity .3s linear;
     -webkit-transition: opacity .3s linear;
     transition: opacity .3s linear;
+}
+#doat-container.shortcuts-customize-visible #connection-message {
+    color: #292929;
+    text-shadow: 0 2px 3px rgba(255, 255, 255, .5);
 }
     #doat-container #connection-message:before {
         background: transparent url('/everything.me/images/connection.png') 0 0 no-repeat;
@@ -32,15 +36,22 @@
     pointer-events: inherit;
 }
 
+#doat-container.connection-error #doat-apps ,
 #doat-container.connection-error #shortcuts,
-#doat-container.connection-error #doat-apps {
+#doat-container.connection-error #shortcuts-favorites .scroll-wrapper
+{
     opacity: 0 !important;
-    pointer-events: none;
+    pointer-events: none !important;
 }
+
+#doat-container.connection-error #shortcuts-favorites {
+    pointer-events: none !important;
+}
+
 #doat-container.connection-error #helper-header,
 #doat-container.connection-error #search-header > * {
-    pointer-events: none;
+    pointer-events: none !important;
 }
 #doat-container.connection-error #search-header #button-clear {
-    pointer-events: inherit;
+    pointer-events: inherit !important;
 }

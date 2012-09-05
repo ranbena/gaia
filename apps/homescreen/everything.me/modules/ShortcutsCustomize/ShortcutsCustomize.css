@@ -52,7 +52,7 @@
     }
     #shortcuts-favorites .subtitle, #shortcuts-favorites li {
         position: relative;
-        font-weight: bold;
+        font-weight: 600;
         height: 43px;
         line-height: 43px;
         padding: 0 12px 0 43px;

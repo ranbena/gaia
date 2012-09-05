@@ -22,7 +22,7 @@
     right: 0;
     margin-top: -20px;
     font-size: 13px;
-    font-weight: bold;
+    font-weight: 600;
     color: #fff;
     text-shadow: 1px 0 2px rgba(0, 0, 0, .5);
     text-align: center;
@@ -52,7 +52,9 @@
 }
 
 #doat-container #doat-apps ul {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     padding-bottom: 30px;
 }
@@ -89,7 +91,7 @@
         height: auto;
         color: #b4dae7;
         font-size: 15px;
-        font-weight: bold;
+        font-weight: 600;
         text-shadow: 0 1px 1px #000;
         cursor: pointer;
         z-index: 100;
@@ -168,17 +170,17 @@
         #doat-container .apps ul li b {
             display: inline-block;
             font-size: 11px;
-            font-weight: bold;
             line-height: 12px;
             max-height: 35px;
             max-width: 95%;
             margin-top: 2px;
             overflow: hidden;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 1), 0 1px 1px #000;
             text-overflow: ellipsis;
             -ms-text-overflow: ellipsis;
             padding: 2px;
             color: #fff;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, .6);
         }
             #doat-container #doat-apps ul li b em,
             #doat-container .apps ul li b em {
@@ -201,7 +203,7 @@
             cursor: pointer;
             text-align: center;
             border-radius: 18px;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 14px;
             z-index: 0;
             opacity: 0;
@@ -222,7 +224,7 @@
         line-height: 60px;
         color: #fff;
         font-size: 14px;
-        font-weight: bold;
+        font-weight: 600;
         padding: 0;
         margin: 10px 0 0 0;
         z-index: 50;
