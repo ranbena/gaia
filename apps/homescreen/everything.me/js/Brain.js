@@ -705,8 +705,8 @@ var Brain = new function() {
                 Brain.UserPage.clickApp(data);
                 return;
             }
-            
-            if (!Apps.isSwiping() && !Searcher.isLoadingApps()) {
+
+            if (!Searcher.isLoadingApps()) {
                 data.keyboardVisible = Utils.isKeyboardVisible() ? 1 : 0;
                 
                 if (!Searcher.searchedExact()) {
@@ -757,6 +757,7 @@ var Brain = new function() {
                 "top": $app[0].offsetTop,
                 "left": $app[0].offsetLeft
             };
+
             var appListHeight = $apps.height(),
                 appListWidth = $apps.width(),
                 appHeight = $app.height(),
@@ -826,37 +827,23 @@ var Brain = new function() {
         };
         
         function goToApp(data, delay) {
+            
             !delay && (delay = 0);
             data["appUrl"] = loadingApp.getLink();
             
             EventHandler.trigger("Core", "redirectedToApp", data);
             
-            if (Utils.isB2G()) {
-                /*$(window)
-                    .unbind("visibilitychange", returnFromOutside)
-                    .bind("visibilitychange", returnFromOutside);
-                    */
-                // for now this hack is in place because Cristian can't fire visibilitychange when returning from an app     
-                setTimeout(returnFromOutside, 2000);
-            } else {
-                $(window)
-                    .unbind("pageshow", returnFromOutside).bind("pageshow", returnFromOutside)
-                    .unbind("focus", returnFromOutside).bind("focus", returnFromOutside);            
-            }
+            /*$(window)
+                .unbind("visibilitychange", returnFromOutside)
+                .bind("visibilitychange", returnFromOutside);
+                */
+            // for now this hack is in place because Cristian can't fire visibilitychange when returning from an app     
+            setTimeout(returnFromOutside, 2000);
             
             window.setTimeout(function(){
-                if (Utils.isB2G()) {
-                    _this.appRedirectExecute(data["appUrl"], data);    
-                } else {
-                    _this.appRedirectBridge(data["appUrl"], data);    
-                }
+                _this.appRedirectExecute(data["appUrl"], data);
             }, delay);
         }
-        
-        // overriden in Analytics.init()
-        this.appRedirectBridge = function(appUrl, data){
-            _this.appRedirectExecute(appUrl, data);
-        };
         
         this.appRedirectExecute = function(appUrl, data){
            var appIcon = Utils.formatImageData(data.icon);

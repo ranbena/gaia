@@ -56,15 +56,8 @@ var Apps = new function() {
             DEFAULT_ICON_URL = [DEFAULT_ICON_URL];
         }
         
-        $list.bind("touchmove", function(){
-            isSwiping = true
-        });
-        
-        $list.bind("mouseup", function(){
+        $list.bind("touchend", function(){
             _this.timeoutHold && window.clearTimeout(_this.timeoutHold);
-            window.setTimeout(function(){
-                isSwiping = false;
-            }, 100);
         });
         
         var hasFixedPositioning = Utils.hasFixedPositioning();
@@ -833,7 +826,7 @@ var App = function(__cfg, __index, __isMore, parent) {
     };
     
     function touchstart(e) {
-        firedHold = false;
+        firedHold = tapIgnored = false;
         timeTouchStart = new Date().getTime();
         parent.timeoutHold = window.setTimeout(cbHold, Apps.getAppTapAndHoldTime());
         touchStartPos = getEventPoint(e);
@@ -849,21 +842,20 @@ var App = function(__cfg, __index, __isMore, parent) {
             Math.abs(distance[1]) > DISTANCE_TO_IGNORE_AS_MOVE) 
         {
             window.clearTimeout(parent.timeoutHold);
-            firedHold = true;    
+            tapIgnored = true;    
         }
     }
     
     function touchend(e) {
-        if (firedHold) {
+        if (firedHold || tapIgnored) {
             return;
         }
         
         window.clearTimeout(parent.timeoutHold);
-        var holdDuration = (new Date().getTime() - timeTouchStart);
         e.preventDefault();
         e.stopPropagation();
         
-        cbClick(holdDuration);
+        cbClick();
     }
             
     function getEventPoint(e) {
@@ -885,15 +877,14 @@ var App = function(__cfg, __index, __isMore, parent) {
         return cfg;
     }
 
-    function cbClick(holdDuration) {
+    function cbClick() {
         EventHandler.trigger(_name, "click", {
             "app": _this,
             "appId": hadID ? cfg.id : 0,
             "$el": $el,
             "data": cfg,
             "index": index,
-            "isMore": isMore,
-            "holdDuration": holdDuration
+            "isMore": isMore
         });
     }
 
