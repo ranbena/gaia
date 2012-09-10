@@ -1,4 +1,5 @@
 var Connection = new function() {
+    
     var _name = "Connection", _this = this,
             $el = null;
             
