@@ -1,7 +1,7 @@
 
 'use strict';
 
-var EverythingMeManager = (function() {
+var EvmeManager = (function() {
 
   var footerStyle = document.querySelector('#footer').style;
   var evmeStyle = document.querySelector('#evme').style;
@@ -40,25 +40,6 @@ var EverythingMeManager = (function() {
     evmeStyle.left = '0';
   }
 
-  function dispatchEvent(e) {
-    if (typeof e.data === 'string' && e.data.indexOf('type') !== -1) {
-      var json = JSON.parse(e.data);
-      switch (json.type) {
-        case 'open-in-app':
-          openApp(json.data);
-          break;
-        case 'add-bookmark':
-          hideEvme(addBookmark, json.data);
-
-          break;
-        case 'home':
-          hideEvme(GridManager.goToPage, GridManager.landingPageIndex);
-
-          break;
-      }
-    }
-  }
-
   function openApp(params) {
     (new EvmeApp({
       url: params.url,
@@ -82,16 +63,24 @@ var EverythingMeManager = (function() {
   }
 
   function setVisibilityChange(visible) {
-      window.postMessage(JSON.stringify({
-        type: 'visibilitychange',
-        data: { hidden: !visible }
-      }), '*');
+    window.postMessage(JSON.stringify({
+      type: 'visibilitychange',
+      data: { hidden: !visible }
+    }), '*');
   }
 
   return {
-    dispatchEvent: dispatchEvent,
+    hide: hideEvme,
 
-    hide: hideEvme
+    openApp: openApp,
+
+    addBookmark: function ev_addBookmark(data) {
+      hideEvme(addBookmark, data);
+    },
+
+    goHome: function ev_goHome() {
+      hideEvme(GridManager.goToPage, GridManager.landingPageIndex);
+    }
   };
 
 }());

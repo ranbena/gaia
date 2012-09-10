@@ -2,7 +2,7 @@ var Utils = new function() {
     var _this = this, userAgent = "", connection, cssPrefix = "", iconsFormat = null,
         isKeyboardVisible = false, _title = "Everything", isNewUser,
         _parseQuery = parseQuery();
-        
+
     this.ICONS_FORMATS = {
         "Small": 10,
         "Large": 20
@@ -10,7 +10,7 @@ var Utils = new function() {
     var CONTAINER_ID = "doat-container",
         COOKIE_NAME_CREDENTIALS = "credentials",
         DYNAMIC_TITLE = false;
-    
+
     this.FFOSMessages = {
         "APP_CLICK": "open-in-app",
         "APP_INSTALL": "add-bookmark",
@@ -34,66 +34,72 @@ var Utils = new function() {
     };
     this.sendToFFOS = function(type, data) {
         if (!type) return;
-        
+
         try {
             if (Utils.isLauncher()) {
                 navigator.everything.client.launcher.message(type, data);
             } else {
-                var obj = {
-                    "type": type,
-                    "data": data || {}
-                };
-                var sMessage = JSON.stringify(obj);
-                window.parent.postMessage(sMessage, "*");
+                switch (type) {
+                    case Utils.FFOSMessages.SWIPE_LEFT_TO_RIGHT:
+                    case Utils.FFOSMessages.SWIPE_RIGHT_TO_LEFT:
+                        EvmeManager.goHome();
+                        break;
+                    case Utils.FFOSMessages.APP_CLICK:
+                        EvmeManager.openApp(data);
+                        break;
+                    case Utils.FFOSMessages.APP_INSTALL:
+                        EvmeManager.addBookmark(data);
+                        break;
+                }
             }
         } catch(ex) {
-            
+
         }
     };
-    
+
     this.getID = function() {
         return CONTAINER_ID;
     };
-    
+
     this.getRoundIcon = function(imageSrc, size, shadowOffset, callback) {
         // canvas
         var canvas = document.createElement("canvas"),
             ctx = canvas.getContext("2d"),
             radius = size/2;
-        
+
         canvas.setAttribute("width", size);
         canvas.setAttribute("height", size);
-        
-        !shadowOffset && (shadowOffset = 0); 
-        
+
+        !shadowOffset && (shadowOffset = 0);
+
         // create clip
         ctx.save();
         ctx.beginPath();
         ctx.arc(radius, radius, radius, 0, 2 * Math.PI, false);
         ctx.clip();
-        
+
         // generate image
         var img = new Image()
         img.onload = function() {
             ctx.drawImage(img,0,0, size, size);
-            
+
             // send to get shadow
             var data = canvas.toDataURL();
             getShadow(data, size, shadowOffset, callback)
         };
         img.src = imageSrc;
     };
-    
+
     var getShadow = function(imageSrc, size, shadowOffset, callback) {
         var canvas = document.createElement("canvas"),
             ctx = canvas.getContext("2d");
-        
+
         canvas.setAttribute("width", size+shadowOffset);
-        canvas.setAttribute("height", size+shadowOffset);    
-    
+        canvas.setAttribute("height", size+shadowOffset);
+
         ctx.shadowColor="rgba(0,0,0,0.3)";
         ctx.shadowOffsetY = shadowOffset;
-        
+
         // generate image
         var img = new Image()
         img.onload = function() {
@@ -103,54 +109,54 @@ var Utils = new function() {
         };
         img.src = imageSrc;
     }
-    
+
     this.init = function() {
         userAgent = navigator.userAgent;
         cssPrefix = _getCSSPrefix();
         connection = Connection.get();
         isTouch = "ontouchstart" in window;
     };
-    
+
     this.isNewUser = function() {
         if (isNewUser === undefined) {
             isNewUser = !Storage.get("counter-ALLTIME");
         }
         return isNewUser;
     };
-    
+
     this.updateObject = function(configData, groupConfig) {
         if (!groupConfig) return;
-        
+
         for (var key in groupConfig) {
             eval('configData["' + key.replace(/=>/g, '"]["') + '"] = groupConfig[key]');
         }
-        
+
         return configData;
     };
-    
+
     this.formatImageData = function(image) {
         if (!image || typeof image !== "object") {
             return image;
-        } 
+        }
         if (!image.MIMEType || image.data.length < 10) {
             return null;
         }
-        
+
         return "data:" + image.MIMEType + ";base64," + image.data;
     };
-    
+
     this.getIconGroup = function() {
         return JSON.parse(JSON.stringify(__config.iconsGroupSettings));
     }
-    
+
     this.getIconsFormat = function() {
         return iconsFormat || _getIconsFormat();
     };
-    
+
     this.isKeyboardVisible = function(){
         return isKeyboardVisible;
     };
-    
+
     this.setKeyboardVisibility = function(value){
         isKeyboardVisible = value;
         if (isKeyboardVisible) {
@@ -159,11 +165,11 @@ var Utils = new function() {
             $("#doat-container").removeClass("keyboard-visible");
         }
     };
-    
+
     this.connection = function(){
         return connection;
     };
-    
+
     this.isOnline = function(callback) {
         Connection.online(callback);
     };
@@ -171,11 +177,11 @@ var Utils = new function() {
     this.getUrlParam = function(key) {
         return _parseQuery[key]
     };
-    
+
     this.cssPrefix = function() {
         return cssPrefix;
     };
-    
+
     this.convertIconsToAPIFormat = function(icons) {
         var aIcons = [];
         if (icons instanceof Array) {
@@ -189,28 +195,28 @@ var Utils = new function() {
         }
         aIcons = aIcons.join(",");
         return aIcons;
-        
+
         function f(icon) {
             return (icon && icon.id && icon.revision && icon.format)? icon.id + ":" + icon.revision + ":" + icon.format : "";
         }
     }
-    
+
     this.hasFixedPositioning = function(){
         return false;
     };
-    
+
     this.isVersionOrHigher = function(v1, v2) {
         if (!v2){ v2 = v1; v1 = Utils.getOS().version; };
         if (!v1){ return undefined; }
-        
+
         var v1parts = v1.split('.');
         var v2parts = v2.split('.');
-        
+
         for (var i = 0; i < v1parts.length; ++i) {
             if (v2parts.length == i) {
                 return true;
             }
-            
+
             if (v1parts[i] == v2parts[i]) {
                 continue;
             } else if (parseInt(v1parts[i], 10) > parseInt(v2parts[i], 10)) {
@@ -219,102 +225,102 @@ var Utils = new function() {
                 return false;
             }
         }
-        
+
         if (v1parts.length != v2parts.length) {
             return false;
         }
-        
+
         return true;
     };
-    
+
     this.User = new function() {
         this.creds = function() {
             var credsFromCookie = Utils.Cookies.get(COOKIE_NAME_CREDENTIALS);
             return credsFromCookie;
         };
     };
-    
+
     this.Cookies = new function() {
         this.set = function(name, value, expMinutes, _domain) {
             var expiration = "",
                 path = norm("path","/"),
                 domain = norm("domain", _domain);
-            
+
             if (expMinutes) {
                 expiration = new Date();
                 expiration.setMinutes(expiration.getMinutes() + expMinutes);
                 expiration = expiration.toGMTString();
             }
             expiration = norm("expires", expiration);
-            
+
             var s = name + "=" + escape(value) + expiration + path + domain;
-            
+
             try {
                 document.cookie = s;
             } catch(ex) {}
-            
+
             return s;
         };
-        
+
         this.get = function(name) {
             var results = null;
-            
+
             try {
-                results = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');   
+                results = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
             } catch(ex) {}
-            
+
             return (results)? unescape(results[2]) : null;
         };
-        
+
         this.remove = function(name) {
             Utils.Cookies.set(name, "", "Thu, 24-Jun-1999 12:34:56 GMT");
         };
-        
+
         function norm(k, v) {
             return k && v ? "; "+k+"="+v : "";
         }
     };
-    
+
     // check that cookies are enabled by setting and getting a temp cookie
     this.bCookiesEnabled = function(){
         var key = "cookiesEnabled",
             value = "true";
-            
-        // set 
+
+        // set
         _this.Cookies.set(key, value, 10);
-        
+
         // get and check
         if (_this.Cookies.get(key) === value){
             _this.Cookies.remove(key);
             return true;
         }
     };
-    
+
     // check that localStorage is enabled by setting and getting a temp value
     this.bLocalStorageEnabled = function(){
         return Storage.enabled();
     };
-    
+
     function _getIconsFormat() {
         return _this.ICONS_FORMATS.Large;
     }
-    
+
     function _getCSSPrefix() {
         return (/webkit/i).test(navigator.appVersion) ? '-webkit-' :
                 (/firefox/i).test(navigator.userAgent) ? '-moz-' :
                 (/msie/i).test(navigator.userAgent) ? '-ms-' :
                 'opera' in window ? '-o-' : '';
     }
-    
+
     this.getCurrentSearchQuery = function(){
         return Brain.Searcher.getDisplayedQuery();
     };
-    
+
     this.CONNECTION = {
         "EVENT_ONLINE": "ononline",
         "EVENT_OFFLINE": "onoffline"
     };
-    
+
     var Connection = new function(){
         var _this = this,
             currentIndex,
@@ -349,12 +355,12 @@ var Utils = new function() {
             onLine = true, imageToPoll = "", pollingInterval = 0, timeoutPolling = null,
             ERROR_TIMEOUT = 0,
             EVENT_ONLINE = "ononline", EVENT_OFFLINE = "onoffline";
-            
+
         this.init = function() {
             imageToPoll = "http://corp.everything.me/img/bg-pages.png";
             pollingInterval = 2000;
             ERROR_TIMEOUT = 5000;
-            
+
             window.addEventListener(EVENT_ONLINE, function(){
                 onLine = true;
                 window.clearTimeout(timeoutPolling);
@@ -363,17 +369,17 @@ var Utils = new function() {
                 onLine = false;
                 checkConnection();
             });
-            
+
             if (imageToPoll && pollingInterval) {
                 checkConnection();
             }
-    
+
             _this.set();
         };
-        
+
         function checkConnection(cb) {
             window.clearTimeout(timeoutPolling);
-            
+
             var img = new Image();
             img.timeout = null;
             img.onload = function() {
@@ -391,38 +397,38 @@ var Utils = new function() {
                 }
                 cb && cb(false);
             };
-            
+
             img.timeout = window.setTimeout(function(){
                 img.onload = null;
                 img.onerror();
             }, ERROR_TIMEOUT);
-            
+
             img.src = imageToPoll + "?ts=" + new Date().getTime();
         }
-        
+
         this.online = function(callback) {
             checkConnection(callback);
         };
-            
+
         this.get = function(){
             return getCurrent();
         };
-        
+
         this.set = function(index){
              currentIndex = index || (navigator.connection && navigator.connection.type) || 0;
              return getCurrent();
         };
-        
+
         function fireEvent(ev) {
             var e = document.createEvent("Events");
             e.initEvent(ev, true, false);
             window.dispatchEvent(e);
         }
-        
+
         function getCurrent(){
             return aug({}, consts, types[currentIndex]);
         }
-        
+
         function aug(){
             var main = arguments[0];
             for (var i=1, len=arguments.length; i<len; i++){
@@ -430,11 +436,11 @@ var Utils = new function() {
             };
             return main;
         }
-        
+
         // init
         _this.init();
     };
-    
+
     this.init();
 };
 
@@ -444,7 +450,7 @@ var Utils = new function() {
         DEFAULT_SPEC_PROP = "hidden",
         prefixes = ["o", "ms", "moz", "webkit"],
         vendorProp, vendorEvent;
-        
+
     if (typeof d[DEFAULT_SPEC_PROP] !== "undefined") {
         return;
     } else {
@@ -452,7 +458,7 @@ var Utils = new function() {
         while(i--) {
             var prefix = prefixes[i],
                 propName = prefix + "Hidden";
-            
+
             if (d[propName] !== "undefined") {
                 vendorProp = propName;
                 vendorEvent = prefix + "visibilitychange";
@@ -460,7 +466,7 @@ var Utils = new function() {
             }
         }
     }
-    
+
     if (vendorEvent) {
         d.addEventListener(vendorEvent, function(){
             setHidden(d[vendorProp]);
@@ -468,7 +474,7 @@ var Utils = new function() {
     } else {
         var evShow = ("onpageshow" in global)? "pageshow" : "focus",
             evHide = ("onpagehide" in global)? "pagehide" : "blur";
-        
+
         global.addEventListener(evShow, function(){
             setHidden(false);
         }, false);
@@ -476,7 +482,7 @@ var Utils = new function() {
             setHidden(true);
         }, false);
     }
-    
+
     function setHidden(hidden) {
         d[DEFAULT_SPEC_PROP] = hidden;
         fireVisibilityEvent();

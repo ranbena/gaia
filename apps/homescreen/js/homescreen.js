@@ -40,7 +40,7 @@ const Homescreen = (function() {
       var current = GridManager.pageHelper.getCurrentPageNumber();
       if (current !== landingPageIndex) {
         if (current === 0) {
-          EverythingMeManager.hide(GridManager.goToPage, landingPageIndex);
+          EvmeManager.hide(GridManager.goToPage, landingPageIndex);
         } else {
           GridManager.goToPage(landingPageIndex);
         }
@@ -51,8 +51,6 @@ const Homescreen = (function() {
   window.addEventListener('message', function onMessage(e) {
     if (e.data === 'home') {
       onHomescreenActivity();
-    } else {
-      EverythingMeManager.dispatchEvent(e);
     }
   });
 
