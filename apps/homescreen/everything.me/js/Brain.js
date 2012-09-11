@@ -70,64 +70,9 @@ var Brain = new function() {
             Searchbar.clear();
             Brain.Searchbar.setEmptyClass();
             
-            Swiper.init();
-            
             Shortcuts.loadDefault();
             Shortcuts.show();
         };
-        
-        var Swiper = new function() {
-            var $els = $("#doat-apps, #shortcuts,#connection-message"),
-                startPoint = null, movePoint = null;
-            
-            var DISTANCE_TO_COUNT_AS_SWIPE;
-            
-            this.init = function() {
-                DISTANCE_TO_COUNT_AS_SWIPE = window.innerWidth/4;
-                
-                $els.bind("touchstart", start);
-            };
-            
-            function start(e) {
-                startPoint = getEventPoint(e);
-                movePoint = startPoint;
-                
-                if (startPoint) {
-                    $els.bind("touchmove", move); // b2g hack due to https://bugzilla.mozilla.org/show_bug.cgi?id=783276
-                    $els.bind("touchend", end);
-                }
-            }
-            
-            function move(e) {
-                movePoint = getEventPoint(e); // b2g hack due to https://bugzilla.mozilla.org/show_bug.cgi?id=783276
-            }
-            
-            function end(e) {
-                if (!startPoint) return;
-                
-                //var point = getEventPoint(e),
-                var point = movePoint, // b2g hack due to https://bugzilla.mozilla.org/show_bug.cgi?id=783276
-                    distance = [point[0] - startPoint[0], point[1] - startPoint[1]];
-
-                if (distance[0] > DISTANCE_TO_COUNT_AS_SWIPE) {
-                    Utils.sendToFFOS(Utils.FFOSMessages.SWIPE_LEFT_TO_RIGHT);
-                } else if (distance[0] < -DISTANCE_TO_COUNT_AS_SWIPE) {
-                    Utils.sendToFFOS(Utils.FFOSMessages.SWIPE_RIGHT_TO_LEFT);
-                }
-                
-                $els.unbind("touchend", end);
-                $els.unbind("touchmove", move); // b2g hack due to https://bugzilla.mozilla.org/show_bug.cgi?id=783276
-                
-                startPoint = null;
-            }
-            
-            function getEventPoint(e) {
-                var touch = e.touches && e.touches[0] ? e.touches[0] : e,
-                    point = touch && [touch.pageX || touch.clientX, touch.pageY || touch.clientY];
-                
-                return point;
-            }
-        }
     };
     
     this.Searchbar = new function() {

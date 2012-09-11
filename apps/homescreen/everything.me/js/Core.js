@@ -6,11 +6,6 @@ var Core = new function() {
     this.shouldSearchOnInputBlur = true;
    
     this.init = function() {
-        document.getElementById(Utils.getID()).addEventListener("mousemove", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        });
-        
         _this.initWithConfig(__config);
         
         window.addEventListener("message", function(e) {
