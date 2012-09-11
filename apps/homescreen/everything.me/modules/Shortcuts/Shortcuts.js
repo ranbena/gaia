@@ -372,8 +372,7 @@ var Shortcuts = new function() {
     function setShortcutsDesign() {
         if (setDesign) return;
         
-        var style = "#" + Utils.getID() + " .shortcut { width: " + 100/itemsDesign.itemsPerRow + "%; } \n" +
-                    "#" + Utils.getID() + " .shortcut:nth-child(" + itemsDesign.itemsPerRow + "n+" + itemsDesign.itemsPerRow + ") .thumb { right: -2px; } \n";
+        var style = "#" + Utils.getID() + " .shortcut { width: " + 100/itemsDesign.itemsPerRow + "%; } \n";
         
         var $style = $('<style type="text/css">' + style + '</style>');
         

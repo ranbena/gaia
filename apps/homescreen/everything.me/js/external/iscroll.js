@@ -19,7 +19,7 @@ var m = Math,
     has3d = 'WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix(),
     hasTouch = 'ontouchstart' in window && !isTouchPad,
     hasTransform = vendor + 'Transform' in document.documentElement.style,
-    hasTransitionEnd = isIDevice || isPlaybook,
+    hasTransitionEnd = true, //isIDevice || isPlaybook,
 
     nextFrame = (function() {
         return window.requestAnimationFrame
@@ -45,6 +45,7 @@ var m = Math,
     MOVE_EV = hasTouch ? 'touchmove' : 'mousemove',
     END_EV = hasTouch ? 'touchend' : 'mouseup',
     CANCEL_EV = hasTouch ? 'touchcancel' : 'mouseup',
+    TRANSITION_END_EV = (vendor == 'webkit')? "webkitTransitionEnd" : 'transitionend',
 
     // Helpers
     trnOpen = 'translate' + (has3d ? '3d(' : '('),
@@ -55,6 +56,14 @@ var m = Math,
         var that = this,
             doc = document,
             i;
+            
+            
+        var elTestTransform = document.createElement("div");
+        elTestTransform.style.cssText = "-" + vendor + "-transform: translate3d(1px, 1px, 1px);";
+        has3d = elTestTransform.style.cssText.indexOf("3d") !== -1 || ('WebKitCSSMatrix' in window && 'm11' in new WebKitCSSMatrix()),
+        trnOpen = 'translate' + (has3d ? '3d(' : '(');
+        trnClose = has3d ? ',0)' : ')';
+
 
         that.wrapper = typeof el == 'object' ? el : doc.getElementById(el);
         that.wrapper.style.overflow = 'hidden';
@@ -134,7 +143,7 @@ iScroll.prototype = {
             case CANCEL_EV: that._end(e); break;
             case RESIZE_EV: that._resize(); break;
             case 'mouseout': that._mouseout(e); break;
-            case 'webkitTransitionEnd': that._transitionEnd(e); break;
+            case TRANSITION_END_EV: that._transitionEnd(e); break;
         }
     },
 
@@ -192,7 +201,7 @@ iScroll.prototype = {
             }
             
             if (x != that.x || y != that.y) {
-                if (that.options.useTransition) that._unbind('webkitTransitionEnd');
+                if (that.options.useTransition) that._unbind(TRANSITION_END_EV);
                 else cancelFrame(that.aniTime);
                 that.steps = [];
                 that._pos(x, y);
@@ -370,7 +379,7 @@ iScroll.prototype = {
 
         if (e.target != that.scroller) return;
 
-        that._unbind('webkitTransitionEnd');
+        that._unbind(TRANSITION_END_EV);
         
         that._startAni();
     },
@@ -405,7 +414,7 @@ iScroll.prototype = {
             that._transitionTime(step.time);
             that._pos(step.x, step.y);
             that.animating = false;
-            if (step.time) that._bind('webkitTransitionEnd');
+            if (step.time) that._bind(TRANSITION_END_EV);
             else that._resetPos(0);
             return;
         }
@@ -500,7 +509,7 @@ iScroll.prototype = {
         that._unbind(END_EV);
         that._unbind(CANCEL_EV);
         that._unbind('mouseout', that.wrapper);
-        if (that.options.useTransition) that._unbind('webkitTransitionEnd');
+        if (that.options.useTransition) that._unbind(TRANSITION_END_EV);
         
         if (that.options.onDestroy) that.options.onDestroy.call(that);
     },

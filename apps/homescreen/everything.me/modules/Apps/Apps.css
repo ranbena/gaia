@@ -53,8 +53,6 @@
 
 #doat-container #doat-apps ul {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     padding-bottom: 30px;
 }
@@ -63,13 +61,17 @@
 }
     #doat-container #doat-apps ul li,
     #doat-container .apps ul li {
-        position: absolute;
         left: 0;
         width: 25%;
         height: 79px;
         padding-top: 10px;
         text-align: center;
         cursor: pointer;
+        
+        display: inline-block;
+        -moz-transform: none !important;
+        vertical-align: top;
+        
         -moz-transition: -moz-transform .2s linear;
         -webkit-transition: -webkit-transform .2s linear;
         -ms-transition: -ms-transform .2s linear;

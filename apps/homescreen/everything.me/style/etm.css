@@ -1,20 +1,8 @@
-#evme {
-	position: fixed;
-	width: 100%;
-	height: 100%;
-	top: 0;
-	left: -100%;
-}
-
-#doat-container{
-	width: 100%;
-	height: 100%;
-}
-
 #etmPage {
-	background-image: -moz-element(#evme);
+    overflow: hidden;
 }
+    #etmPage ol {
+        display: none;
+    }
+    
 
-li:active {
-  background-color: transparent !important;
-}

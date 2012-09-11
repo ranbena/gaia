@@ -4,13 +4,15 @@
 var EvmeManager = (function() {
 
   var footerStyle = document.querySelector('#footer').style;
-  var evmeStyle = document.querySelector('#evme').style;
-
   var previousPage = GridManager.landingPageIndex;
   var everythingMeIndex = 0;
-
-  document.querySelector('#etmPage').addEventListener('transitionend',
-                                                    function transitionEnd(e) {
+  var evmePage = document.querySelector('#etmPage');
+  
+  evmePage.addEventListener('transitionstart', function transitionEnd(e) {
+    this.style.visibility = "visible";
+  });
+  
+  evmePage.addEventListener('transitionend', function transitionEnd(e) {
     var currentPage = GridManager.pageHelper.getCurrentPageNumber();
 
     if (previousPage !== currentPage) {
@@ -18,9 +20,11 @@ var EvmeManager = (function() {
         showEvme();
         footerStyle.MozTransform = 'translateY(7.5rem)';
         setVisibilityChange(true);
+        this.style.visibility = "visible";
       } else {
         footerStyle.MozTransform = 'translateY(0)';
         setVisibilityChange(false);
+        this.style.visibility = "hidden";
       }
       footerStyle.MozTransition = '-moz-transform .2s ease';
     }
@@ -29,15 +33,10 @@ var EvmeManager = (function() {
   });
 
   function hideEvme(callback, param) {
-    evmeStyle.left = '-100%';
-    window.addEventListener('MozAfterPaint', function map() {
-      window.removeEventListener('MozAfterPaint', map);
-      callback(param);
-    });
+    callback(param);
   }
 
   function showEvme() {
-    evmeStyle.left = '0';
   }
 
   function openApp(params) {
