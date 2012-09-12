@@ -17,6 +17,10 @@ var Utils = new function() {
         "SWIPE_LEFT_TO_RIGHT": false,
         "SWIPE_RIGHT_TO_LEFT": "home"
     };
+    
+    this.log = function(message) {
+        console.log("(" + (new Date().getTime()) + ") DOAT: " + message);
+    };
     this.isLauncher = function() {
         return (window.location.href.indexOf("mode=launcher") !== -1);
     };
