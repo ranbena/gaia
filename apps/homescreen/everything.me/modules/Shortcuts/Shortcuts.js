@@ -21,30 +21,10 @@ var Shortcuts = new function() {
         $("#header-category .back").bind("touchstart", _this.showCategories);
         $("#category-page-button").bind("click", clickContinueButton);
         
-        
-        var prevSwipe = false,
-            startY = 0,
-            THRESHOLD = 1;
-        
-        
         scroll = new Scroll($el.find("#shortcuts-list")[0], {
             "hScroll": false,
             "checkDOMChanges": false,
-            "onBeforeScrollStart": function(e){
-                prevSwipe = false;
-                startY = scroll.y;
-            },
-            "onBeforeScrollMove": function(e){
-                swiped = true;
-                
-                if (!prevSwipe && Math.abs(scroll.y - startY) > THRESHOLD) {
-                    prevSwipe = true;
-                }
-                
-                if (prevSwipe) {
-                    e.preventDefault();
-                }
-            },
+            "onBeforeScrollMove": function(e){ swiped = true; },
             "onBeforeScrollEnd": function(){ swiped = false; }
         });
         scrollPage = new Scroll($("#page-category")[0], {

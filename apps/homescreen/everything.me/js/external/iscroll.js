@@ -50,6 +50,8 @@ var m = Math,
     // Helpers
     trnOpen = 'translate' + (has3d ? '3d(' : '('),
     trnClose = has3d ? ',0)' : ')',
+    
+    _preventingEvent = false,
 
     // Constructor
     iScroll = function (el, options) {
@@ -84,7 +86,7 @@ var m = Math,
 
             // Events
             onRefresh: null,
-            onBeforeScrollStart: function (e) { e.preventDefault(); },
+            onBeforeScrollStart: null,
             onScrollStart: null,
             onBeforeScrollMove: null,
             onScrollMove: null,
@@ -130,6 +132,7 @@ iScroll.prototype = {
     y: 0,
     steps: [],
     scale: 1,
+    _preventingEvent: false,
     
     handleEvent: function (e) {
         var that = this;
@@ -188,6 +191,7 @@ iScroll.prototype = {
         that.absDistY = 0;
         that.dirX = 0;
         that.dirY = 0;
+        that._unpreventMove();
 
         if (that.options.momentum) {
             if (that.options.useTransform) {
@@ -268,6 +272,10 @@ iScroll.prototype = {
         that._pos(newX, newY);
         that.dirX = deltaX > 0 ? -1 : deltaX < 0 ? 1 : 0;
         that.dirY = deltaY > 0 ? -1 : deltaY < 0 ? 1 : 0;
+        
+        if (that.dirY != 0) {
+            that._preventMove();
+        }
 
         if (timestamp - that.startTime > 300) {
             that.startTime = timestamp;
@@ -489,6 +497,22 @@ iScroll.prototype = {
 
     _unbind: function (type, el, bubble) {
         (el || this.scroller).removeEventListener(type, this, !!bubble);
+    },
+    _unpreventMove: function() {
+        if (!this._preventingEvent) return;
+        
+        document.body.removeEventListener("touchmove", this._preventTouchMove);
+        this._preventingEvent = false;
+    },
+    _preventMove: function() {
+        if (this._preventingEvent) return;
+        
+        this._preventingEvent = true;
+        document.body.addEventListener("touchmove", this._preventTouchMove);
+    },
+    _preventTouchMove: function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
     },
 
 
