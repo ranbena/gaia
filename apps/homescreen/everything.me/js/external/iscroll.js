@@ -83,6 +83,8 @@ var m = Math,
             lockDirection: true,
             useTransform: true,
             useTransition: false,
+            
+            elToPreventMove: document.getElementById(Utils.getID()),
 
             // Events
             onRefresh: null,
@@ -498,18 +500,21 @@ iScroll.prototype = {
     _unbind: function (type, el, bubble) {
         (el || this.scroller).removeEventListener(type, this, !!bubble);
     },
+    
     _unpreventMove: function() {
         if (!this._preventingEvent) return;
         
-        document.body.removeEventListener("touchmove", this._preventTouchMove);
+        this.options.elToPreventMove.removeEventListener("touchmove", this._preventTouchMove);
         this._preventingEvent = false;
     },
+    
     _preventMove: function() {
         if (this._preventingEvent) return;
         
         this._preventingEvent = true;
-        document.body.addEventListener("touchmove", this._preventTouchMove);
+        this.options.elToPreventMove.addEventListener("touchmove", this._preventTouchMove);
     },
+    
     _preventTouchMove: function(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
