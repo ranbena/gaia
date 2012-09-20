@@ -18,117 +18,97 @@ body {
 }
 
 
-.card-content-layer {
+.card > .header {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background: #fff;
-    opacity: 0;
-    pointer-events: none;
-    -moz-transition: opacity .4s ease;
-    -webki-transition: opacity .4s ease;
-    transition: opacity .4s ease;
+    z-index: 50;
+    height: 48px;
+    line-height: 48px;
+    color: #fff;
+    padding: 0 56px 0 31px;
+    background: #c4582b;
+    background: -moz-linear-gradient(50% 0, #cd6723, #bb482d);
+    border-bottom: 1px solid #9a3124;
+    -moz-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .4);
+    -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .4);
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .4);
 }
-.card-content-layer.visible {
-    opacity: 1;
-    pointer-events: inherit;
-}
-
-.card {
-}
-.card.drawer {
-    
-}
-    .card .header {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 48px;
-        line-height: 48px;
-        color: #fff;
-        padding: 0 56px 0 31px;
-        background: #c4582b;
-        background: -moz-linear-gradient(50% 0, #cd6723, #bb482d);
-        border-bottom: 1px solid #9a3124;
-        -moz-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .4);
-        -webkit-box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .4);
-        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, .4);
+    .card .header h1 {
+        font-size: 22px;
     }
-        .card .header h1 {
-            font-size: 22px;
-        }
-        .card .header b {
-            position: absolute;
-            cursor: pointer;
-            font-size: 0;
-            overflow: hidden;
-            text-indent: -100px;
-        }
-        .card .header b.topleft {
-            top: 0;
-            bottom: 0;
-            left: 0;
-            width: 20px;
-            border-right: 1px solid rgba(255, 255, 255, .3);
-            -moz-box-shadow: -1px 0 0 0 rgba(0, 0, 0, .3) inset;
-            -webkit-box-shadow: -1px 0 0 0 rgba(0, 0, 0, .3) inset;
-            box-shadow: -1px 0 0 0 rgba(0, 0, 0, .3) inset;
-            background: -moz-linear-gradient(50% 0, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, .18));
-        }
-        .card .header b.topright {
-            top: 8px;
-            bottom: 8px;
-            right: 0;
-            width: 50px;
-            border-left: 1px solid rgba(0, 0, 0, .3);
-            -moz-box-shadow: 1px 0 0 0 rgba(255, 255, 255, .3) inset;
-            -webkit-box-shadow: 1px 0 0 0 rgba(255, 255, 255, .3) inset;
-            box-shadow: 1px 0 0 0 rgba(255, 255, 255, .3) inset;
-        }
-    .card .footer {
+    .card .header b {
         position: absolute;
+        cursor: pointer;
+        font-size: 0;
+        overflow: hidden;
+        text-indent: -100px;
+    }
+    .card .header b.topleft {
+        top: 0;
         bottom: 0;
         left: 0;
-        right: 0;
-        height: 40px;
-        line-height: 40px;
-        background: rgba(0, 0, 0, .8);
+        width: 20px;
+        border-right: 1px solid rgba(255, 255, 255, .3);
+        -moz-box-shadow: -1px 0 0 0 rgba(0, 0, 0, .3) inset;
+        -webkit-box-shadow: -1px 0 0 0 rgba(0, 0, 0, .3) inset;
+        box-shadow: -1px 0 0 0 rgba(0, 0, 0, .3) inset;
+        background: -moz-linear-gradient(50% 0, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, .18));
     }
-        .card .footer b {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 40px;
-            font-size: 0;
-            text-indent: -100px;
-            cursor: pointer;
-        }
-        .card .footer #button-notebook-search {
-            left: 10px;
-        }
-        .card .footer #button-notebook-sortby {
-            right: 10px;
-        }
-        .card .footer select {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 50px;
-            height: 40px;
-            opacity: 0;
-        }
-        
-    .card > .content {
+    .card .header b.topright {
+        top: 8px;
+        bottom: 8px;
+        right: 0;
+        width: 50px;
+        border-left: 1px solid rgba(0, 0, 0, .3);
+        -moz-box-shadow: 1px 0 0 0 rgba(255, 255, 255, .3) inset;
+        -webkit-box-shadow: 1px 0 0 0 rgba(255, 255, 255, .3) inset;
+        box-shadow: 1px 0 0 0 rgba(255, 255, 255, .3) inset;
+    }
+.card > .footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    z-index: 50;
+    line-height: 40px;
+    background: rgba(0, 0, 0, .8);
+}
+    .card .footer b {
         position: absolute;
-        top: 49px;
-        bottom: 40px;
-        left: 0;
-        right: 0;
-        overflow-y: auto;
+        top: 0;
+        bottom: 0;
+        width: 40px;
+        font-size: 0;
+        text-indent: -100px;
+        cursor: pointer;
     }
+    .card .footer #button-notebook-search {
+        left: 10px;
+    }
+    .card .footer #button-notebook-sortby {
+        right: 10px;
+    }
+    .card .footer select {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 50px;
+        height: 40px;
+        opacity: 0;
+    }
+    
+.card > .content {
+    position: absolute;
+    top: 49px;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    overflow-y: auto;
+}
 
 .notebook-notes {
     list-style-type: none;
@@ -263,7 +243,7 @@ body {
 
 .sprited:before {
     content: "";
-    background: transparent url('images/sprite.png') 0 0 no-repeat;
+    background: transparent url('../images/sprite.png') 0 0 no-repeat;
     position: absolute;
     top: 50%;
     left: 50%;
