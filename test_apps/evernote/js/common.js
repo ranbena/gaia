@@ -1,22 +1,25 @@
 var App = new function() {
     var _this = this,
         cards = null, notebooks = [],
-        $notebooksList = null;
+        $notebooksList = null,
+        createNoteOnTap = false;
 
-    var TEXTS = {
-        "NEW_NOTEBOOK": "Create Notebook",
-        "NEW_NOTE": "New Note",
-        "FIRST_NOTEBOOK_NAME": "My Notebook",
-        "EMPTY_NOTEBOOK_NAME": "Notes"
-    },
-    ORDERS = {
-        "dateUpdated": "Date updated",
-        "dateCreated": "Date created",
-        "title": "Title",
-        "notebookId": "Notebook",
-        "city": "City",
-        "country": "Country"
-    };
+    var TIME_FOR_NEW_NOTE_DOUBLECLICK = 200,
+        NUMBER_OF_SCROLL_RETRIES = 10,
+        TEXTS = {
+            "NEW_NOTEBOOK": "Create Notebook",
+            "NEW_NOTE": "New Note",
+            "FIRST_NOTEBOOK_NAME": "My Notebook",
+            "EMPTY_NOTEBOOK_NAME": "Notes"
+        },
+        ORDERS = {
+            "dateUpdated": "Date updated",
+            "dateCreated": "Date created",
+            "title": "Title",
+            "notebookId": "Notebook",
+            "city": "City",
+            "country": "Country"
+        };
     
     this.init = function() {
         cards = new Cards();
@@ -43,12 +46,12 @@ var App = new function() {
         document.getElementById("button-note-save").addEventListener("click", _this.saveNote);
         
         document.getElementById("button-notebook-add").addEventListener("click", function() {
-            _this.newNote();
+            _this.newNote(null, true);
         });
         
         initUserNotes();
     };
-
+    
     function initUserNotes() {
         var _notebooks = getUserNotes();
         
@@ -115,8 +118,11 @@ var App = new function() {
         return notebook;
     };
 
-    this.newNote = function(notebook) {
+    this.newNote = function(notebook, bFocus) {
         _this.showNote(null, notebook || NotebookView.getCurrent());
+        if (bFocus) {
+            NoteView.focus();
+        }
     };
 
     this.saveNote = function() {
@@ -125,7 +131,11 @@ var App = new function() {
                 _this.refreshNotebooks();
             }
             _this.showNotes();
-        })
+        });
+    };
+    
+    this.sortNotes = function(sort, isDesc) {
+        NotebookView.showNotes(sort, isDesc);
     };
     
     var Sorter = new function() {
@@ -174,12 +184,9 @@ var App = new function() {
         }
     };
     
-    this.sortNotes = function(sort, isDesc) {
-        NotebookView.showNotes(sort, isDesc);
-    };
-
     var NoteView = new function() {
-        var currentNote = null, currentNotebook = null,
+        var _this = this,
+            currentNote = null, currentNotebook = null,
             el = null, elContent = null;
             
         this.init = function(options) {
@@ -228,10 +235,28 @@ var App = new function() {
                 callback();
             }
         };
+        
+        this.focus = function() {
+            elContent.focus();
+            _this.scrollToElement(NUMBER_OF_SCROLL_RETRIES);
+        };
+        
+        this.scrollToElement = function(numberOfTries) {
+            var top = elContent.getBoundingClientRect().top;
+            
+            window.scrollTo(0, top);
+            if (numberOfTries > 0 && document.body.scrollTop < top) {
+                window.setTimeout(function(){
+                    _this.scrollToElement(numberOfTries-1);
+                }, 80);
+            }
+        };
 
         function onContentFocus(e) {
             el.classList.remove("empty-note");
+            window.scrollTo(0, 1);
         }
+        
         function onContentBlur(e) {
             if (elContent.value) {
                 el.classList.remove("empty-note");
@@ -300,7 +325,6 @@ var App = new function() {
         function sortNotes(notes, sortby, isDesc) {
             if (!sortby) return notes;
             
-            var valMethod = "get" + sortby;
             notes.sort(function(a, b){
                 var valA = a.getProperty(sortby),
                     valB = b.getProperty(sortby);
@@ -319,7 +343,18 @@ var App = new function() {
                 elNote = elNote.parentNode;
             }
             
-            elNote && onClickNote && onClickNote(elNote.objNote);
+            if (elNote) {
+                onClickNote && onClickNote(elNote.objNote);
+            } else if (TIME_FOR_NEW_NOTE_DOUBLECLICK) {
+                if (createNoteOnTap) {
+                    App.newNote(null, true);
+                } else {
+                    createNoteOnTap = true;
+                    window.setTimeout(function(){
+                        createNoteOnTap = false;
+                    }, TIME_FOR_NEW_NOTE_DOUBLECLICK);
+                }
+            }
         }
     };
 };
