@@ -127,6 +127,9 @@ body {
     }
         .notebook-notes li .name {
             font-size: 18px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .notebook-notes li .time {
             font-size: 13px;

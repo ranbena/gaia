@@ -125,11 +125,11 @@ var Note = function(_options) {
 
     this.getId = function() { return id; };
     this.getName = function() {
-        this.name = content;
-        
         if (!content) return "";
         
-        return content.substring(0, 10);
+        var name = content.split("\n");
+        
+        return name[0];
     };
     this.getContent = function() { return content; };
     this.getElement = function() { return el; };
