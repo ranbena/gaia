@@ -37,6 +37,9 @@ body {
 }
     .card .header h1 {
         font-size: 22px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
     .card .header b {
         position: absolute;
@@ -179,10 +182,12 @@ body {
         display: block;
     }
 
-        
 #notebooks {
     background: #3b3b3b;
     color: #fff;
+    -moz-box-shadow: -5px 0 5px 0 rgba(0, 0, 0, .3) inset;
+    -webkit-box-shadow: -5px 0 5px 0 rgba(0, 0, 0, .3) inset;
+    box-shadow: -5px 0 5px 0 rgba(0, 0, 0, .3) inset;
 }
     #notebooks h2 {
         position: relative;
