@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Evernote</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link href="common.css" rel="Stylesheet" type="text/css" />
+    </head>
+    <body>
+        <div id="container" class="cards">
+            <div class="card drawer" id="notebooks" data-gutter="20">
+                <h2>
+                    Notebooks<b id="button-new-notebook" class="sprited"></b>
+                </h2>
+                <b class="card-next"></b>
+                <ul id="notebooks-list"></ul>
+            </div>
+            <div class="card active" id="main">
+                <div class="header">
+                    <b class="topleft sprited card-prev" id="button-notebook-menu">Notebooks</b>
+                    <h1>Notes</h1>
+                    <b class="topright sprited" id="button-notebook-add">Add</b>
+                </div>
+                <div class="content">
+                    <form method="GET" action="" id="search" class="sprited">
+                        <input type="text" id="searchNotes" name="searchNotes" />
+                    </form>
+                    <ul class="notebook-notes"></ul>
+                </div>
+                <div class="footer" id="notebook-footer">
+                    <b id="button-notebook-search" class="sprited">Search</b>
+                    <b id="button-notebook-sortby" class="sprited">Sort By</b>
+                </div>
+            </div>
+            <div class="card" id="note">
+                <div class="header">
+                    <b class="topleft sprited card-prev" id="button-note-cancel">Cancel</b>
+                    <h1>New Note</h1>
+                    <b class="topright sprited" id="button-note-save">Save</b>
+                </div>
+                <div class="content">
+                    <textarea id="note-content"></textarea>
+                    <div class="empty sprited">
+                        <p>tap anywhere to start</p>
+                    </div>
+                </div>
+                <div class="footer"></div>
+            </div>
+        </div>
+        <script src="common.js" type="text/javascript"></script>
+    </body>
+</html>
