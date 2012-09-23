@@ -59,7 +59,11 @@ var App = new function() {
             "onChange": _this.refreshNotebooks
         });
         NoteView.init({
-            "container": document.getElementById("note")
+            "container": document.getElementById("note"),
+            "elCancel": document.getElementById("button-note-cancel"),
+            "elSave": document.getElementById("button-note-save"),
+            "onSave": onNoteSave,
+            "onCancel": onNoteCancel
         });
         Sorter.init({
             "orders": ORDERS,
@@ -72,9 +76,6 @@ var App = new function() {
         $notebooksList = document.getElementById("notebooks-list");
         
         document.getElementById("button-new-notebook").addEventListener("click", _this.promptNewNotebook);
-        
-        document.getElementById("button-note-cancel").addEventListener("click", _this.cancelNote);
-        document.getElementById("button-note-save").addEventListener("click", _this.saveNote);
         
         document.getElementById("button-notebook-add").addEventListener("click", function() {
             _this.newNote(null, true);
@@ -160,29 +161,27 @@ var App = new function() {
             NoteView.focus();
         }
     };
-
-    this.saveNote = function() {
-        NoteView.save(function(noteSaved){
-            _this.refreshNotebooks();
-            _this.showNotes();
-        });
+    
+    this.sortNotes = function(sort, isDesc) {
+        NotebookView.showNotes(sort, isDesc);
     };
     
-    this.cancelNote = function() {
-        if (NoteView.changed()) {
+    function onNoteSave(noteSaved) {
+        _this.refreshNotebooks();
+        _this.showNotes();
+    }
+    
+    function onNoteCancel(isChanged) {
+        if (isChanged) {
             if (confirm(TEXTS.NOTE_CANCEL_CHANGES)) {
-                _this.saveNote();
+                NoteView.save();
             } else {
                 cards.goTo(cards.CARDS.MAIN);
             }
         } else {
             cards.goTo(cards.CARDS.MAIN);
         }
-    };
-    
-    this.sortNotes = function(sort, isDesc) {
-        NotebookView.showNotes(sort, isDesc);
-    };
+    }
     
     var Sorter = new function() {
         var _this = this,
@@ -265,10 +264,16 @@ var App = new function() {
         var _this = this,
             currentNote = null, currentNotebook = null,
             noteContentBeforeEdit = "",
-            el = null, elContent = null, elTitle = null, elActions = null;
+            el = null, elContent = null, elTitle = null, elActions = null,
+            onSave = null, onCancel = null;
             
         this.init = function(options) {
             el = options.container;
+            elSave = options.elSave;
+            elCancel = options.elCancel;
+            
+            onSave = options.onSave;
+            onCancel = options.onCancel;
             
             elContent = el.querySelector("textarea");
             elTitle = el.querySelector("h1");
@@ -276,6 +281,9 @@ var App = new function() {
             
             elContent.addEventListener("focus", onContentFocus);
             elContent.addEventListener("blur", onContentBlur);
+            
+            elSave.addEventListener("click", _this.save);
+            elCancel.addEventListener("click", _this.cancel);
             
             NoteActions.init({
                 "el": elActions,
@@ -316,9 +324,9 @@ var App = new function() {
             elTitle.innerHTML = title || TEXTS.NEW_NOTE;
         };
         
-        this.save = function(callback) {
+        this.save = function() {
             var content = elContent.value;
-
+            
             if (currentNote) {
                 currentNote.setContent(content);
             } else {
@@ -328,7 +336,11 @@ var App = new function() {
                 currentNotebook.addNote(currentNote);
             }
             
-            callback && callback(currentNote);
+            onSave && onSave(currentNote);
+        };
+        
+        this.cancel = function() {
+            onCancel && onCancel(_this.changed());
         };
         
         this.focus = function() {
