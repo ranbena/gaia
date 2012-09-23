@@ -12,7 +12,8 @@ var App = new function() {
             "NEW_NOTEBOOK": "Create Notebook",
             "NEW_NOTE": "New Note",
             "FIRST_NOTEBOOK_NAME": "My Notebook",
-            "EMPTY_NOTEBOOK_NAME": "Notes"
+            "EMPTY_NOTEBOOK_NAME": "Notes",
+            "CONFIRM_DELETE_NOTE": "Are you sure you want to delete this note?"
         },
         ORDERS = [
             {
@@ -258,9 +259,15 @@ var App = new function() {
             elContent = el.querySelector("textarea");
             elTitle = el.querySelector("h1");
             elActions = el.querySelector("#note-edit-actions");
-
+            
             elContent.addEventListener("focus", onContentFocus);
             elContent.addEventListener("blur", onContentBlur);
+            
+            NoteActions.init({
+                "el": elActions,
+                "onBeforeAction": onBeforeAction,
+                "onAfterAction": onAfterAction
+            });
         };
 
         this.show = function(note, notebook) {
@@ -279,7 +286,14 @@ var App = new function() {
             }
             
             currentNote = note;
-            currentNotebook = notebook;
+            currentNotebook = notebook || currentNote.getNotebook();
+        };
+        
+        this.getCurrent = function() {
+            return {
+                "notebook": currentNotebook,
+                "note": currentNote
+            };
         };
         
         this.setTitle = function(title) {
@@ -358,6 +372,39 @@ var App = new function() {
         
         function resetHeight() {
             elContent.style.height = elContent.style.minHeight = "";
+        }
+        
+        function onBeforeAction(action) {
+            switch(action) {
+                case "type":
+                    elContent.focus();
+                    break;
+                case "photo":
+                    break;
+                case "info":
+                    break;
+                case "share":
+                    break;
+            }
+        }
+        
+        function onAfterAction(action, output) {
+            switch(action) {
+                case "type":
+                    break;
+                case "photo":
+                    break;
+                case "info":
+                    break;
+                case "share":
+                    break;
+                case "delete":
+                    if (output) {
+                        App.showNotes();
+                        App.refreshNotebooks
+                    }
+                    break;
+            }
         }
     };
 
@@ -499,6 +546,68 @@ var App = new function() {
                     }, TIME_FOR_NEW_NOTE_DOUBLECLICK);
                 }
             }
+        }
+    };
+
+    var NoteActions = new function() {
+        var _this = this,
+            el = null,
+            onBeforeAction = null, onAfterAction = null;
+            
+        this.init = function(options) {
+            el = options.el;
+            onBeforeAction = options.onBeforeAction;
+            onAfterAction = options.onAfterAction;
+            
+            elType = el.querySelector(".type");
+            elPhoto = el.querySelector(".photo");
+            elInfo = el.querySelector(".info");
+            elShare = el.querySelector(".share");
+            elDelete = el.querySelector(".delete");
+            
+            elType.addEventListener("click", actionType);
+            elPhoto.addEventListener("click", actionPhoto);
+            elInfo.addEventListener("click", actionInfo);
+            elShare.addEventListener("click", actionShare);
+            elDelete.addEventListener("click", actionDelete);
+        };
+        
+        function actionType() {
+            onBeforeAction && onBeforeAction("type");
+            
+            onAfterAction && onAfterAction("type");
+        }
+        
+        function actionPhoto() {
+            onBeforeAction && onBeforeAction("photo");
+            
+            onAfterAction && onAfterAction("photo");
+        }
+        
+        function actionInfo() {
+            onBeforeAction && onBeforeAction("info");
+            
+            onAfterAction && onAfterAction("info");
+        }
+        
+        function actionShare() {
+            onBeforeAction && onBeforeAction("share");
+            
+            onAfterAction && onAfterAction("share");
+        }
+        
+        function actionDelete() {
+            onBeforeAction && onBeforeAction("delete");
+            
+            var deleted = false;
+            
+            if (confirm(TEXTS.CONFIRM_DELETE_NOTE)) {
+                var current = NoteView.getCurrent();
+                current.notebook.removeNote(current.note);
+                deleted = true;
+            }
+            
+            onAfterAction && onAfterAction("delete", deleted);
         }
     };
 };

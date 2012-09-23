@@ -1,4 +1,3 @@
-
 var Notebook = function(_options) {
     var _this = this,
         id = "", name = "",
@@ -12,12 +11,16 @@ var Notebook = function(_options) {
     }
     
     this.addNote = function(note) {
+        if (!note) return;
+        
         note.setNotebook(_this);
         notes[note.getId()] = note;
         numberOfNotes++;
     };
     
     this.removeNote = function(note) {
+        if (!note) return;
+        
         delete notes[note.getId()];
         numberOfNotes--;
     };
@@ -142,6 +145,7 @@ var Note = function(_options) {
     this.getElement = function() { return el; };
     this.getDateCreated = function() { return dateCreated.getTime(); };
     this.getDateUpdated = function() { return dateUpdated.getTime(); };
+    this.getNotebook = function() { return notebook; };
     
     init(_options);
 };
