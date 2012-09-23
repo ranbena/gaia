@@ -1,7 +1,7 @@
 var App = new function() {
     var _this = this,
         cards = null, notebooks = [],
-        $notebooksList = null,
+        $notebooksList = null, elButtonNewNote = null,
         createNoteOnTap = false;
 
     var TIME_FOR_NEW_NOTE_DOUBLECLICK = 200,
@@ -12,6 +12,7 @@ var App = new function() {
             "NEW_NOTEBOOK": "Create Notebook",
             "NOTEBOOK_ALL": "All Notes",
             "NOTEBOOK_TRASH": "Trash",
+            "NOTE_RESTORED": "Restored to {{notebook}}",
             "NEW_NOTE": "New Note",
             "FIRST_NOTEBOOK_NAME": "My Notebook",
             "EMPTY_NOTEBOOK_NAME": "Notes",
@@ -65,7 +66,9 @@ var App = new function() {
             "elCancel": document.getElementById("button-note-cancel"),
             "elSave": document.getElementById("button-note-save"),
             "onSave": onNoteSave,
-            "onCancel": onNoteCancel
+            "onCancel": onNoteCancel,
+            "onRestore": onNoteRestore,
+            "onDelete": onNoteDelete,
         });
         Sorter.init({
             "orders": ORDERS,
@@ -73,13 +76,17 @@ var App = new function() {
             "onChange": function(order, desc) {
                 NotebookView.showNotes(order, desc);
             }
-        })
+        });
+        Notification.init({
+            "container": document.getElementById("container")
+        });
         
         $notebooksList = document.getElementById("notebooks-list");
+        elButtonNewNote = document.getElementById("button-notebook-add");
         
         document.getElementById("button-new-notebook").addEventListener("click", _this.promptNewNotebook);
         
-        document.getElementById("button-notebook-add").addEventListener("click", function() {
+        elButtonNewNote.addEventListener("click", function() {
             _this.newNote(null, true);
         });
         
@@ -112,6 +119,7 @@ var App = new function() {
         cards.goTo(cards.CARDS.NOTE);
     };
     this.showNotes = function(notebook) {
+        elButtonNewNote.style.display = "";
         NotebookView.show(notebook);
         cards.goTo(cards.CARDS.MAIN);
     };
@@ -190,14 +198,18 @@ var App = new function() {
         } else {
             _this.showNotes(notebook);
         }
-
+        
         return notebook;
     };
 
     this.newNote = function(notebook, bFocus) {
-        _this.showNote(null, notebook || NotebookView.getCurrent());
-        if (bFocus) {
-            NoteView.focus();
+        !notebook & (notebook = NotebookView.getCurrent());
+        
+        if (notebook) {
+            _this.showNote(null, notebook);
+            if (bFocus) {
+                NoteView.focus();
+            }
         }
     };
     
@@ -210,10 +222,18 @@ var App = new function() {
     };
     
     this.showTrashedNotes = function() {
-        alert("Need to Implement:\nShow trashed notes");
+        var notes = [];
+        for (var i=0; i<notebooks.length; i++) {
+            notes = notes.concat(notebooks[i].getTrashedNotes());
+        }
+        
+        elButtonNewNote.style.display = "none";
+        NotebookView.show(null, notes);
+        NotebookView.setTitle(TEXTS.NOTEBOOK_TRASH);
+        cards.goTo(cards.CARDS.MAIN);
     };
     
-    function onNoteSave(noteSaved) {
+    function onNoteSave(noteAffected) {
         _this.showNotes();
         _this.refreshNotebooks();
     }
@@ -228,6 +248,19 @@ var App = new function() {
         } else {
             cards.goTo(cards.CARDS.MAIN);
         }
+    }
+    
+    function onNoteRestore(noteAffected) {
+        _this.showNotes();
+        _this.refreshNotebooks();
+        
+        var txt = TEXTS.NOTE_RESTORED.replace("{{notebook}}", noteAffected.getNotebook().getName());
+        Notification.show(txt);
+    }
+    
+    function onNoteDelete(noteAffected) {
+        _this.showNotes();
+        _this.refreshNotebooks();
     }
     
     function getNoteNameFromContent(content) {
@@ -316,10 +349,12 @@ var App = new function() {
             currentNote = null, currentNotebook = null,
             noteContentBeforeEdit = "", noteNameBeforeEdit = "",
             el = null, elContent = null, elTitle = null, elEditTitle = null, elActions = null,
-            onSave = null, onCancel = null, onTitleChange = null;
+            elRestore = null, elDelete = null,
+            onSave = null, onCancel = null, onRestore = null, onDelete = null, onTitleChange = null;
             
         var CLASS_EDIT_TITLE = "edit-title",
-            CLASS_WHEN_VISIBLE = "visible";
+            CLASS_WHEN_VISIBLE = "visible",
+            CLASS_WHEN_TRASHED = "readonly";
             
         this.init = function(options) {
             el = options.container;
@@ -328,12 +363,16 @@ var App = new function() {
             
             onSave = options.onSave;
             onCancel = options.onCancel;
+            onRestore = options.onRestore;
+            onDelete = options.onDelete;
             onTitleChange = options.onTitleChange;
             
             elContent = el.querySelector("textarea");
             elTitle = el.querySelector("h1");
             elEditTitle = el.querySelector("input");
             elActions = el.querySelector("#note-edit-actions");
+            elRestore = el.querySelector("#button-note-restore");
+            elDelete = el.querySelector("#button-note-delete");
             
             elTitle.addEventListener("click", _this.editTitle);
             elEditTitle.addEventListener("blur", _this.saveEditTitle);
@@ -347,6 +386,9 @@ var App = new function() {
             
             elSave.addEventListener("click", _this.save);
             elCancel.addEventListener("click", _this.cancel);
+            
+            elRestore.addEventListener("click", _this.restore);
+            elDelete.addEventListener("click", _this.del);
             
             NoteActions.init({
                 "el": elActions,
@@ -366,10 +408,17 @@ var App = new function() {
                 _this.setTitle(noteName);
                 elContent.value = noteContent;
                 
+                if (note.isTrashed()) {
+                    el.classList.add(CLASS_WHEN_TRASHED);
+                } else {
+                    el.classList.remove(CLASS_WHEN_TRASHED);
+                }
+                
                 onContentKeyUp();
 
                 onContentBlur();
             } else {
+                el.classList.remove(CLASS_WHEN_TRASHED);
                 _this.setTitle();
                 elContent.value = "";
                 onContentBlur();
@@ -425,6 +474,20 @@ var App = new function() {
         
         this.cancel = function() {
             onCancel && onCancel(_this.changed());
+        };
+        
+        this.restore = function() {
+            if (currentNote) {
+                currentNote.setTrashed(false);
+                onRestore && onRestore(currentNote);
+            }
+        };
+        
+        this.del = function() {
+            if (currentNote) {
+                currentNote.remove();
+                onDelete && onDelete(currentNote);
+            }
         };
         
         this.focus = function() {
@@ -557,10 +620,16 @@ var App = new function() {
             notebookScrollOffset = document.getElementById("search").offsetHeight;
         };
         
-        this.show = function(notebook) {
-            !notebook && (notebook = currentNotebook);
+        this.show = function(notebook, notes) {
+            if (notes) {
+                notebook = null;
+                currentNotebook = null;
+            } else {
+                !notebook && (notebook = currentNotebook);
+            }
             
-            _this.setTitle(notebook.getName());
+            
+            notebook && _this.setTitle(notebook.getName());
             
             if (!currentNotebook || currentNotebook.getId() != notebook.getId()) {
                 currentSort = "";
@@ -569,9 +638,9 @@ var App = new function() {
             
             currentNotebook = notebook;
             
-            this.showNotes(currentSort, currentIsDesc);
+            _this.showNotes(currentSort, currentIsDesc, notes);
             
-            this.scrollTop();
+            _this.scrollTop();
         };
         
         this.setTitle = function(title) {
@@ -601,20 +670,20 @@ var App = new function() {
             }
         };
         
-        this.showNotes = function(sortby, isDesc) {
-            if (!currentNotebook) return;
-            
+        this.showNotes = function(sortby, isDesc, _notes) {
             $notesList.innerHTML = '';
             
             window.setTimeout(function(){
-                var notes = sortNotes(currentNotebook.getNotes(), sortby, isDesc);
-                if (notes.length > 0) {
-                    for (var i=0; i<notes.length; i++) {
-                        $notesList.appendChild(getNoteElement(notes[i]));
+                var notes = sortNotes(_notes || currentNotebook && currentNotebook.getNotes(), sortby, isDesc);
+                if (notes) {
+                    if (notes.length > 0 || _notes) {
+                        for (var i=0; i<notes.length; i++) {
+                            $notesList.appendChild(getNoteElement(notes[i]));
+                        }
+                        el.classList.remove(EMPTY_CONTENT_CLASS);
+                    } else {
+                        el.classList.add(EMPTY_CONTENT_CLASS);
                     }
-                    el.classList.remove(EMPTY_CONTENT_CLASS);
-                } else {
-                    el.classList.add(EMPTY_CONTENT_CLASS);
                 }
             }, 0);
             
@@ -665,7 +734,7 @@ var App = new function() {
             if (elNote) {
                 onClickNote && onClickNote(elNote.objNote);
             } else if (TIME_FOR_NEW_NOTE_DOUBLECLICK) {
-                if (createNoteOnTap || el.classList.contains(EMPTY_CONTENT_CLASS)) {
+                if (currentNotebook && (createNoteOnTap || el.classList.contains(EMPTY_CONTENT_CLASS))) {
                     App.newNote(null, true);
                 } else {
                     createNoteOnTap = true;
@@ -766,6 +835,35 @@ var App = new function() {
             onAfterAction && onAfterAction("delete", deleted);
         }
     };
+
+    var Notification = new function() {
+        var _this = this,
+            el = null, timeoutHide = null;
+            
+        var CLASS_WHEN_VISIBLE = "visible",
+            TIME_TO_SHOW = 4000;
+            
+        this.init = function(options) {
+            el = document.createElement("div");
+            el.className = "notifier";
+            
+            options.container.appendChild(el);
+        };
+        
+        this.show = function(message) {
+            window.clearTimeout(timeoutHide);
+            
+            el.innerHTML = message;
+            el.classList.add(CLASS_WHEN_VISIBLE);
+            
+            timeoutHide = window.setTimeout(_this.hide, TIME_TO_SHOW);
+        };
+        
+        this.hide = function() {
+            window.clearTimeout(timeoutHide);
+            el.classList.remove(CLASS_WHEN_VISIBLE);
+        };
+    }
 };
 
 /* taken from the email app */

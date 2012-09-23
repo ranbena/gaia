@@ -21,7 +21,7 @@ var Notebook = function(_options) {
         if (!note) return;
         
         for (var i=0; i<notes.length; i++) {
-            if (notes[i].getId() == note) {
+            if (notes[i].getId() == note.getId()) {
                 notes.splice(i, 1);
             }
         }
@@ -96,7 +96,6 @@ var Note = function(_options) {
     };
     
     this.remove = function() {
-        // remove note element
         return notebook.removeNote(_this);
     };
     
