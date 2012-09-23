@@ -13,7 +13,9 @@ var App = new function() {
             "NEW_NOTE": "New Note",
             "FIRST_NOTEBOOK_NAME": "My Notebook",
             "EMPTY_NOTEBOOK_NAME": "Notes",
-            "CONFIRM_DELETE_NOTE": "Are you sure you want to delete this note?"
+            "NOTE_CANCEL_CHANGES": "You have made changes to the note, do you wish to save it?",
+            "CONFIRM_DELETE_NOTE": "Are you sure you want to delete this note?",
+            "ADD_IMAGE_TITLE": "Attach a photo to your note:"
         },
         ORDERS = [
             {
@@ -71,6 +73,7 @@ var App = new function() {
         
         document.getElementById("button-new-notebook").addEventListener("click", _this.promptNewNotebook);
         
+        document.getElementById("button-note-cancel").addEventListener("click", _this.cancelNote);
         document.getElementById("button-note-save").addEventListener("click", _this.saveNote);
         
         document.getElementById("button-notebook-add").addEventListener("click", function() {
@@ -85,7 +88,7 @@ var App = new function() {
         
         if (!_notebooks || _notebooks.length == 0) {
             var notebook = _this.newNotebook(TEXTS.FIRST_NOTEBOOK_NAME);
-            _this.newNote(notebook);
+            _this.newNote(notebook, true);
         } else {
             _this.refreshNotebooks();
         }
@@ -160,11 +163,21 @@ var App = new function() {
 
     this.saveNote = function() {
         NoteView.save(function(noteSaved){
-            if (noteSaved) {
-                _this.refreshNotebooks();
-            }
+            _this.refreshNotebooks();
             _this.showNotes();
         });
+    };
+    
+    this.cancelNote = function() {
+        if (NoteView.changed()) {
+            if (confirm(TEXTS.NOTE_CANCEL_CHANGES)) {
+                _this.saveNote();
+            } else {
+                cards.goTo(cards.CARDS.MAIN);
+            }
+        } else {
+            cards.goTo(cards.CARDS.MAIN);
+        }
     };
     
     this.sortNotes = function(sort, isDesc) {
@@ -251,11 +264,12 @@ var App = new function() {
     var NoteView = new function() {
         var _this = this,
             currentNote = null, currentNotebook = null,
+            noteContentBeforeEdit = "",
             el = null, elContent = null, elTitle = null, elActions = null;
             
         this.init = function(options) {
             el = options.container;
-
+            
             elContent = el.querySelector("textarea");
             elTitle = el.querySelector("h1");
             elActions = el.querySelector("#note-edit-actions");
@@ -275,6 +289,8 @@ var App = new function() {
                 _this.setTitle(note.getName());
 
                 var content = note.getContent() || "";
+                
+                noteContentBeforeEdit = content;
 
                 elContent.value = content;
 
@@ -303,20 +319,16 @@ var App = new function() {
         this.save = function(callback) {
             var content = elContent.value;
 
-            if (content) {
-                if (currentNote) {
-                    currentNote.setContent(content);
-                } else {
-                    currentNote = new Note({
-                        "content": content
-                    });
-                    currentNotebook.addNote(currentNote);
-                }
-                
-                callback(currentNote);
+            if (currentNote) {
+                currentNote.setContent(content);
             } else {
-                callback();
+                currentNote = new Note({
+                    "content": content
+                });
+                currentNotebook.addNote(currentNote);
             }
+            
+            callback && callback(currentNote);
         };
         
         this.focus = function() {
@@ -333,6 +345,10 @@ var App = new function() {
                     _this.scrollToElement(numberOfTries-1);
                 }, 80);
             }
+        };
+        
+        this.changed = function() {
+            return noteContentBeforeEdit !== elContent.value;
         };
 
         function onContentFocus(e) {
@@ -487,7 +503,7 @@ var App = new function() {
                 var notes = sortNotes(currentNotebook.getNotes(), sortby, isDesc);
                 if (notes.length > 0) {
                     for (var i=0; i<notes.length; i++) {
-                        $notesList.appendChild(notes[i].getElement());
+                        $notesList.appendChild(getNoteElement(notes[i]));
                     }
                     el.classList.remove(EMPTY_CONTENT_CLASS);
                 } else {
@@ -506,6 +522,17 @@ var App = new function() {
         this.scrollTop = function() {
             $notesList.parentNode.scrollTop = notebookScrollOffset;
         };
+        
+        function getNoteElement(note) {
+            var el = document.createElement("li");
+            el.className = "note";
+            el.objNote = note;
+            el.innerHTML = '<div class="name">' + (note.getName() || TEXTS.NEW_NOTE) + ' <span class="time">' + prettyDate(note.getDateUpdated()) + '</span></div>' +
+                            '<div class="content">' + note.getContent() + '</div>' +
+                            (note.getImage()? '<div class="image" style="background-image: url(' + note.getImage() + ')"></div>' : '');
+                            
+            return el;
+        }
         
         function onEditTitleKeyUp(e) {
             if (e.keyCode == 13) {
@@ -581,7 +608,19 @@ var App = new function() {
         function actionPhoto() {
             onBeforeAction && onBeforeAction("photo");
             
+            DeviceImagesGallery.show({
+                "title": TEXTS.ADD_IMAGE_TITLE,
+                "onSelect": onImageAdded
+            });
+            
             onAfterAction && onAfterAction("photo");
+        }
+        
+        function onImageAdded(image) {
+            var el = document.createElement("img");
+            el.style.cssText = "width: 50px; height: 50px; position: absolute; top: " + (Math.round(Math.random()*70)+20) + "%; right: 0; z-index: 600;";
+            el.src = image.src;
+            document.body.appendChild(el);
         }
         
         function actionInfo() {
@@ -593,6 +632,22 @@ var App = new function() {
         function actionShare() {
             onBeforeAction && onBeforeAction("share");
             
+            var act = new MozActivity({
+                "name": "email",
+                "data": {
+                    "URI": "mailto:evyatron@gmail.com?subject=hi!"
+                }
+            });
+            
+            act.onerror = function(e){
+                var s = "";
+                for (var k in e) {
+                    s += k + ": " + e[k] + "\n";
+                }
+                
+                document.getElementById("note-content").value = "Activity Error!\n" + e.message + "\n" + s;
+            };
+            
             onAfterAction && onAfterAction("share");
         }
         
@@ -603,7 +658,7 @@ var App = new function() {
             
             if (confirm(TEXTS.CONFIRM_DELETE_NOTE)) {
                 var current = NoteView.getCurrent();
-                current.notebook.removeNote(current.note);
+                current.note.remove();
                 deleted = true;
             }
             
@@ -611,3 +666,36 @@ var App = new function() {
         }
     };
 };
+
+/* taken from the email app */
+function prettyDate(time) {
+  switch (time.constructor) {
+    case String:
+      time = parseInt(time);
+      break;
+    case Date:
+      time = time.getTime();
+      break;
+  }
+  
+  var f = navigator.mozL10n? new navigator.mozL10n.DateTimeFormat() : null;
+  var diff = Date.now() - time;
+  var day_diff = Math.floor(diff / 86400);
+  var actualDate = new Date();
+  actualDate.setTime(time);
+  
+  if (isNaN(day_diff))
+    return '(incorrect date)';
+
+  if (day_diff < 0 || diff < 0) {
+    // future time
+    return f.localeFormat(new Date(time), _('shortDateTimeFormat'));
+  }
+  
+  return day_diff == 0 && (
+    diff < 60 && 'Just now' ||
+    diff < 86400 && (actualDate.getHours() + ":" + actualDate.getMinutes()) ||
+    day_diff == 1 && 'yesterday' ||
+    day_diff < 7 && f.localeFormat(new Date(time), '%A') ||
+    (f? f.localeFormat(new Date(time), '%x') : new Date(time)));
+}

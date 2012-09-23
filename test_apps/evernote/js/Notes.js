@@ -48,7 +48,7 @@ var Notebook = function(_options) {
 
 var Note = function(_options) {
     var _this = this,
-        el = null, notebook = null,
+        notebook = null,
         id = "", content = "", image = "",
         dateCreated = null, dateUpdated = null;
         
@@ -67,8 +67,6 @@ var Note = function(_options) {
         if (typeof dateUpdated == "number") {
             dateUpdated = new Date(dateUpdated);
         }
-        
-        createElement();
     }
 
     this.update = function() {
@@ -88,30 +86,6 @@ var Note = function(_options) {
     this.setContent = function(_content) {
         content = _content;
         dateUpdated = new Date();
-        
-        _this.updateElement();
-    };
-
-    this.updateElement = function() {
-        el.innerHTML = _this.getHTML();
-        if (content) {
-            el.classList.remove("empty");
-        } else {
-            el.classList.add("empty");
-        }
-    };
-
-    function createElement() {
-        el = document.createElement("li");
-        el.className = "note";
-        el.objNote = _this;
-        _this.updateElement();
-    }
-    
-    this.getHTML = function() {
-        return '<div class="name">' + _this.getName() + ' <span class="time">' + prettyDate(dateUpdated.getTime()) + '</span></div>' +
-                '<div class="content">' + content + '</div>' +
-                (image? '<div class="image" style="background-image: url(' + image + ')"></div>' : '');
     };
     
     this.getProperty = function(prop) {
@@ -142,44 +116,10 @@ var Note = function(_options) {
         return name[0];
     };
     this.getContent = function() { return content; };
-    this.getElement = function() { return el; };
+    this.getImage = function() { return image; };
     this.getDateCreated = function() { return dateCreated.getTime(); };
     this.getDateUpdated = function() { return dateUpdated.getTime(); };
     this.getNotebook = function() { return notebook; };
     
     init(_options);
 };
-
-
-/* taken from the email app */
-function prettyDate(time) {
-  switch (time.constructor) {
-    case String:
-      time = parseInt(time);
-      break;
-    case Date:
-      time = time.getTime();
-      break;
-  }
-  
-  var f = navigator.mozL10n? new navigator.mozL10n.DateTimeFormat() : null;
-  var diff = Date.now() - time;
-  var day_diff = Math.floor(diff / 86400);
-  var actualDate = new Date();
-  actualDate.setTime(time);
-  
-  if (isNaN(day_diff))
-    return '(incorrect date)';
-
-  if (day_diff < 0 || diff < 0) {
-    // future time
-    return f.localeFormat(new Date(time), _('shortDateTimeFormat'));
-  }
-  
-  return day_diff == 0 && (
-    diff < 60 && 'Just now' ||
-    diff < 86400 && (actualDate.getHours() + ":" + actualDate.getMinutes()) ||
-    day_diff == 1 && 'yesterday' ||
-    day_diff < 7 && f.localeFormat(new Date(time), '%A') ||
-    (f? f.localeFormat(new Date(time), '%x') : new Date(time)));
-}
