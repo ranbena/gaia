@@ -1,11 +1,11 @@
 var Notebook = function(_options) {
     var _this = this,
         id = "", name = "",
-        notes = {}, numberOfNotes = 0;
+        notes = [];
 
     function init(options) {
         !options && (options = {});
-    
+        
         id = new Date().getTime() + "_" + Math.random();
         name = options.name || "";
     }
@@ -14,15 +14,17 @@ var Notebook = function(_options) {
         if (!note) return;
         
         note.setNotebook(_this);
-        notes[note.getId()] = note;
-        numberOfNotes++;
+        notes.push(note);
     };
     
     this.removeNote = function(note) {
         if (!note) return;
         
-        delete notes[note.getId()];
-        numberOfNotes--;
+        for (var i=0; i<notes.length; i++) {
+            if (notes[i].getId() == note) {
+                notes.splice(i, 1);
+            }
+        }
     };
     
     this.setName = function(_name) {
@@ -32,13 +34,21 @@ var Notebook = function(_options) {
         return _this;
     };
     
-    this.getNumberOfNotes = function() { return numberOfNotes; };
-    this.getNotes = function() {
-        var arrNotes = [];
-        for (var id in notes) {
-            arrNotes.push(notes[id]);
+    this.getNumberOfNotes = function(bIncludeTrashed) {
+        return _this.getNotes(bIncludeTrashed).length;
+    };
+    this.getNotes = function(bIncludeTrashed) {
+        if (bIncludeTrashed) {
+            return notes;
+        }
+        
+        var _notes = [];
+        for (var i=0; i<notes.length; i++) {
+            if (!notes[i].isTrashed()) {
+                _notes.push(notes[i]);
+            } 
         } 
-        return arrNotes;
+        return _notes;
     };
     this.getId = function() { return id; };
     this.getName = function() { return name; };
@@ -48,7 +58,7 @@ var Notebook = function(_options) {
 
 var Note = function(_options) {
     var _this = this,
-        notebook = null,
+        notebook = null, trashed = false,
         id = "", name = "", content = "", image = "",
         dateCreated = null, dateUpdated = null;
         
@@ -59,6 +69,7 @@ var Note = function(_options) {
         name = options.name || "";
         content = options.content || "";
         image = options.image || "";
+        trashed = options.trashed || false;
         dateCreated = options.dateCreated || new Date();
         dateUpdated = options.dateUpdated || new Date();
         
@@ -77,6 +88,10 @@ var Note = function(_options) {
     this.remove = function() {
         // remove note element
         return notebook.removeNote(_this);
+    };
+    
+    this.setTrashed = function(_trashed) {
+        trashed = _trashed;
     };
     
     this.setNotebook = function(_notebook) {
@@ -112,6 +127,8 @@ var Note = function(_options) {
         
         return id;
     };
+    
+    this.isTrashed = function() { return trashed; };
 
     this.getId = function() { return id; };
     this.getContent = function() { return content; };

@@ -10,6 +10,8 @@ var App = new function() {
         CLASS_EDIT_TITLE = "edit-title",
         TEXTS = {
             "NEW_NOTEBOOK": "Create Notebook",
+            "NOTEBOOK_ALL": "All Notes",
+            "NOTEBOOK_TRASH": "Trash",
             "NEW_NOTE": "New Note",
             "FIRST_NOTEBOOK_NAME": "My Notebook",
             "EMPTY_NOTEBOOK_NAME": "Notes",
@@ -114,15 +116,31 @@ var App = new function() {
 
     this.refreshNotebooks = function() {
         $notebooksList.innerHTML = "";
+        
+        $notebooksList.appendChild(createNotebookEntry_All());
         for (var i=0; i<notebooks.length; i++) {
-            createNotebookEntry(notebooks[i]);
+            $notebooksList.appendChild(createNotebookEntry(notebooks[i]));
         }
+        $notebooksList.appendChild(createNotebookEntry_Trash());
     };
-    function createNotebookEntry(notebook) {
-        var el = getNotebookEntryElement(notebook);
-        $notebooksList.appendChild(el);
+    
+    function createNotebookEntry_All() {
+        var el = document.createElement("li");
+        el.innerHTML = TEXTS.NOTEBOOK_ALL;
+        el.className = "all";
+        el.addEventListener("click", _this.showAllNotes);
+        return el;
     }
-    function getNotebookEntryElement(notebook) {
+    
+    function createNotebookEntry_Trash() {
+        var el = document.createElement("li");
+        el.innerHTML = TEXTS.NOTEBOOK_TRASH;
+        el.className = "trash";
+        el.addEventListener("click", _this.showTrashedNotes);
+        return el;
+    }
+    
+    function createNotebookEntry(notebook) {
         var el = document.createElement("li");
         el.innerHTML = notebook.getName() + " (" + notebook.getNumberOfNotes() + ")";
         el.objNotebook = notebook;
@@ -170,9 +188,17 @@ var App = new function() {
         NotebookView.showNotes(sort, isDesc);
     };
     
+    this.showAllNotes = function() {
+        
+    };
+    
+    this.showTrashedNotes = function() {
+        
+    };
+    
     function onNoteSave(noteSaved) {
-        _this.refreshNotebooks();
         _this.showNotes();
+        _this.refreshNotebooks();
     }
     
     function onNoteCancel(isChanged) {
@@ -479,7 +505,7 @@ var App = new function() {
                 case "delete":
                     if (output) {
                         App.showNotes();
-                        App.refreshNotebooks
+                        App.refreshNotebooks();
                     }
                     break;
             }
@@ -716,7 +742,7 @@ var App = new function() {
             
             if (confirm(TEXTS.CONFIRM_DELETE_NOTE)) {
                 var current = NoteView.getCurrent();
-                current.note.remove();
+                current.note.setTrashed(true);
                 deleted = true;
             }
             
