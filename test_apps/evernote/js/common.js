@@ -99,6 +99,10 @@ var App = new function() {
         return [];
     }
     
+    this.getNotes = function() {
+        return notes;
+    };
+    
     this.showNote = function(note, notebook) {
         NoteView.show(note, notebook);
         cards.goTo(cards.CARDS.NOTE);
@@ -183,6 +187,10 @@ var App = new function() {
         }
     }
     
+    function getNoteNameFromContent(content) {
+        return (content || "").split("\n")[0];
+    }
+    
     var Sorter = new function() {
         var _this = this,
             el = null, elOptionNotebook = null,
@@ -263,11 +271,12 @@ var App = new function() {
     var NoteView = new function() {
         var _this = this,
             currentNote = null, currentNotebook = null,
-            noteContentBeforeEdit = "",
-            el = null, elContent = null, elTitle = null, elActions = null,
-            onSave = null, onCancel = null;
+            noteContentBeforeEdit = "", noteNameBeforeEdit = "",
+            el = null, elContent = null, elTitle = null, elEditTitle = null, elActions = null,
+            onSave = null, onCancel = null, onTitleChange = null;
             
-        var CLASS_WHEN_VISIBLE = "visible";
+        var CLASS_EDIT_TITLE = "edit-title",
+            CLASS_WHEN_VISIBLE = "visible";
             
         this.init = function(options) {
             el = options.container;
@@ -276,10 +285,18 @@ var App = new function() {
             
             onSave = options.onSave;
             onCancel = options.onCancel;
+            onTitleChange = options.onTitleChange;
             
             elContent = el.querySelector("textarea");
             elTitle = el.querySelector("h1");
+            elEditTitle = el.querySelector("input");
             elActions = el.querySelector("#note-edit-actions");
+            
+            elTitle.addEventListener("click", _this.editTitle);
+            elEditTitle.addEventListener("blur", _this.saveEditTitle);
+            elEditTitle.addEventListener("keyup", function(e){
+                (e.keyCode == 13) && _this.saveEditTitle();
+            });
             
             elContent.addEventListener("focus", onContentFocus);
             elContent.addEventListener("blur", onContentBlur);
@@ -297,13 +314,14 @@ var App = new function() {
 
         this.show = function(note, notebook) {
             if (note) {
-                _this.setTitle(note.getName());
+                var noteContent = note.getContent(),
+                    noteName = note.getName();
 
-                var content = note.getContent() || "";
-                
-                noteContentBeforeEdit = content;
+                noteContentBeforeEdit = noteContent;
+                noteNameBeforeEdit = noteName;
 
-                elContent.value = content;
+                _this.setTitle(noteName);
+                elContent.value = noteContent;
                 
                 onContentKeyUp();
 
@@ -326,17 +344,35 @@ var App = new function() {
         };
         
         this.setTitle = function(title) {
-            elTitle.innerHTML = title || TEXTS.NEW_NOTE;
+            elTitle.innerHTML = title || getNoteNameFromContent(elContent.value) || TEXTS.NEW_NOTE;
+            elEditTitle.value = title || "";
+        };
+        
+        this.editTitle = function() {
+            el.classList.add(CLASS_EDIT_TITLE);
+            elEditTitle.focus();
+        };
+        
+        this.saveEditTitle = function() {
+            el.classList.remove(CLASS_EDIT_TITLE);
+            elEditTitle.blur();
+            
+            _this.setTitle(elEditTitle.value);
+            
+            onTitleChange && onTitleChange();
         };
         
         this.save = function() {
-            var content = elContent.value;
+            var content = elContent.value,
+                name = elEditTitle.value;
             
             if (currentNote) {
                 currentNote.setContent(content);
+                currentNote.setName(name);
             } else {
                 currentNote = new Note({
-                    "content": content
+                    "content": content,
+                    "name": name
                 });
                 currentNotebook.addNote(currentNote);
             }
@@ -365,12 +401,13 @@ var App = new function() {
         };
         
         this.changed = function() {
-            return noteContentBeforeEdit !== elContent.value;
+            return noteContentBeforeEdit !== elContent.value || noteNameBeforeEdit !== elEditTitle.value;
         };
         
         function onContentKeyUp(e) {
             if (elContent.value) {
                 elSave.classList.add(CLASS_WHEN_VISIBLE);
+                !elEditTitle.value && (elTitle.innerHTML = getNoteNameFromContent(elContent.value));
             } else {
                 elSave.classList.remove(CLASS_WHEN_VISIBLE);
             }
@@ -466,7 +503,9 @@ var App = new function() {
             
             elTitle.addEventListener("click", _this.editTitle);
             elEditTitle.addEventListener("blur", _this.saveEditTitle);
-            elEditTitle.addEventListener("keyup", onEditTitleKeyUp);
+            elEditTitle.addEventListener("keyup", function(e){
+                (e.keyCode == 13) && _this.saveEditTitle();
+            });
             
             $notesList = el.getElementsByClassName("notebook-notes")[0];
             
@@ -552,17 +591,11 @@ var App = new function() {
             var el = document.createElement("li");
             el.className = "note";
             el.objNote = note;
-            el.innerHTML = '<div class="name">' + (note.getName() || TEXTS.NEW_NOTE) + ' <span class="time">' + prettyDate(note.getDateUpdated()) + '</span></div>' +
+            el.innerHTML = '<div class="name">' + (note.getName() || getNoteNameFromContent(note.getContent())) + ' <span class="time">' + prettyDate(note.getDateUpdated()) + '</span></div>' +
                             '<div class="content">' + note.getContent() + '</div>' +
                             (note.getImage()? '<div class="image" style="background-image: url(' + note.getImage() + ')"></div>' : '');
-                            
+            
             return el;
-        }
-        
-        function onEditTitleKeyUp(e) {
-            if (e.keyCode == 13) {
-                _this.saveEditTitle();
-            }
         }
         
         function sortNotes(notes, sortby, isDesc) {

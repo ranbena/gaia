@@ -49,13 +49,14 @@ var Notebook = function(_options) {
 var Note = function(_options) {
     var _this = this,
         notebook = null,
-        id = "", content = "", image = "",
+        id = "", name = "", content = "", image = "",
         dateCreated = null, dateUpdated = null;
         
     function init(options) {
         !options && (options = {});
         
         id = options.id || "id_" + Math.round(Math.random()*100000);
+        name = options.name || "";
         content = options.content || "";
         image = options.image || "";
         dateCreated = options.dateCreated || new Date();
@@ -82,6 +83,11 @@ var Note = function(_options) {
         notebook = _notebook;
         return _this;
     };
+    
+    this.setName = function(_name) {
+        name = _name;
+        return _this;
+    }
 
     this.setContent = function(_content) {
         content = _content;
@@ -108,18 +114,12 @@ var Note = function(_options) {
     };
 
     this.getId = function() { return id; };
-    this.getName = function() {
-        if (!content) return "";
-        
-        var name = content.split("\n");
-        
-        return name[0];
-    };
     this.getContent = function() { return content; };
     this.getImage = function() { return image; };
     this.getDateCreated = function() { return dateCreated.getTime(); };
     this.getDateUpdated = function() { return dateUpdated.getTime(); };
     this.getNotebook = function() { return notebook; };
+    this.getName = function() { return name; };
     
     init(_options);
 };
