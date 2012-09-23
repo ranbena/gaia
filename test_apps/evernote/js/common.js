@@ -267,6 +267,8 @@ var App = new function() {
             el = null, elContent = null, elTitle = null, elActions = null,
             onSave = null, onCancel = null;
             
+        var CLASS_WHEN_VISIBLE = "visible";
+            
         this.init = function(options) {
             el = options.container;
             elSave = options.elSave;
@@ -281,6 +283,7 @@ var App = new function() {
             
             elContent.addEventListener("focus", onContentFocus);
             elContent.addEventListener("blur", onContentBlur);
+            elContent.addEventListener("keyup", onContentKeyUp);
             
             elSave.addEventListener("click", _this.save);
             elCancel.addEventListener("click", _this.cancel);
@@ -301,6 +304,8 @@ var App = new function() {
                 noteContentBeforeEdit = content;
 
                 elContent.value = content;
+                
+                onContentKeyUp();
 
                 onContentBlur();
             } else {
@@ -362,6 +367,14 @@ var App = new function() {
         this.changed = function() {
             return noteContentBeforeEdit !== elContent.value;
         };
+        
+        function onContentKeyUp(e) {
+            if (elContent.value) {
+                elSave.classList.add(CLASS_WHEN_VISIBLE);
+            } else {
+                elSave.classList.remove(CLASS_WHEN_VISIBLE);
+            }
+        }
 
         function onContentFocus(e) {
             el.classList.remove(EMPTY_CONTENT_CLASS);

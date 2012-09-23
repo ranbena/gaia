@@ -185,6 +185,17 @@ body {
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
     }
+    #note #button-note-save {
+        opacity: 0;
+        pointer-events: none;
+        -moz-transition: opacity 150ms linear;
+        -webkit-transition: opacity 150ms linear;
+        transition: opacity 150ms linear;
+    }
+    #note #button-note-save.visible {
+        opacity: 1;
+        pointer-events: inherit;
+    }
     
 #note-edit-actions {
     position: absolute;
