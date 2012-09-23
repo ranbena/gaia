@@ -6,27 +6,54 @@ var App = new function() {
 
     var TIME_FOR_NEW_NOTE_DOUBLECLICK = 200,
         NUMBER_OF_SCROLL_RETRIES = 10,
+        EMPTY_CONTENT_CLASS = "show-empty",
+        CLASS_EDIT_TITLE = "edit-title",
         TEXTS = {
             "NEW_NOTEBOOK": "Create Notebook",
             "NEW_NOTE": "New Note",
             "FIRST_NOTEBOOK_NAME": "My Notebook",
             "EMPTY_NOTEBOOK_NAME": "Notes"
         },
-        ORDERS = {
-            "dateUpdated": "Date updated",
-            "dateCreated": "Date created",
-            "title": "Title",
-            "notebookId": "Notebook",
-            "city": "City",
-            "country": "Country"
-        };
+        ORDERS = [
+            {
+                "property": "dateUpdated",
+                "label": "Date updated",
+                "descending": true
+            },
+            {
+                "property": "dateCreated",
+                "label": "Date created",
+                "descending": true
+            },
+            {
+                "property": "title",
+                "label": "Title",
+                "descending": false
+            },
+            {
+                "property": "notebookId",
+                "label": "Notebook",
+                "descending": false
+            },
+            {
+                "property": "city",
+                "label": "City",
+                "descending": false
+            },
+            {
+                "property": "country",
+                "label": "Country",
+                "descending": false
+            }
+        ];
     
     this.init = function() {
         cards = new Cards();
         
         NotebookView.init({
             "container": document.getElementById("main"),
-            "onClickNote": _this.showNote
+            "onClickNote": _this.showNote,
+            "onChange": _this.refreshNotebooks
         });
         NoteView.init({
             "container": document.getElementById("note")
@@ -101,11 +128,11 @@ var App = new function() {
     this.promptNewNotebook = function() {
         var notebookName = prompt(TEXTS.NEW_NOTEBOOK, "");
         if (notebookName) {
-            _this.newNotebook(notebookName);
+            _this.newNotebook(notebookName, true);
         }
     };
 
-    this.newNotebook = function(name) {
+    this.newNotebook = function(name, isSartEditing) {
         var notebook = new Notebook({
             "name": name
         });
@@ -113,7 +140,12 @@ var App = new function() {
         
         createNotebookEntry(notebook);
         
-        _this.showNotes(notebook);
+        if (isSartEditing) {
+            NotebookView.show(notebook);
+            _this.newNote(notebook);
+        } else {
+            _this.showNotes(notebook);
+        }
 
         return notebook;
     };
@@ -140,7 +172,7 @@ var App = new function() {
     
     var Sorter = new function() {
         var _this = this,
-            el = null,
+            el = null, elOptionNotebook = null,
             currentOrder = "", currentDesc = false, onChange = null;
             
         this.ORDER = {};
@@ -152,7 +184,17 @@ var App = new function() {
         };
         
         this.show = function() {
-            
+            el.focus();
+        };
+        
+        /* these don't work on B2G, since they create a new element of their own
+         * the created element should take the visibility from the actual options
+         */
+        this.showSortByNotebook = function() {
+            elOptionNotebook.style.display = "block";
+        };
+        this.hideSortByNotebook = function() {
+            elOptionNotebook.style.display = "none";
         };
         
         function createElement(parent) {
@@ -160,39 +202,62 @@ var App = new function() {
             
             el = document.createElement("select");
             
+            el.addEventListener("change", el.blur);
             el.addEventListener("blur", select);
             
             var html = '';
-            for (var key in _this.ORDER) {
-                html += '<option value="' + key + '">' + _this.ORDER[key] + '</option>';
+            for (var i=0; i<_this.ORDER.length; i++) {
+                var order = _this.ORDER[i],
+                    option = document.createElement("option");
+                    
+                option.value = order.property;
+                option.innerHTML = order.label;
+                option.setAttribute("data-descending", order.descending);
+                
+                if (option.value == "notebookId") {
+                    elOptionNotebook = option;
+                }
+                
+                el.appendChild(option);
             }
-            el.innerHTML = html;
+            
+            _this.hideSortByNotebook();
             
             parent.appendChild(el);
         }
         
         function select() {
-            if (el.value == currentOrder) {
-                currentDesc = !currentDesc;
-            } else {
-                currentDesc = false;
+            var options = el.childNodes,
+                sortby = "",
+                isDescending = false;
+                
+            for (var i=0,l=options.length; i<l; i++) {
+                if (options[i].selected) {
+                    sortby = options[i].value;
+                    isDescending = options[i].getAttribute("data-descending") == "true";
+                    break;
+                }
             }
             
-            currentOrder = el.value;
-            
-            onChange && onChange(currentOrder, currentDesc)
+            if (currentOrder != sortby) {
+                currentOrder = sortby;
+                currentDesc = isDescending;
+                onChange && onChange(currentOrder, currentDesc);
+            }
         }
     };
     
     var NoteView = new function() {
         var _this = this,
             currentNote = null, currentNotebook = null,
-            el = null, elContent = null;
+            el = null, elContent = null, elTitle = null, elActions = null;
             
         this.init = function(options) {
             el = options.container;
 
             elContent = el.querySelector("textarea");
+            elTitle = el.querySelector("h1");
+            elActions = el.querySelector("#note-edit-actions");
 
             elContent.addEventListener("focus", onContentFocus);
             elContent.addEventListener("blur", onContentBlur);
@@ -200,7 +265,7 @@ var App = new function() {
 
         this.show = function(note, notebook) {
             if (note) {
-                el.querySelector("h1").innerHTML = note.getName() || TEXTS.NEW_NOTE;
+                _this.setTitle(note.getName());
 
                 var content = note.getContent() || "";
 
@@ -208,7 +273,7 @@ var App = new function() {
 
                 onContentBlur();
             } else {
-                el.querySelector("h1").innerHTML = TEXTS.NEW_NOTE;
+                _this.setTitle();
                 elContent.value = "";
                 onContentBlur();
             }
@@ -216,7 +281,11 @@ var App = new function() {
             currentNote = note;
             currentNotebook = notebook;
         };
-
+        
+        this.setTitle = function(title) {
+            elTitle.innerHTML = title || TEXTS.NEW_NOTE;
+        };
+        
         this.save = function(callback) {
             var content = elContent.value;
 
@@ -253,27 +322,63 @@ var App = new function() {
         };
 
         function onContentFocus(e) {
-            el.classList.remove("empty-note");
+            el.classList.remove(EMPTY_CONTENT_CLASS);
+            
             window.scrollTo(0, 1);
+            
+            setHeightAccordingToScreen();
         }
         
         function onContentBlur(e) {
             if (elContent.value) {
-                el.classList.remove("empty-note");
+                el.classList.remove(EMPTY_CONTENT_CLASS);
             } else {
-                el.classList.add("empty-note");
+                el.classList.add(EMPTY_CONTENT_CLASS);
             }
+            
+            resetHeight();
+        }
+        
+        function setHeightAccordingToScreen() {
+            var tries = 20,
+                initialHeight = window.innerHeight,
+                intervalHeight = window.setInterval(function(){
+                
+                if (window.innerHeight < initialHeight) {
+                    elContent.style.height = elContent.style.minHeight = (window.innerHeight-elTitle.offsetHeight-elActions.offsetHeight) + "px";
+                    window.scrollTo(0, 1);
+                }
+                
+                if (tries == 0 || window.innerHeight < initialHeight) {
+                    window.clearInterval(intervalHeight);
+                }
+                tries--;
+            }, 100);
+        }
+        
+        function resetHeight() {
+            elContent.style.height = elContent.style.minHeight = "";
         }
     };
 
     var NotebookView = new function() {
-        var el = null, $notesList = null,
+        var _this = this,
+            el = null, elTitle = null, elEditTitle = null, $notesList = null,
             currentNotebook = null, currentSort = "", currentIsDesc = false,
-            onClickNote = null, notebookScrollOffset = 0;
+            onClickNote = null, notebookScrollOffset = 0,
+            onChange = null;
 
         this.init = function(options) {
             el = options.container;
             onClickNote = options.onClickNote;
+            onChange = options.onChange;
+            
+            elTitle = el.querySelector("h1");
+            elEditTitle = el.querySelector("input");
+            
+            elTitle.addEventListener("click", _this.editTitle);
+            elEditTitle.addEventListener("blur", _this.saveEditTitle);
+            elEditTitle.addEventListener("keyup", onEditTitleKeyUp);
             
             $notesList = el.getElementsByClassName("notebook-notes")[0];
             
@@ -285,8 +390,7 @@ var App = new function() {
         this.show = function(notebook) {
             !notebook && (notebook = currentNotebook);
             
-            el.querySelector("h1").innerHTML = notebook.getName() || TEXTS.EMPTY_NOTEBOOK_NAME;
-            
+            _this.setTitle(notebook.getName());
             
             if (!currentNotebook || currentNotebook.getId() != notebook.getId()) {
                 currentSort = "";
@@ -300,15 +404,49 @@ var App = new function() {
             this.scrollTop();
         };
         
+        this.setTitle = function(title) {
+            elTitle.innerHTML = title || TEXTS.EMPTY_NOTEBOOK_NAME;
+            elEditTitle.value = title || "";
+        };
+        
+        this.editTitle = function() {
+            if (!currentNotebook) return;
+            
+            el.classList.add(CLASS_EDIT_TITLE);
+            elEditTitle.focus();
+        };
+        
+        this.saveEditTitle = function() {
+            if (!currentNotebook) return;
+            
+            el.classList.remove(CLASS_EDIT_TITLE);
+            elEditTitle.blur();
+            
+            var newName = elEditTitle.value;
+            if (newName != currentNotebook.getName()) {
+                currentNotebook.setName(newName);
+                _this.setTitle(newName);
+                
+                onChange && onChange();
+            }
+        };
+        
         this.showNotes = function(sortby, isDesc) {
             if (!currentNotebook) return;
             
             $notesList.innerHTML = '';
             
-            var notes = sortNotes(currentNotebook.getNotes(), sortby, isDesc);
-            for (var i=0; i<notes.length; i++) {
-                $notesList.appendChild(notes[i].getElement());
-            }
+            window.setTimeout(function(){
+                var notes = sortNotes(currentNotebook.getNotes(), sortby, isDesc);
+                if (notes.length > 0) {
+                    for (var i=0; i<notes.length; i++) {
+                        $notesList.appendChild(notes[i].getElement());
+                    }
+                    el.classList.remove(EMPTY_CONTENT_CLASS);
+                } else {
+                    el.classList.add(EMPTY_CONTENT_CLASS);
+                }
+            }, 0);
             
             currentSort = sortby;
             currentIsDesc = isDesc;
@@ -321,6 +459,12 @@ var App = new function() {
         this.scrollTop = function() {
             $notesList.parentNode.scrollTop = notebookScrollOffset;
         };
+        
+        function onEditTitleKeyUp(e) {
+            if (e.keyCode == 13) {
+                _this.saveEditTitle();
+            }
+        }
         
         function sortNotes(notes, sortby, isDesc) {
             if (!sortby) return notes;
@@ -346,7 +490,7 @@ var App = new function() {
             if (elNote) {
                 onClickNote && onClickNote(elNote.objNote);
             } else if (TIME_FOR_NEW_NOTE_DOUBLECLICK) {
-                if (createNoteOnTap) {
+                if (createNoteOnTap || el.classList.contains(EMPTY_CONTENT_CLASS)) {
                     App.newNote(null, true);
                 } else {
                     createNoteOnTap = true;

@@ -41,6 +41,28 @@ body {
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+    .card .header input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 22px;
+        width: 100%;
+        height: 48px;
+        background: transparent;
+        border: none;
+        color: #fff;
+        padding: 0 56px 0 31px;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        display: none;
+    }
+    .edit-title .header h1 {
+        display: none;
+    }
+    .edit-title .header input {
+        display: block;
+    }
     .card .header b {
         position: absolute;
         cursor: pointer;
@@ -149,6 +171,9 @@ body {
 #note {
 
 }
+#note.card > .content {
+    top: 85px;
+}
     #note #note-content {
         background: transparent;
         border: none;
@@ -160,30 +185,70 @@ body {
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
     }
-    #note .empty {
+    
+#note-edit-actions {
+    position: absolute;
+    top: 49px;
+    left: 0;
+    right: 0;
+    list-style-type: none;
+    background: #c9c7c7;
+    border-bottom: 1px solid #c9c7c7;
+}
+    #note-edit-actions:after {
+        display: list-item;
+        float: none;
+        clear: both;
+        height: 0;
+        width: 0;
+    }
+    #note-edit-actions li {
+        position: relative;
+        float: left;
+        width: 20%;
+        height: 36px;
+        line-height: 36px;
+        font-size: 0;
+        text-indent: -100px;
+        cursor: pointer;
+        border-right: 1px solid #a6a5a5;
+        border-left: 1px solid #d9d8d8;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+    #note-edit-actions li:first-child {
+        background: #fff;
+        border-left: none;
+    }
+    #note-edit-actions li:last-child {
+        border-right: none;
+    }
+    
+.empty {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    display: none;
+}
+    .empty p {
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        pointer-events: none;
-        display: none;
+        top: 50%;
+        left: 24px;
+        right: 24px;
+        color: #606060;
+        font-size: 21px;
+        line-height: 130%;
+        padding-top: 5px;
+        margin-top: -25px;
+        border-top: 1px solid rgba(0, 0, 0, .5);
     }
-        #note .empty p {
-            position: absolute;
-            top: 50%;
-            left: 24px;
-            right: 24px;
-            color: #606060;
-            font-size: 21px;
-            height: 50px;
-            line-height: 50px;
-            margin-top: -25px;
-            border-top: 1px solid rgba(0, 0, 0, .5);
-        }
-    #note.empty-note .empty {
-        display: block;
-    }
+#main.show-empty .empty, #note.show-empty .empty {
+    display: block;
+}
 
 #notebooks {
     background: #3b3b3b;
@@ -311,9 +376,40 @@ body {
     left: auto;
     right: 23px;
 }
-#note .empty:before {
+.empty:before {
     background-position: 0 -40px;
     width: 150px;
     height: 183px;
     margin: -92px 0 0 -75px;
+}
+
+#note-edit-actions .type:before {
+    background-position: -200px -40px;
+    width: 20px;
+    height: 20px;
+    margin: -9px 0 0 -10px;
+}
+#note-edit-actions .photo:before {
+    background-position: -200px -80px;
+    width: 28px;
+    height: 22px;
+    margin: -10px 0 0 -14px;
+}
+#note-edit-actions .info:before {
+    background-position: -200px -120px;
+    width: 24px;
+    height: 24px;
+    margin: -10px 0 0 -12px;
+}
+#note-edit-actions .share:before {
+    background-position: -200px -160px;
+    width: 22px;
+    height: 24px;
+    margin: -10px 0 0 -11px;
+}
+#note-edit-actions .delete:before {
+    background-position: -200px -200px;
+    width: 24px;
+    height: 26px;
+    margin: -11px 0 0 -12px;
 }

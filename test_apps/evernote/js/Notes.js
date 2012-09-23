@@ -22,6 +22,13 @@ var Notebook = function(_options) {
         numberOfNotes--;
     };
     
+    this.setName = function(_name) {
+        if (_name && _name != name) {
+            name = _name;
+        }
+        return _this;
+    };
+    
     this.getNumberOfNotes = function() { return numberOfNotes; };
     this.getNotes = function() {
         var arrNotes = [];
