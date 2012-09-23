@@ -174,21 +174,54 @@ body {
 }
 #note.card > .content {
     top: 85px;
+    bottom: 0;
 }
-#note.card > .footer b {
+#note.card > .footer {
     display: none;
 }
     #note #note-content {
         background: transparent;
         border: none;
         width: 100%;
-        min-height: 100%;
+        min-height: 250px;
         padding: 20px;
         line-height: 130%;
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
     }
+    #note #note-images {
+        list-style-type: none;
+        color: #2c2c2c;
+        font-size: 13px;
+        margin: 15px;
+    }
+        #note #note-images li {
+            position: relative;
+            margin-top: 15px;
+            height: 60px;
+            padding-left: 90px;
+        }
+            #note #note-images li:before {
+                content: "";
+                background: transparent url('../images/sprite.png') -240px -80px no-repeat;
+                position: absolute;
+                top: 0;
+                left: 70px;
+                width: 10px;
+                height: 22px;
+            }
+            #note #note-images li .image {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 60px;
+                height: 60px;
+                background-position: 50% 50%;
+                background-repeat: no-repeat;
+                background-size: cover;
+            }
+        
     #note #button-note-save {
         opacity: 0;
         pointer-events: none;
@@ -203,6 +236,7 @@ body {
     
 #note.card.readonly > .content {
     top: 49px;
+    bottom: 40px;
 }
     #note.readonly #note-edit-actions {
         display: none;
@@ -213,9 +247,8 @@ body {
     #note.readonly #note-content {
         pointer-events: none;
     }
-    #note.readonly > .footer b {
+    #note.readonly > .footer {
         display: block;
-        background: rgba(255, 0, 0, .5);
     }
     
 #note-edit-actions {
@@ -357,7 +390,7 @@ body {
     font-size: 14px;
     padding: 0 20px;
     color: #fff;
-    font-weight: 600;
+    font-weight: 400;
     background: #565d65;
     z-index: 400;
     pointer-events: none;
@@ -468,6 +501,19 @@ body {
     margin: -10px 0 0 -11px;
 }
 #note-edit-actions .delete:before {
+    background-position: -200px -200px;
+    width: 24px;
+    height: 26px;
+    margin: -11px 0 0 -12px;
+}
+
+#button-note-restore:before {
+    background-position: -240px -40px;
+    width: 28px;
+    height: 26px;
+    margin: -11px 0 0 -14px;
+}
+#button-note-delete:before {
     background-position: -200px -200px;
     width: 24px;
     height: 26px;

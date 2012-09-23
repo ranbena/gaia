@@ -69,7 +69,7 @@ var Notebook = function(_options) {
 var Note = function(_options) {
     var _this = this,
         notebook = null, trashed = false,
-        id = "", name = "", content = "", image = "",
+        id = "", name = "", content = "", images = "",
         dateCreated = null, dateUpdated = null;
         
     function init(options) {
@@ -78,7 +78,7 @@ var Note = function(_options) {
         id = options.id || "id_" + Math.round(Math.random()*100000);
         name = options.name || "";
         content = options.content || "";
-        image = options.image || "";
+        images = options.images || [];
         trashed = options.trashed || false;
         dateCreated = options.dateCreated || new Date();
         dateUpdated = options.dateUpdated || new Date();
@@ -88,6 +88,10 @@ var Note = function(_options) {
         }
         if (typeof dateUpdated == "number") {
             dateUpdated = new Date(dateUpdated);
+        }
+        
+        if (options.notebook) {
+            options.notebook.addNote(_this);
         }
     }
 
@@ -118,6 +122,10 @@ var Note = function(_options) {
         dateUpdated = new Date();
     };
     
+    this.addImage = function(image) {
+        images.push(image);
+    };
+    
     this.getProperty = function(prop) {
         switch(prop) {
             case "dateUpdated":
@@ -141,7 +149,7 @@ var Note = function(_options) {
 
     this.getId = function() { return id; };
     this.getContent = function() { return content; };
-    this.getImage = function() { return image; };
+    this.getImages = function() { return images; };
     this.getDateCreated = function() { return dateCreated.getTime(); };
     this.getDateUpdated = function() { return dateUpdated.getTime(); };
     this.getNotebook = function() { return notebook; };
@@ -149,3 +157,10 @@ var Note = function(_options) {
     
     init(_options);
 };
+
+function NoteImage(name, src, size, type) {
+    this.name = name;
+    this.src = src;
+    this.size = size;
+    this.type = type;
+}

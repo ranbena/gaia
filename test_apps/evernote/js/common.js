@@ -210,7 +210,12 @@ var App = new function() {
         !notebook & (notebook = NotebookView.getCurrent());
         
         if (notebook) {
-            _this.showNote(null, notebook);
+            var note = new Note({
+                "notebook": notebook
+            });
+            
+            _this.showNote(note, notebook);
+            
             if (bFocus) {
                 NoteView.focus();
             }
@@ -242,13 +247,16 @@ var App = new function() {
         _this.refreshNotebooks();
     }
     
-    function onNoteCancel(isChanged) {
-        if (isChanged) {
-            if (confirm(TEXTS.NOTE_CANCEL_CHANGES)) {
-                NoteView.save();
-            } else {
-                cards.goTo(cards.CARDS.MAIN);
-            }
+    function onNoteCancel(noteAffected, isChanged) {
+        if (isChanged && confirm(TEXTS.NOTE_CANCEL_CHANGES)) {
+            NoteView.save();
+            return;
+        }
+        
+        if (noteAffected.getName() == "" && noteAffected.getContent() == "") {
+            noteAffected.remove();
+            _this.showNotes();
+            _this.refreshNotebooks();
         } else {
             cards.goTo(cards.CARDS.MAIN);
         }
@@ -288,7 +296,7 @@ var App = new function() {
             el.focus();
         };
         
-        /* these don't work on B2G, since they create a new element of their own
+        /* these don't work on B2G, since they create a new element of their own.
          * the created element should take the visibility from the actual options
          */
         this.showSortByNotebook = function() {
@@ -352,7 +360,7 @@ var App = new function() {
         var _this = this,
             currentNote = null, currentNotebook = null,
             noteContentBeforeEdit = "", noteNameBeforeEdit = "",
-            el = null, elContent = null, elTitle = null, elEditTitle = null, elActions = null,
+            el = null, elContent = null, elImages = null, elTitle = null, elEditTitle = null, elActions = null,
             elRestore = null, elDelete = null,
             onSave = null, onCancel = null, onRestore = null, onDelete = null, onTitleChange = null;
             
@@ -372,6 +380,7 @@ var App = new function() {
             onTitleChange = options.onTitleChange;
             
             elContent = el.querySelector("textarea");
+            elImages = el.querySelector("#note-images");
             elTitle = el.querySelector("h1");
             elEditTitle = el.querySelector("input");
             elActions = el.querySelector("#note-edit-actions");
@@ -402,34 +411,39 @@ var App = new function() {
         };
 
         this.show = function(note, notebook) {
-            if (note) {
-                var noteContent = note.getContent(),
-                    noteName = note.getName();
+            var noteContent = note.getContent(),
+                noteName = note.getName();
 
-                noteContentBeforeEdit = noteContent;
-                noteNameBeforeEdit = noteName;
+            noteContentBeforeEdit = noteContent;
+            noteNameBeforeEdit = noteName;
 
-                _this.setTitle(noteName);
-                elContent.value = noteContent;
-                
-                if (note.isTrashed()) {
-                    el.classList.add(CLASS_WHEN_TRASHED);
-                } else {
-                    el.classList.remove(CLASS_WHEN_TRASHED);
-                }
-                
-                onContentKeyUp();
-
-                onContentBlur();
+            _this.setTitle(noteName);
+            _this.loadImages(note.getImages());
+            elContent.value = noteContent;
+            
+            if (note.isTrashed()) {
+                el.classList.add(CLASS_WHEN_TRASHED);
             } else {
                 el.classList.remove(CLASS_WHEN_TRASHED);
-                _this.setTitle();
-                elContent.value = "";
-                onContentBlur();
             }
+            
+            onContentKeyUp();
+            
+            onContentBlur();
             
             currentNote = note;
             currentNotebook = notebook || currentNote.getNotebook();
+        };
+        
+        
+        this.loadImages = function(images) {
+            elImages.innerHTML = '';
+            for (var i=0; i<images.length; i++) {
+                elImages.appendChild(getImageElement(images[i]));
+            }
+        };
+        this.addImage = function(image) {
+            elImages.appendChild(getImageElement(image));
         };
         
         this.getCurrent = function() {
@@ -462,22 +476,14 @@ var App = new function() {
             var content = elContent.value,
                 name = elEditTitle.value;
             
-            if (currentNote) {
-                currentNote.setContent(content);
-                currentNote.setName(name);
-            } else {
-                currentNote = new Note({
-                    "content": content,
-                    "name": name
-                });
-                currentNotebook.addNote(currentNote);
-            }
+            currentNote.setContent(content);
+            currentNote.setName(name);
             
             onSave && onSave(currentNote);
         };
         
         this.cancel = function() {
-            onCancel && onCancel(_this.changed());
+            onCancel && onCancel(currentNote, _this.changed());
         };
         
         this.restore = function() {
@@ -564,6 +570,14 @@ var App = new function() {
             elContent.style.height = elContent.style.minHeight = "";
         }
         
+        function getImageElement(image) {
+            console.info(image);
+            var el = document.createElement("li");
+            el.innerHTML = '<span class="image" style="background-image: url(' + image.src + ')"></span> ' +
+                            image.name + ' (' + readableFilesize(image.size) + ')';
+            return el;
+        }
+        
         function onBeforeAction(action) {
             switch(action) {
                 case "type":
@@ -583,6 +597,9 @@ var App = new function() {
                 case "type":
                     break;
                 case "photo":
+                    var image = new NoteImage(output.name, output.src, output.size, output.type);
+                    currentNote.addImage(image);
+                    _this.addImage(image);
                     break;
                 case "info":
                     break;
@@ -711,7 +728,7 @@ var App = new function() {
             el.objNote = note;
             el.innerHTML = '<div class="name">' + (note.getName() || getNoteNameFromContent(note.getContent())) + ' <span class="time">' + prettyDate(note.getDateUpdated()) + '</span></div>' +
                             '<div class="content">' + note.getContent() + '</div>' +
-                            (note.getImage()? '<div class="image" style="background-image: url(' + note.getImage() + ')"></div>' : '');
+                            (note.getImages().length > 0? '<div class="image" style="background-image: url(' + note.getImages()[0].src + ')"></div>' : '');
             
             return el;
         }
@@ -784,19 +801,23 @@ var App = new function() {
         function actionPhoto() {
             onBeforeAction && onBeforeAction("photo");
             
-            DeviceImagesGallery.show({
-                "title": TEXTS.ADD_IMAGE_TITLE,
-                "onSelect": onImageAdded
+            /*
+            onAfterAction && onAfterAction("photo", {
+                "name": "Photo",
+                "src": "http://www.cbc.ca/sevenwonders/images/pic_wonder_prairie_sky_lg.jpg",
+                "size": 82364,
+                "type": "image/jpeg"
             });
             
-            onAfterAction && onAfterAction("photo");
-        }
-        
-        function onImageAdded(image) {
-            var el = document.createElement("img");
-            el.style.cssText = "width: 50px; height: 50px; position: absolute; top: " + (Math.round(Math.random()*70)+20) + "%; right: 0; z-index: 600;";
-            el.src = image.src;
-            document.body.appendChild(el);
+            return;
+            */
+            
+            DeviceImagesGallery.show({
+                "title": TEXTS.ADD_IMAGE_TITLE,
+                "onSelect": function(image) {
+                    onAfterAction && onAfterAction("photo", image);
+                }
+            });
         }
         
         function actionInfo() {
@@ -871,6 +892,17 @@ var App = new function() {
         };
     }
 };
+
+function readableFilesize(size) {
+    var sizes = ["kb", "mb", "gb", "tb"];
+    
+    for (var i=0; i<sizes.length; i++) {
+        size = Math.round(size/1000);
+        if (size < 1000) {
+            return size + sizes[i];
+        }
+    }
+}
 
 /* taken from the email app */
 function prettyDate(time) {
