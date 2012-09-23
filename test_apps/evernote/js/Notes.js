@@ -50,6 +50,16 @@ var Notebook = function(_options) {
         } 
         return _notes;
     };
+    this.getTrashedNotes = function() {
+        var _notes = [];
+        for (var i=0; i<notes.length; i++) {
+            if (notes[i].isTrashed()) {
+                _notes.push(notes[i]);
+            } 
+        } 
+        return _notes;
+    };
+    
     this.getId = function() { return id; };
     this.getName = function() { return name; };
 

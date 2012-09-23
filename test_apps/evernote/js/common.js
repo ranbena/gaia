@@ -87,17 +87,19 @@ var App = new function() {
     };
     
     function initUserNotes() {
-        var _notebooks = getUserNotes();
+        var _notebooks = getUserData();
         
         if (!_notebooks || _notebooks.length == 0) {
             var notebook = _this.newNotebook(TEXTS.FIRST_NOTEBOOK_NAME);
             _this.newNote(notebook, true);
         } else {
-            _this.refreshNotebooks();
+            _notebooks = notebook;
         }
+        
+        _this.refreshNotebooks();
     }
 
-    function getUserNotes() {
+    function getUserData() {
         return [];
     }
     
@@ -129,22 +131,37 @@ var App = new function() {
         el.innerHTML = TEXTS.NOTEBOOK_ALL;
         el.className = "all";
         el.addEventListener("click", _this.showAllNotes);
+        
         return el;
     }
     
     function createNotebookEntry_Trash() {
-        var el = document.createElement("li");
-        el.innerHTML = TEXTS.NOTEBOOK_TRASH;
+        var el = document.createElement("li"),
+            numberOfApps = getNumberOfTrashedApps();
+            
+        el.innerHTML = TEXTS.NOTEBOOK_TRASH + (numberOfApps? " (" + numberOfApps + ")" : "");
         el.className = "trash";
         el.addEventListener("click", _this.showTrashedNotes);
+        
         return el;
     }
     
+    function getNumberOfTrashedApps() {
+        var numberOfApps = 0;
+        for (var i=0; i<notebooks.length; i++) {
+            numberOfApps += notebooks[i].getTrashedNotes().length;
+        }
+        return numberOfApps;
+    }
+    
     function createNotebookEntry(notebook) {
-        var el = document.createElement("li");
-        el.innerHTML = notebook.getName() + " (" + notebook.getNumberOfNotes() + ")";
+        var el = document.createElement("li"),
+            numberOfApps = notebook.getNumberOfNotes();
+            
+        el.innerHTML = notebook.getName() + (numberOfApps? " (" + numberOfApps + ")" : "");
         el.objNotebook = notebook;
         el.addEventListener("click", clickNotebook);
+        
         return el;
     }
 
@@ -189,11 +206,11 @@ var App = new function() {
     };
     
     this.showAllNotes = function() {
-        
+        alert("Need to Implement:\nShow all notes");
     };
     
     this.showTrashedNotes = function() {
-        
+        alert("Need to Implement:\nShow trashed notes");
     };
     
     function onNoteSave(noteSaved) {
