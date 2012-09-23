@@ -17,7 +17,8 @@ var App = new function() {
             "FIRST_NOTEBOOK_NAME": "My Notebook",
             "EMPTY_NOTEBOOK_NAME": "Notes",
             "NOTE_CANCEL_CHANGES": "You have made changes to the note, do you wish to save it?",
-            "CONFIRM_DELETE_NOTE": "Are you sure you want to delete this note?",
+            "CONFIRM_TRASH_NOTE": "Tap OK to move this note to the Trash",
+            "CONFIRM_DELETE_NOTE": "Are you sure you want to permanently delete this note?",
             "ADD_IMAGE_TITLE": "Attach a photo to your note:"
         },
         ORDERS = [
@@ -119,9 +120,12 @@ var App = new function() {
         cards.goTo(cards.CARDS.NOTE);
     };
     this.showNotes = function(notebook) {
-        elButtonNewNote.style.display = "";
         NotebookView.show(notebook);
         cards.goTo(cards.CARDS.MAIN);
+        
+        if (NotebookView.getCurrent()) {
+            elButtonNewNote.style.display = "";
+        }
     };
 
     this.refreshNotebooks = function() {
@@ -485,8 +489,10 @@ var App = new function() {
         
         this.del = function() {
             if (currentNote) {
-                currentNote.remove();
-                onDelete && onDelete(currentNote);
+                if (confirm(TEXTS.CONFIRM_DELETE_NOTE)) {
+                    currentNote.remove();
+                    onDelete && onDelete(currentNote);
+                }
             }
         };
         
@@ -826,7 +832,7 @@ var App = new function() {
             
             var deleted = false;
             
-            if (confirm(TEXTS.CONFIRM_DELETE_NOTE)) {
+            if (confirm(TEXTS.CONFIRM_TRASH_NOTE)) {
                 var current = NoteView.getCurrent();
                 current.note.setTrashed(true);
                 deleted = true;
