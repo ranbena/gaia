@@ -4,9 +4,10 @@
   "launch_path": "/index.html",
   "developer": {
     "name": "DoAT",
-    "url": "https://github.com/mozilla-b2g/gaia"
+    "url": "http://everything.me/"
   },
   "permissions": [
+    "device-storage:pictures",
     "location"
   ],
   "locales": {},
