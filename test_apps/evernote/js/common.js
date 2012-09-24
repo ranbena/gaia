@@ -482,20 +482,12 @@ var App = new function() {
             elRestore.addEventListener("click", _this.restore);
             elDelete.addEventListener("click", _this.del);
             
-            createDemoElement();
-            
             NoteActions.init({
                 "el": elActions,
                 "onBeforeAction": onBeforeAction,
                 "onAfterAction": onAfterAction
             });
         };
-        
-        function createDemoElement() {
-            elDemoContent = document.createElement("div");
-            elDemoContent.className = "demo-content";
-            el.appendChild(elDemoContent);
-        }
 
         this.show = function(note, notebook) {
             var noteContent = note.getContent(),

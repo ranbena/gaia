@@ -375,7 +375,7 @@ body {
         margin-top: -25px;
         border-top: 1px solid rgba(0, 0, 0, .5);
     }
-#main.show-empty .empty, #note.show-empty:not(.has-images, .readonly) .empty {
+#main.show-empty .empty, #note.show-empty:not(.has-images):not(.readonly) .empty {
     display: block;
 }
 
