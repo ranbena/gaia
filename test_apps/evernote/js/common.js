@@ -339,6 +339,7 @@ var App = new function() {
         }
         
         _this.refreshNotebooks();
+        NoteInfoView.selectNotebook(notebook.getId());
         NotebookView.show(notebook);
     }
     
@@ -347,7 +348,7 @@ var App = new function() {
     }
     
     function onResourceDelete(resource) {
-        alert("deleted");
+        alert("Need to implement - actually delete the resource");
         ResourceView.hide();
     }
     
@@ -764,6 +765,10 @@ var App = new function() {
             elFields.querySelector(".notebookId").innerHTML = html;
         };
         
+        this.selectNotebook = function(notebookId) {
+            elFields.querySelector(".notebookId").value = notebookId;
+        };
+        
         this.onChange_notebookId = function(e) {
             onNotebookChange && onNotebookChange(this.value);
         };
@@ -815,7 +820,7 @@ var App = new function() {
             return s;
         }
     };
-
+    
     var NotebookView = new function() {
         var _this = this,
             el = null, elTitle = null, elEditTitle = null, elEmptyNotes = null, $notesList = null,
@@ -1137,7 +1142,7 @@ var App = new function() {
             el.classList.remove(CLASS_WHEN_VISIBLE);
         };
     }
-
+    
     var SearchHandler = new function() {
         var notebookBeforeSearch = null;
         
