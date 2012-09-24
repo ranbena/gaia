@@ -394,7 +394,8 @@ var App = new function() {
             
         var CLASS_EDIT_TITLE = "edit-title",
             CLASS_WHEN_VISIBLE = "visible",
-            CLASS_WHEN_TRASHED = "readonly";
+            CLASS_WHEN_TRASHED = "readonly",
+            CLASS_WHEN_HAS_IMAGES = "has-images";
             
         this.init = function(options) {
             el = options.container;
@@ -431,12 +432,20 @@ var App = new function() {
             elRestore.addEventListener("click", _this.restore);
             elDelete.addEventListener("click", _this.del);
             
+            createDemoElement();
+            
             NoteActions.init({
                 "el": elActions,
                 "onBeforeAction": onBeforeAction,
                 "onAfterAction": onAfterAction
             });
         };
+        
+        function createDemoElement() {
+            elDemoContent = document.createElement("div");
+            elDemoContent.className = "demo-content";
+            el.appendChild(elDemoContent);
+        }
 
         this.show = function(note, notebook) {
             var noteContent = note.getContent(),
@@ -487,6 +496,8 @@ var App = new function() {
         };
         
         this.editTitle = function() {
+            if (!currentNote || currentNote.isTrashed()) return;
+            
             el.classList.add(CLASS_EDIT_TITLE);
             elEditTitle.focus();
         };
@@ -627,6 +638,7 @@ var App = new function() {
                     var image = new NoteImage(output.name, output.src, output.size, output.type);
                     currentNote.addImage(image);
                     _this.addImage(image);
+                    el.classList.add(CLASS_WHEN_HAS_IMAGES);
                     break;
                 case "info":
                     break;

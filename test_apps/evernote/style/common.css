@@ -97,7 +97,7 @@ body {
         -webkit-box-shadow: 1px 0 0 0 rgba(255, 255, 255, .3) inset;
         box-shadow: 1px 0 0 0 rgba(255, 255, 255, .3) inset;
     }
-    .card .header b.topleft:hover {
+    .card .header b.topleft:active {
         background: -moz-linear-gradient(50% 0, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, .18));
     }
 .card > .footer {
@@ -188,7 +188,7 @@ body {
 #note.card > .footer {
     display: none;
 }
-    #note #note-content {
+    #note #note-content, #note .demo-content {
         background: transparent;
         border: none;
         width: 100%;
@@ -199,11 +199,23 @@ body {
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
     }
+    #note .demo-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0;
+    }
+    #note.show-empty #note-content {
+    }
+    #note.has-images #note-content {
+    }
     #note #note-images {
         list-style-type: none;
         color: #2c2c2c;
         font-size: 13px;
-        margin: 15px;
+        margin: 0 15px 15px 15px;
     }
         #note #note-images li {
             position: relative;
@@ -320,7 +332,7 @@ body {
         margin-top: -25px;
         border-top: 1px solid rgba(0, 0, 0, .5);
     }
-#main.show-empty .empty, #note.show-empty .empty {
+#main.show-empty .empty, #note.show-empty:not(.has-images) .empty {
     display: block;
 }
 

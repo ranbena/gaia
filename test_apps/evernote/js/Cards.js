@@ -84,6 +84,7 @@ var Cards = function(_options) {
             }
             if (el.className.indexOf(CLASS_DRAWER) !== -1) {
                 hasDrawer = true;
+                el.isDrawer = true;
                 drawerWidth -= el.getAttribute("data-gutter");
                 el.style.cssText += "; width: " + drawerWidth + "px;";
             }
@@ -115,8 +116,14 @@ var Cards = function(_options) {
     
     function enableAnimation() {
         for (var i=0, l=cardElements.length; i<l; i++) {
-            cardElements[i].style.cssText += "; -moz-transition: all " + transitionDuration + "ms " + transitionEasing + ";" +
-                                             "; -webkit-transition: all " + transitionDuration + "ms " + transitionEasing + ";";
+            var duration = transitionDuration;
+            
+            if (cardElements[i].isDrawer) {
+                // duration should be proportionate so that there won't be the movement gap
+            }
+            
+            cardElements[i].style.cssText += "; -moz-transition: all " + duration + "ms " + transitionEasing + ";" +
+                                             "; -webkit-transition: all " + duration + "ms " + transitionEasing + ";";
         }
     }
     
