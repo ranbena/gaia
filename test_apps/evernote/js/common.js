@@ -36,23 +36,13 @@ var App = new function() {
                 "descending": true
             },
             {
-                "property": "title",
+                "property": "name",
                 "label": "Title",
                 "descending": false
             },
             {
                 "property": "notebookId",
                 "label": "Notebook",
-                "descending": false
-            },
-            {
-                "property": "city",
-                "label": "City",
-                "descending": false
-            },
-            {
-                "property": "country",
-                "label": "Country",
                 "descending": false
             }
         ],
@@ -121,7 +111,7 @@ var App = new function() {
         
         Searcher.init({
             "input": $("searchNotes"),
-            "fields": "content",
+            "fields": ["content", "name"],
             "onSearch": SearchHandler.onSearch,
             "onInputFocus": SearchHandler.onFocus,
             "onInputBlur": SearchHandler.onBlur
@@ -631,7 +621,7 @@ var App = new function() {
         }
         
         function setHeightAccordingToScreen() {
-            var tries = 20,
+            var tries = 30,
                 initialHeight = window.innerHeight,
                 intervalHeight = window.setInterval(function(){
                 
@@ -902,16 +892,14 @@ var App = new function() {
             
             window.setTimeout(function(){
                 var notes = sortNotes(_notes || currentNotebook && currentNotebook.getNotes(), sortby, isDesc);
-                if (notes) {
-                    if (notes.length > 0) {
-                        for (var i=0; i<notes.length; i++) {
-                            $notesList.appendChild(getNoteElement(notes[i]));
-                        }
-                        el.classList.remove(EMPTY_CONTENT_CLASS);
-                    } else {
-                        el.classList.add(EMPTY_CONTENT_CLASS);
-                        elEmptyNotes.innerHTML = currentNotebook? TEXTS.EMPTY_NOTEBOOK : TEXTS.EMPTY_TRASH;
+                if (notes && notes.length > 0) {
+                    for (var i=0; i<notes.length; i++) {
+                        $notesList.appendChild(getNoteElement(notes[i]));
                     }
+                    el.classList.remove(EMPTY_CONTENT_CLASS);
+                } else {
+                    el.classList.add(EMPTY_CONTENT_CLASS);
+                    elEmptyNotes.innerHTML = currentNotebook? TEXTS.EMPTY_NOTEBOOK : TEXTS.EMPTY_TRASH;
                 }
             }, 0);
             
@@ -1048,7 +1036,7 @@ var App = new function() {
             
             /*
             onAfterAction && onAfterAction("photo", {
-                "name": "Photo",
+                "name": "DCIM/img_asckjbasckbkasjcnascaschkbascasc.jpg",
                 "src": "http://www.cbc.ca/sevenwonders/images/pic_wonder_prairie_sky_lg.jpg",
                 "size": 82364,
                 "type": "image/jpeg"

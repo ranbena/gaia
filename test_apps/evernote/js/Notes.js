@@ -132,7 +132,7 @@ var Note = function(_options) {
                 return dateUpdated;
             case "dateCreated":
                 return dateCreated;
-            case "title":
+            case "name":
                 return _this.getName();
             case "notebookId":
                 return notebook.getId();
