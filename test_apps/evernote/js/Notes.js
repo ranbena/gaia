@@ -2,7 +2,7 @@ var Notebook = function(_options) {
     var _this = this,
         id = "", name = "",
         notes = [];
-
+    
     function init(options) {
         !options && (options = {});
         

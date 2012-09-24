@@ -93,7 +93,8 @@ var App = new function() {
         // handler of the note-info card
         NoteInfoView.init({
             "container": $("note-info"),
-            "fields": INFO_FIELDS
+            "fields": INFO_FIELDS,
+            "onNotebookChange": onNoteChangeNotebook
         });
         // handles the sorting of notebooks
         Sorter.init({
@@ -301,6 +302,24 @@ var App = new function() {
     function onNoteDelete(noteAffected) {
         _this.showNotes();
         _this.refreshNotebooks();
+    }
+    
+    function onNoteChangeNotebook(newNotebookId) {
+        var notebook = null,
+            note = NoteInfoView.getCurrent();
+            
+        note.getNotebook().removeNote(note);
+            
+        for (var i=0; i<notebooks.length; i++) {
+            if (notebooks[i].getId() == newNotebookId) {
+                notebook = notebooks[i];
+                notebook.addNote(note);
+                break;
+            }
+        }
+        
+        _this.refreshNotebooks();
+        NotebookView.show(notebook);
     }
     
     function getNoteNameFromContent(content) {
@@ -656,11 +675,13 @@ var App = new function() {
     
     var NoteInfoView = new function() {
         var _this = this,
-            el = null, fields = [], currentNote = null;
+            el = null, fields = [], currentNote = null,
+            onNotebookChange = null;
             
         this.init = function(options) {
             el = options.container;
             fields = options.fields;
+            onNotebookChange = options.onNotebookChange;
             
             elFields = el.querySelector(".fields");
             
@@ -691,12 +712,20 @@ var App = new function() {
             currentNote = note;
         };
         
+        this.getCurrent = function() {
+            return currentNote;
+        };
+        
         this.refreshNotebooks = function(notebooks) {
             var html = '';
             for (var i=0; i<notebooks.length; i++) {
                 html += '<option value="' + notebooks[i].getId() + '">' + notebooks[i].getName() + '</option>';
             }
             elFields.querySelector(".notebookId").innerHTML = html;
+        };
+        
+        this.onChange_notebookId = function(e) {
+            onNotebookChange && onNotebookChange(this.value);
         };
         
         function initView() {
@@ -717,13 +746,21 @@ var App = new function() {
             }
             
             elFields.innerHTML += html;
+            
+            // automatically bind onChange events to all fields of type "option"
+            for (var i=0; i<fields.length; i++) {
+                var f = fields[i];
+                
+                if (f.type == "options") {
+                    elFields.querySelector("select." + f.key).addEventListener("change", _this["onChange_" + f.key]);
+                }
+            }
         }
         
         function getNotebookSelect(field) {
             var html = '' +
                         '<label>' + field.label + '</label>' +
-                        '<select name="" class="' + field.key + '">' +
-                        '</select>';
+                        '<select class="' + field.key + '"></select>';
             
             return html;
         }
@@ -1039,10 +1076,8 @@ function prettyDate(time) {
   }
   
   var f = navigator.mozL10n? new navigator.mozL10n.DateTimeFormat() : null;
-  var diff = Date.now() - time;
+  var diff = (Date.now() - time) / 1000;
   var day_diff = Math.floor(diff / 86400);
-  var actualDate = new Date();
-  actualDate.setTime(time);
   
   if (isNaN(day_diff))
     return '(incorrect date)';
@@ -1053,11 +1088,14 @@ function prettyDate(time) {
   }
   
   return day_diff == 0 && (
-    diff < 60 && 'Just now' ||
-    diff < 86400 && (actualDate.getHours() + ":" + actualDate.getMinutes()) ||
-    day_diff == 1 && 'yesterday' ||
+    diff < 60 && 'Just Now' ||
+    diff < 120 && '1 Minute Ago' ||
+    diff < 3600 && Math.floor(diff / 60) + ' Minutes Ago' ||
+    diff < 7200 && '1 Hour Ago' ||
+    diff < 86400 && Math.floor(diff / 3600) + ' Hours Ago') ||
+    day_diff == 1 && 'Yesterday' ||
     day_diff < 7 && f.localeFormat(new Date(time), '%A') ||
-    (f? f.localeFormat(new Date(time), '%x') : new Date(time)));
+    f.localeFormat(new Date(time), '%x');
 }
 
 function $(s) { return document.getElementById(s); }
