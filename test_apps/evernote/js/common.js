@@ -132,6 +132,8 @@ var App = new function() {
         
         $("button-new-notebook").addEventListener("click", _this.promptNewNotebook);
         
+        $("button-notebook-search").addEventListener("click", SearchHandler.open);
+        
         elButtonNewNote.addEventListener("click", function() {
             _this.newNote(null, true);
         });
@@ -924,8 +926,8 @@ var App = new function() {
             return currentNotebook;
         };
         
-        this.scrollTop = function() {
-            $notesList.parentNode.scrollTop = notebookScrollOffset;
+        this.scrollTop = function(scrollTop) {
+            $notesList.parentNode.scrollTop = (typeof scrollTop == "number")? scrollTop : notebookScrollOffset;
         };
         
         function getNoteElement(note) {
@@ -1138,6 +1140,11 @@ var App = new function() {
 
     var SearchHandler = new function() {
         var notebookBeforeSearch = null;
+        
+        this.open = function() {
+            NotebookView.scrollTop(0);
+            Searcher.focus();
+        };
         
         this.onSearch = function(items, keyword) {
             if (items.length > 0) {

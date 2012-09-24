@@ -61,6 +61,10 @@ var Searcher = new function() {
         return value;
     };
     
+    this.focus = function() {
+        elInput.focus();
+    };
+    
     function onFocus(e) {
         onInputFocus && onInputFocus(e);
     }
