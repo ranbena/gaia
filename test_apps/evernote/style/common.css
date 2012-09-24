@@ -100,14 +100,17 @@ body {
     .card .header b.topleft:active {
         background: -moz-linear-gradient(50% 0, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, .18));
     }
-.card > .footer {
+    
+.card .footer {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
     height: 40px;
-    z-index: 50;
     line-height: 40px;
+    z-index: 50;
+    color: #fff;
+    text-align: center;
     background: rgba(0, 0, 0, .8);
 }
     .card .footer b {
@@ -311,6 +314,46 @@ body {
         border-right: none;
     }
     
+    
+#image-fullscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #000;
+    z-index: 600;
+    display: none;
+}
+#image-fullscreen.visible {
+    display: block;
+}
+    #image-fullscreen .image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10;
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        background-size: contain;
+    }
+    #image-fullscreen .footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 40px;
+        line-height: 40px;
+        padding: 0 40px;
+        z-index: 50;
+        background: rgba(0, 0, 0, .8);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
 .empty {
     position: absolute;
     top: 0;
@@ -455,6 +498,20 @@ body {
             }
 
 
+.search-results #main .header,
+.search-results #main .footer,
+.search-results #main .empty {
+    display: none;
+}
+.search-results #main .content {
+    top: 0;
+    bottom: 0;
+}
+.search-results .trashed {
+    opacity: .6;
+}
+
+
 .notifier {
     position: absolute;
     bottom: 0;
@@ -553,6 +610,9 @@ body {
     height: 183px;
     margin: -92px 0 0 -75px;
 }
+.notebook-fake .empty:before {
+    background-position: 0 -240px;
+}
 
 #note-edit-actions .type:before {
     background-position: -200px -40px;
@@ -603,4 +663,17 @@ body {
     width: 11px;
     height: 17px;
     margin: -8px 0 0 -5px;
+}
+
+#button-image-close:before {
+    background-position: 0 0;
+    width: 17px;
+    height: 17px;
+    margin: -8.5px 0 0 -9px;
+}
+#button-image-delete:before {
+    background-position: -200px -200px;
+    width: 24px;
+    height: 26px;
+    margin: -11px 0 0 -12px;
 }

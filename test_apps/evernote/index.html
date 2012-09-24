@@ -7,6 +7,7 @@
         <title>Notes</title>
         
         <script src="js/PhotoGallery.js" type="text/javascript"></script>
+        <script src="js/Searcher.js" type="text/javascript"></script>
         <script src="js/Cards.js" type="text/javascript"></script>
         <script src="js/Notes.js" type="text/javascript"></script>
         <script src="js/common.js" type="text/javascript"></script>
@@ -28,12 +29,12 @@
                     <b class="topright sprited" id="button-notebook-add">Add</b>
                 </div>
                 <div class="content">
-                    <form method="get" action="" id="search" class="sprited">
+                    <form method="get" action="" id="search" class="sprited" onsubmit="return false;">
                         <input type="text" id="searchNotes" name="searchNotes" />
                     </form>
                     <ul class="notebook-notes"></ul>
-                    <div class="empty sprited">
-                        <p>no notes recorded<br />start writing now</p>
+                    <div class="empty sprited" id="empty-notebook">
+                        <p></p>
                     </div>
                 </div>
                 <div class="footer" id="notebook-footer">
@@ -65,6 +66,14 @@
                 <div class="footer">
                     <b id="button-note-restore" class="sprited bottomleft">Restore</b>
                     <b id="button-note-delete" class="sprited bottomright">Delete</b>
+                </div>
+                <div id="image-fullscreen">
+                    <div class="image"></div>
+                    <div class="footer">
+                        <b id="button-image-close" class="sprited bottomleft">Close</b>
+                        <span class="name"></span>
+                        <b id="button-image-delete" class="sprited bottomright">Delete</b>
+                    </div>
                 </div>
             </div>
             <div class="card" id="note-info">
