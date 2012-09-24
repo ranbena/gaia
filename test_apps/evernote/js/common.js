@@ -14,6 +14,8 @@ var App = new function() {
             "NOTEBOOK_TRASH": "Trash",
             "NOTE_RESTORED": "Restored to {{notebook}}",
             "NEW_NOTE": "New Note",
+            "EMPTY_NOTEBOOK": "no notes recorded<br />start writing now",
+            "EMPTY_TRASH": "your trash is empty!",
             "FIRST_NOTEBOOK_NAME": "My Notebook",
             "EMPTY_NOTEBOOK_NAME": "Notes",
             "NOTE_CANCEL_CHANGES": "You have made changes to the note, do you wish to save it?",
@@ -107,6 +109,10 @@ var App = new function() {
         // general object to show notifications on screen
         Notification.init({
             "container": $("container")
+        });
+        
+        Searcher.init({
+            "input": $("searchNotes")
         });
         
         $notebooksList = $("notebooks-list");
@@ -778,11 +784,11 @@ var App = new function() {
 
     var NotebookView = new function() {
         var _this = this,
-            el = null, elTitle = null, elEditTitle = null, $notesList = null,
+            el = null, elTitle = null, elEditTitle = null, elEmptyNotes = null, $notesList = null,
             currentNotebook = null, currentSort = "", currentIsDesc = false,
             onClickNote = null, notebookScrollOffset = 0,
             onChange = null;
-
+        
         this.init = function(options) {
             el = options.container;
             onClickNote = options.onClickNote;
@@ -790,6 +796,7 @@ var App = new function() {
             
             elTitle = el.querySelector("h1");
             elEditTitle = el.querySelector("input");
+            elEmptyNotes = el.querySelector(".empty p");
             
             elTitle.addEventListener("click", _this.editTitle);
             elEditTitle.addEventListener("blur", _this.saveEditTitle);
@@ -812,6 +819,9 @@ var App = new function() {
                 !notebook && (notebook = currentNotebook);
             }
             
+            el.classList.remove("notebook-real");
+            el.classList.remove("notebook-fake");
+            el.classList.add(notebook? "notebook-real": "notebook-fake");
             
             notebook && _this.setTitle(notebook.getName());
             
@@ -860,13 +870,14 @@ var App = new function() {
             window.setTimeout(function(){
                 var notes = sortNotes(_notes || currentNotebook && currentNotebook.getNotes(), sortby, isDesc);
                 if (notes) {
-                    if (notes.length > 0 || _notes) {
+                    if (notes.length > 0) {
                         for (var i=0; i<notes.length; i++) {
                             $notesList.appendChild(getNoteElement(notes[i]));
                         }
                         el.classList.remove(EMPTY_CONTENT_CLASS);
                     } else {
                         el.classList.add(EMPTY_CONTENT_CLASS);
+                        elEmptyNotes.innerHTML = currentNotebook? TEXTS.EMPTY_NOTEBOOK : TEXTS.EMPTY_TRASH;
                     }
                 }
             }, 0);
