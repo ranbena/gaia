@@ -1,16 +1,18 @@
 {
-  "name": "Evernote",
+  "name": "Notes",
   "description": "Notes app",
   "launch_path": "/index.html",
   "developer": {
     "name": "DoAT",
-    "url": "https://github.com/mozilla-b2g/gaia"
+    "url": "http://everything.me/"
   },
   "permissions": [
+    "device-storage:pictures",
+    "location"
   ],
   "locales": {},
   "default_locale": "en-US",
   "icons": {
-    "128": "/images/icon.png"
+    "64": "/images/icon.png"
   }
 }
