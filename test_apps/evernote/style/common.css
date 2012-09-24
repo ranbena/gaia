@@ -498,6 +498,20 @@ body {
             }
 
 
+.search-results #main .header,
+.search-results #main .footer,
+.search-results #main .empty {
+    display: none;
+}
+.search-results #main .content {
+    top: 0;
+    bottom: 0;
+}
+.search-results .trashed {
+    opacity: .6;
+}
+
+
 .notifier {
     position: absolute;
     bottom: 0;

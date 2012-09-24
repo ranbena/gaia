@@ -136,6 +136,8 @@ var Note = function(_options) {
                 return _this.getName();
             case "notebookId":
                 return notebook.getId();
+            case "content":
+                return content;
             case "city":
                 return "";
             case "country":

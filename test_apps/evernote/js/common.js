@@ -8,6 +8,7 @@ var App = new function() {
         NUMBER_OF_SCROLL_RETRIES = 10,
         EMPTY_CONTENT_CLASS = "show-empty",
         CLASS_EDIT_TITLE = "edit-title",
+        CLASS_SEARCH_RESULTS = "search-results",
         TEXTS = {
             "NEW_NOTEBOOK": "Create Notebook",
             "NOTEBOOK_ALL": "All Notes",
@@ -119,7 +120,11 @@ var App = new function() {
         });
         
         Searcher.init({
-            "input": $("searchNotes")
+            "input": $("searchNotes"),
+            "fields": "content",
+            "onSearch": SearchHandler.onSearch,
+            "onInputFocus": SearchHandler.onFocus,
+            "onInputBlur": SearchHandler.onBlur
         });
         
         $notebooksList = $("notebooks-list");
@@ -322,7 +327,7 @@ var App = new function() {
             note = NoteInfoView.getCurrent();
             
         note.getNotebook().removeNote(note);
-            
+        
         for (var i=0; i<notebooks.length; i++) {
             if (notebooks[i].getId() == newNotebookId) {
                 notebook = notebooks[i];
@@ -838,7 +843,7 @@ var App = new function() {
             notebookScrollOffset = $("search").offsetHeight;
         };
         
-        this.show = function(notebook, notes) {
+        this.show = function(notebook, notes, bDontScroll) {
             if (notes) {
                 notebook = null;
                 currentNotebook = null;
@@ -861,7 +866,9 @@ var App = new function() {
             
             _this.showNotes(currentSort, currentIsDesc, notes);
             
-            _this.scrollTop();
+            if (!bDontScroll) {
+                _this.scrollTop();
+            }
         };
         
         this.setTitle = function(title) {
@@ -928,6 +935,10 @@ var App = new function() {
             el.innerHTML = '<div class="name">' + (note.getName() || getNoteNameFromContent(note.getContent())) + ' <span class="time">' + prettyDate(note.getDateUpdated()) + '</span></div>' +
                             '<div class="content">' + note.getContent() + '</div>' +
                             (note.getImages().length > 0? '<div class="image" style="background-image: url(' + note.getImages()[0].src + ')"></div>' : '');
+            
+            if (note.isTrashed()) {
+                el.className += " trashed";
+            }
             
             return el;
         }
@@ -1123,6 +1134,48 @@ var App = new function() {
             window.clearTimeout(timeoutHide);
             el.classList.remove(CLASS_WHEN_VISIBLE);
         };
+    }
+
+    var SearchHandler = new function() {
+        var notebookBeforeSearch = null;
+        
+        this.onSearch = function(items, keyword) {
+            if (items.length > 0) {
+                NotebookView.show(null, items, true);
+            } else {
+                if (!keyword) {
+                    showPreviousNotebook(true);
+                } else {
+                    NotebookView.show(null, [], true);
+                }
+            }
+        };
+        
+        this.onFocus = function(e) {
+            document.body.classList.add(CLASS_SEARCH_RESULTS);
+            
+            var notes = [];
+            for (var i=0; i<notebooks.length; i++) {
+                notes = notes.concat(notebooks[i].getNotes(true));
+            }
+            Searcher.setData(notes);
+            
+            var _currentNotebook = NotebookView.getCurrent();
+            if (_currentNotebook) {
+                notebookBeforeSearch = _currentNotebook;
+            }
+        };
+        
+        this.onBlur = function(e) {
+            document.body.classList.remove(CLASS_SEARCH_RESULTS);
+            if (!Searcher.value()) {
+                showPreviousNotebook(true);
+            }
+        };
+        
+        function showPreviousNotebook(hideSearch) {
+            NotebookView.show(notebookBeforeSearch, null, hideSearch);
+        }
     }
 };
 
