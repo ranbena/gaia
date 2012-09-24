@@ -91,6 +91,7 @@ var App = new function() {
             "onCancel": onNoteCancel,
             "onRestore": onNoteRestore,
             "onDelete": onNoteDelete,
+            "onResourceClick": onResourceClick
         });
         // handler of the note-info card
         NoteInfoView.init({
@@ -109,6 +110,12 @@ var App = new function() {
         // general object to show notifications on screen
         Notification.init({
             "container": $("container")
+        });
+        
+        // when viewing image in full screen
+        ResourceView.init({
+            "container": $("image-fullscreen"),
+            "onDelete": onResourceDelete
         });
         
         Searcher.init({
@@ -328,6 +335,15 @@ var App = new function() {
         NotebookView.show(notebook);
     }
     
+    function onResourceClick(resource) {
+        ResourceView.show(resource);
+    }
+    
+    function onResourceDelete(resource) {
+        alert("deleted");
+        ResourceView.hide();
+    }
+    
     function getNoteNameFromContent(content) {
         return (content || "").split("\n")[0];
     }
@@ -432,6 +448,7 @@ var App = new function() {
             onRestore = options.onRestore;
             onDelete = options.onDelete;
             onTitleChange = options.onTitleChange;
+            onResourceClick = options.onResourceClick;
             
             elContent = el.querySelector("textarea");
             elImages = el.querySelector("#note-images");
@@ -638,7 +655,17 @@ var App = new function() {
             var el = document.createElement("li");
             el.innerHTML = '<span style="background-image: url(' + image.src + ')"></span> ' +
                             image.name + ' (' + readableFilesize(image.size) + ')';
+                            
+                            
+            el.addEventListener("click", function(){
+                onResourceClick(image);
+            });
+            
             return el;
+        }
+        
+        function onImageClick(resource) {
+            onResourceClick && onResourceClick(resource);
         }
         
         function onBeforeAction(action) {
@@ -940,7 +967,43 @@ var App = new function() {
             }
         }
     };
-
+    
+    var ResourceView = new function() {
+        var _this = this,
+            el = null, elImage = null, elName = null,
+            currentResource = null, onDelete = null;
+            
+        var CLASS_WHEN_VISIBLE = "visible";
+            
+        this.init = function(options) {
+            el = options.container;
+            onDelete = options.onDelete;
+            
+            elImage = el.querySelector(".image");
+            elName = el.querySelector(".name");
+            
+            el.querySelector("#button-image-close").addEventListener("click", _this.hide);
+            el.querySelector("#button-image-delete").addEventListener("click", _this.del);
+        };
+        
+        this.show = function(resource) {
+            elImage.style.backgroundImage = 'url(' + resource.src + ')';
+            elName.innerHTML = resource.name;
+            
+            el.classList.add(CLASS_WHEN_VISIBLE);
+            
+            currentResource = resource;
+        };
+        
+        this.hide = function() {
+            el.classList.remove(CLASS_WHEN_VISIBLE);
+        };
+        
+        this.del = function() {
+            currentResource && onDelete && onDelete(currentResource);
+        };
+    };
+    
     var NoteActions = new function() {
         var _this = this,
             el = null,
@@ -980,10 +1043,9 @@ var App = new function() {
                 "size": 82364,
                 "type": "image/jpeg"
             });
-            
             return;
             */
-            
+           
             DeviceImagesGallery.show({
                 "title": TEXTS.ADD_IMAGE_TITLE,
                 "onSelect": function(image) {
