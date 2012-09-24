@@ -142,7 +142,7 @@ var Note = function(_options) {
                 return "";
         }
         
-        return id;
+        throw "Invalid propety '" + prop + "'!";
     };
     
     this.isTrashed = function() { return trashed; };
@@ -150,8 +150,8 @@ var Note = function(_options) {
     this.getId = function() { return id; };
     this.getContent = function() { return content; };
     this.getImages = function() { return images; };
-    this.getDateCreated = function() { return dateCreated.getTime(); };
-    this.getDateUpdated = function() { return dateUpdated.getTime(); };
+    this.getDateCreated = function() { return dateCreated; };
+    this.getDateUpdated = function() { return dateUpdated; };
     this.getNotebook = function() { return notebook; };
     this.getName = function() { return name; };
     

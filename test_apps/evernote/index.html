@@ -15,7 +15,7 @@
     </head>
     <body onload="App.init();">
         <div id="container" class="cards">
-            <div class="card drawer" id="notebooks" data-gutter="20">
+            <div class="card drawer" id="notebooks" data-gutter="50">
                 <h2>Notebooks <b id="button-new-notebook" class="sprited"></b></h2>
                 <b class="card-next"></b>
                 <ul id="notebooks-list"></ul>
@@ -65,6 +65,15 @@
                 <div class="footer">
                     <b id="button-note-restore" class="sprited bottomleft">Restore</b>
                     <b id="button-note-delete" class="sprited bottomright">Delete</b>
+                </div>
+            </div>
+            <div class="card" id="note-info">
+                <div class="header">
+                    <b class="topleft sprited card-prev">Back to Note</b>
+                    <h1>Note Info</h1>
+                </div>
+                <div class="content">
+                    <ul class="fields"></ul>
                 </div>
             </div>
         </div>

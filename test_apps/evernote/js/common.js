@@ -52,40 +52,66 @@ var App = new function() {
                 "label": "Country",
                 "descending": false
             }
+        ],
+        INFO_FIELDS = [
+            {
+                "key": "notebookId",
+                "label": "Notebook",
+                "type": "options"
+            },
+            {
+                "key": "dateCreated",
+                "label": "Created on",
+                "type": "date"
+            },
+            {
+                "key": "dateUpdated",
+                "label": "Modified on",
+                "type": "date"
+            }
         ];
     
     this.init = function() {
         cards = new Cards();
         
+        // handler of the notebook card (list of notes)
         NotebookView.init({
-            "container": document.getElementById("main"),
+            "container": $("main"),
             "onClickNote": _this.showNote,
             "onChange": _this.refreshNotebooks
         });
+        // handler of the note card (view and edit actual note)
         NoteView.init({
-            "container": document.getElementById("note"),
-            "elCancel": document.getElementById("button-note-cancel"),
-            "elSave": document.getElementById("button-note-save"),
+            "container": $("note"),
+            "elCancel": $("button-note-cancel"),
+            "elSave": $("button-note-save"),
             "onSave": onNoteSave,
             "onCancel": onNoteCancel,
             "onRestore": onNoteRestore,
             "onDelete": onNoteDelete,
         });
+        // handler of the note-info card
+        NoteInfoView.init({
+            "container": $("note-info"),
+            "fields": INFO_FIELDS
+        });
+        // handles the sorting of notebooks
         Sorter.init({
             "orders": ORDERS,
-            "container": document.getElementById("notebook-footer"),
+            "container": $("notebook-footer"),
             "onChange": function(order, desc) {
                 NotebookView.showNotes(order, desc);
             }
         });
+        // general object to show notifications on screen
         Notification.init({
-            "container": document.getElementById("container")
+            "container": $("container")
         });
         
-        $notebooksList = document.getElementById("notebooks-list");
-        elButtonNewNote = document.getElementById("button-notebook-add");
+        $notebooksList = $("notebooks-list");
+        elButtonNewNote = $("button-notebook-add");
         
-        document.getElementById("button-new-notebook").addEventListener("click", _this.promptNewNotebook);
+        $("button-new-notebook").addEventListener("click", _this.promptNewNotebook);
         
         elButtonNewNote.addEventListener("click", function() {
             _this.newNote(null, true);
@@ -136,6 +162,8 @@ var App = new function() {
             $notebooksList.appendChild(createNotebookEntry(notebooks[i]));
         }
         $notebooksList.appendChild(createNotebookEntry_Trash());
+        
+        NoteInfoView.refreshNotebooks(notebooks);
     };
     
     function createNotebookEntry_All() {
@@ -416,10 +444,10 @@ var App = new function() {
 
             noteContentBeforeEdit = noteContent;
             noteNameBeforeEdit = noteName;
-
+            
+            elContent.value = noteContent;
             _this.setTitle(noteName);
             _this.loadImages(note.getImages());
-            elContent.value = noteContent;
             
             if (note.isTrashed()) {
                 el.classList.add(CLASS_WHEN_TRASHED);
@@ -571,9 +599,8 @@ var App = new function() {
         }
         
         function getImageElement(image) {
-            console.info(image);
             var el = document.createElement("li");
-            el.innerHTML = '<span class="image" style="background-image: url(' + image.src + ')"></span> ' +
+            el.innerHTML = '<span style="background-image: url(' + image.src + ')"></span> ' +
                             image.name + ' (' + readableFilesize(image.size) + ')';
             return el;
         }
@@ -583,9 +610,9 @@ var App = new function() {
                 case "type":
                     elContent.focus();
                     break;
-                case "photo":
-                    break;
                 case "info":
+                    NoteInfoView.load(currentNote);
+                    cards.goTo(cards.CARDS.NOTE_INFO);
                     break;
                 case "share":
                     break;
@@ -614,6 +641,91 @@ var App = new function() {
             }
         }
     };
+    
+    var NoteInfoView = new function() {
+        var _this = this,
+            el = null, fields = [], currentNote = null;
+            
+        this.init = function(options) {
+            el = options.container;
+            fields = options.fields;
+            
+            elFields = el.querySelector(".fields");
+            
+            initView();
+        };
+        
+        this.load = function(note) {
+            if (currentNote && note.getId() == currentNote.getId()) {
+                return;
+            }
+            
+            for (var i=0; i<fields.length; i++) {
+                var f = fields[i],
+                    value = note.getProperty(f.key),
+                    elValue = elFields.querySelector("." + f.key);
+                    
+                switch(f.type) {
+                    case "date":
+                        value = printDate(value);
+                        elValue.innerHTML = value;
+                        break;
+                    case "options":
+                        elValue.value = value;
+                        break;
+                }
+            }
+            
+            currentNote = note;
+        };
+        
+        this.refreshNotebooks = function(notebooks) {
+            var html = '';
+            for (var i=0; i<notebooks.length; i++) {
+                html += '<option value="' + notebooks[i].getId() + '">' + notebooks[i].getName() + '</option>';
+            }
+            elFields.querySelector(".notebookId").innerHTML = html;
+        };
+        
+        function initView() {
+            var html = '';
+            
+            for (var i=0; i<fields.length; i++) {
+                var f = fields[i],
+                    type = f.type;
+                
+                if (type == "options") {
+                    html += '<li>' + getNotebookSelect(f) + '</li>';
+                } else {
+                    html += '<li>' +
+                                '<label>' + f.label + '</label>' +
+                                '<b class="value ' + f.key + '"></b>' +
+                            '</li>';
+                }
+            }
+            
+            elFields.innerHTML += html;
+        }
+        
+        function getNotebookSelect(field) {
+            var html = '' +
+                        '<label>' + field.label + '</label>' +
+                        '<select name="" class="' + field.key + '">' +
+                        '</select>';
+            
+            return html;
+        }
+        
+        function printDate(date) {
+            var s = "";
+            
+            s += date.getHours() + ":" + date.getMinutes();
+            s += " ";
+            s += date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
+            
+            return s;
+        }
+    };
 
     var NotebookView = new function() {
         var _this = this,
@@ -640,7 +752,7 @@ var App = new function() {
             
             $notesList.addEventListener("click", clickNote);
             
-            notebookScrollOffset = document.getElementById("search").offsetHeight;
+            notebookScrollOffset = $("search").offsetHeight;
         };
         
         this.show = function(notebook, notes) {
@@ -842,7 +954,7 @@ var App = new function() {
                     s += k + ": " + e[k] + "\n";
                 }
                 
-                document.getElementById("note-content").value = "Activity Error!\n" + e.message + "\n" + s;
+                $("note-content").value = "Activity Error!\n" + e.message + "\n" + s;
             };
             
             onAfterAction && onAfterAction("share");
@@ -852,7 +964,6 @@ var App = new function() {
             onBeforeAction && onBeforeAction("delete");
             
             var deleted = false;
-            
             if (confirm(TEXTS.CONFIRM_TRASH_NOTE)) {
                 var current = NoteView.getCurrent();
                 current.note.setTrashed(true);
@@ -862,7 +973,7 @@ var App = new function() {
             onAfterAction && onAfterAction("delete", deleted);
         }
     };
-
+    
     var Notification = new function() {
         var _this = this,
             el = null, timeoutHide = null;
@@ -936,3 +1047,5 @@ function prettyDate(time) {
     day_diff < 7 && f.localeFormat(new Date(time), '%A') ||
     (f? f.localeFormat(new Date(time), '%x') : new Date(time)));
 }
+
+function $(s) { return document.getElementById(s); }
