@@ -17,13 +17,13 @@ var Cards = function(_options) {
         elContainer = options.container || document.querySelector(".cards");
         
         elContainer.style.cssText += '; position: relative; overflow: hidden; min-height: 100%;';
-
+        
         cardWidth = drawerWidth = elContainer.offsetWidth;
         cardElements = elContainer.getElementsByClassName("card");
-
+        
         transitionDuration = options.transitionDuration || DEFAULT_TRANSITION_DURATION;
         transitionEasing = options.transitionEasing || DEFAULT_TRANSITION_EASING;
-
+        
         initCards();
     };
 
@@ -31,11 +31,11 @@ var Cards = function(_options) {
         if (typeof index == "string") {
             index = getIndexById(index);
         }
-
+        
         if (index < 0 || index >= cardElements.length) {
             return _this;
         }
-
+        
         for (var i=0, l=cardElements.length; i<l; i++) {
             var pos = 0,
                 zIndex = 10,
@@ -60,7 +60,7 @@ var Cards = function(_options) {
                                  "-moz-transform: translate3d(" + pos + "px, 0, 0); " +
                                  "-webkit-transform: translate3d(" + pos + "px, 0, 0); ";
         }
-
+        
         cardElements[currentIndex].classList.remove(CLASS_WHEN_ACTIVE);
         document.body.classList.remove("card-" + cardElements[currentIndex].id);
         currentIndex = index;
@@ -88,7 +88,7 @@ var Cards = function(_options) {
                 el.style.cssText += "; width: " + drawerWidth + "px;";
             }
 
-            _this.CARDS[el.id.toUpperCase()] = el.id;
+            _this.CARDS[el.id.toUpperCase().replace(/-/g, "_")] = el.id;
 
             addDefaultButtons(el, i);
         }
