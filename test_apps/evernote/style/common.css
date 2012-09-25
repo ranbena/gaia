@@ -215,22 +215,25 @@ body {
     }
     #note.has-images #note-content {
     }
-    #note #note-images {
+    #note #note-resources {
         list-style-type: none;
         color: #2c2c2c;
         font-size: 13px;
         margin: 0 15px 15px 15px;
     }
-        #note #note-images li {
+        #note #note-resources li {
             position: relative;
             margin-top: 15px;
+        }
+        
+        #note #note-resources .image {
             height: 60px;
             padding-left: 90px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
-            #note #note-images li:before {
+            #note #note-resources .image:before {
                 content: "";
                 background: transparent url('../images/sprite.png') -240px -80px no-repeat;
                 position: absolute;
@@ -239,7 +242,7 @@ body {
                 width: 10px;
                 height: 22px;
             }
-            #note #note-images li span {
+            #note #note-resources .image span {
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -667,13 +670,13 @@ body {
     margin: -8px 0 0 -5px;
 }
 
-#button-image-close:before {
+#button-resource-close:before {
     background-position: 0 0;
     width: 17px;
     height: 17px;
     margin: -8.5px 0 0 -9px;
 }
-#button-image-delete:before {
+#button-resource-delete:before {
     background-position: -200px -200px;
     width: 24px;
     height: 26px;

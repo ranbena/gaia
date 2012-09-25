@@ -37,12 +37,12 @@ var Searcher = new function() {
             return results;
         }
         
-        for (var i=0,il=searchNotes.length; i<il; i++) {
-            var item = searchNotes[i],
+        for (var id in searchNotes) {
+            var item = searchNotes[id],
                 match = 0;
             
             for (var j=0,jl=searchFields.length; j<jl; j++) {
-                var val = item.getProperty(searchFields[j]),
+                var val = item["data_" + searchFields[j]],
                     matches = val.match(regexMatch);
                     
                 if (matches && matches.length) {

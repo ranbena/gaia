@@ -6,9 +6,17 @@
         
         <title>Notes</title>
         
+        <!--
+        <script src="js/db/database.js" type="text/javascript"></script>
+        <script src="js/db/query.js" type="text/javascript"></script>
+        <script src="js/db/store.js" type="text/javascript"></script>
+        -->
+        
+        <script src="js/Console.js" type="text/javascript"></script>
         <script src="js/Searcher.js" type="text/javascript"></script>
         <script src="js/Cards.js" type="text/javascript"></script>
         <script src="js/Notes.js" type="text/javascript"></script>
+        
         <script src="js/common.js" type="text/javascript"></script>
         
         <link href="style/common.css" rel="Stylesheet" type="text/css" />
@@ -57,7 +65,7 @@
                 </ul>
                 <div class="content">
                     <textarea id="note-content"></textarea>
-                    <ul id="note-images"></ul>
+                    <ul id="note-resources"></ul>
                     <div class="empty sprited">
                         <p>tap anywhere to start</p>
                     </div>
@@ -69,9 +77,9 @@
                 <div id="image-fullscreen">
                     <div class="image"></div>
                     <div class="footer">
-                        <b id="button-image-close" class="sprited bottomleft">Close</b>
+                        <b id="button-resource-close" class="sprited bottomleft">Close</b>
                         <span class="name"></span>
-                        <b id="button-image-delete" class="sprited bottomright">Delete</b>
+                        <b id="button-resource-delete" class="sprited bottomright">Delete</b>
                     </div>
                 </div>
             </div>
