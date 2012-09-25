@@ -1055,6 +1055,13 @@ var App = new function() {
                 }
             });
             
+            var reopenApp = function reopen() {
+                navigator.mozApps.getSelf().onsuccess = function getSelfCB(evt) {
+                    var app = evt.target.result;
+                    app.launch();
+                };
+            };
+            
             activityRequestPhoto.onsuccess = function onWallpaperSuccess() {
                 if (!activityRequestPhoto.result.url)
                     return;
@@ -1072,6 +1079,8 @@ var App = new function() {
                     "size": 0,
                     "type": ""
                 });
+                
+                reopenApp();
             };
             
             activityRequestPhoto.onerror = function onWallpaperError() {
