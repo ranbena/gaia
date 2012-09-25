@@ -1,4 +1,4 @@
-var Location = new function() {
+Evme.Location = new function() {
     var _name = "Location", _this = this,
         $elLocationName = null, $elButton = null, $elSelectorDialog = null, $locationScreen = null,
         dialog = null, dialogActive = false, timeoutLocationRequest = null;
@@ -32,10 +32,6 @@ var Location = new function() {
         ERROR_CANT_LOCATE_BUTTON = "FROM CONFIG";
     
     this.init = function(options) {
-        if (Utils.isLauncher()) {
-            COOKIE_NAME = "userLocLauncher";
-        }
-        
         options || (options = {});
         
         $elLocationName = options.$elName;
@@ -84,7 +80,7 @@ var Location = new function() {
         
         _this.setLocationFromCookie();
         
-        EventHandler.trigger(_name, "init");
+        Evme.EventHandler.trigger(_name, "init");
     };
     
     this.toggleDialog = function() {
@@ -131,7 +127,7 @@ var Location = new function() {
     };
     
     this.locateMe = function() {
-        Utils.Cookies.remove(COOKIE_NAME);
+        Evme.Utils.Cookies.remove(COOKIE_NAME);
         _this.requestUserLocation(showOSErrorDialog, true);
     };
     
@@ -144,22 +140,17 @@ var Location = new function() {
     };
     
     this.userClickedDoItLater = function() {
-        var locationFromCookie = Utils.Cookies.get(COOKIE_NAME);
+        var locationFromCookie = Evme.Utils.Cookies.get(COOKIE_NAME);
         return (locationFromCookie && locationFromCookie == "n");
     };
     
     this.shouldShowButton = function() {
-        var locationFromCookie = Utils.Cookies.get(COOKIE_NAME);
-        return (locationFromCookie && locationFromCookie == "n") || Utils.Cookies.get(COOKIE_MANUAL_NAME);
+        var locationFromCookie = Evme.Utils.Cookies.get(COOKIE_NAME);
+        return (locationFromCookie && locationFromCookie == "n") || Evme.Utils.Cookies.get(COOKIE_MANUAL_NAME);
     };
     
     this.setLocationFromCookie = function() {
-        if (Utils.isLauncher()) {
-            _this.setLocation("51.505791", "-0.140809");
-            return true;
-        }
-        
-        var locationFromCookie = Utils.Cookies.get(COOKIE_NAME);
+        var locationFromCookie = Evme.Utils.Cookies.get(COOKIE_NAME);
         
         if (locationFromCookie) {
             if (locationFromCookie == "n") {
@@ -171,7 +162,7 @@ var Location = new function() {
                 return true;
             }
         } else {
-            locationFromCookie = Utils.Cookies.get(COOKIE_MANUAL_NAME);
+            locationFromCookie = Evme.Utils.Cookies.get(COOKIE_MANUAL_NAME);
             
             if (locationFromCookie) {
                 locationFromCookie = locationFromCookie.split(",");
@@ -195,12 +186,12 @@ var Location = new function() {
         }
         
         $elButton.addClass("visible");
-        $("#doat-container ").addClass("location-visible");
+        $("#evmeContainer ").addClass("location-visible");
     };
     
     this.hideButton = function() {
         $elButton.removeClass("visible");
-        $("#doat-container ").removeClass("location-visible");
+        $("#evmeContainer ").removeClass("location-visible");
     };
     
     this.setButtonText = function(txt) {
@@ -217,12 +208,12 @@ var Location = new function() {
         (typeof bRemoveDialog !== "boolean") && (bRemoveDialog = true);
         
         if (_name) {
-            Utils.Cookies.remove(COOKIE_NAME);
-            Utils.Cookies.set(COOKIE_MANUAL_NAME, _lat + "," + _lon + "," + name, COOKIE_MANUAL_EXPIRATION_MINUTES);
+            Evme.Utils.Cookies.remove(COOKIE_NAME);
+            Evme.Utils.Cookies.set(COOKIE_MANUAL_NAME, _lat + "," + _lon + "," + name, COOKIE_MANUAL_EXPIRATION_MINUTES);
             _this.setButtonText(name);
         } else {
-            Utils.Cookies.remove(COOKIE_MANUAL_NAME);
-            Utils.Cookies.set(COOKIE_NAME, _lat + "," + _lon, COOKIE_EXPIRATION_MINUTES);
+            Evme.Utils.Cookies.remove(COOKIE_MANUAL_NAME);
+            Evme.Utils.Cookies.set(COOKIE_NAME, _lat + "," + _lon, COOKIE_EXPIRATION_MINUTES);
             _this.hideButton();
         }
         
@@ -263,7 +254,7 @@ var Location = new function() {
             
             $input.bind("keyup", checkValue);
             
-            EventHandler.trigger(_name, "init");
+            Evme.EventHandler.trigger(_name, "init");
         };
         
         this.show = function() {
@@ -326,23 +317,23 @@ var Location = new function() {
         }
         
         function cbBlur(e) {
-            EventHandler.trigger(_name, "blur", {
+            Evme.EventHandler.trigger(_name, "blur", {
                 "e": e,
                 "value": value
             });
         }
         
         function cbShow(e) {
-            EventHandler.trigger(_name, "show");
+            Evme.EventHandler.trigger(_name, "show");
         }
         
         function cbClose(e) {
             stopPolling();
-            EventHandler.trigger(_name, "close");
+            Evme.EventHandler.trigger(_name, "close");
         }
         
         function cbValueChanged(e) {
-            EventHandler.trigger(_name, "valueChanged", {
+            Evme.EventHandler.trigger(_name, "valueChanged", {
                 "value": value,
                 "e": e,
                 "callback": _this.load
@@ -350,7 +341,7 @@ var Location = new function() {
         }
         
         function cbClick(city, country, state, lat, lon, $el) {
-            EventHandler.trigger(_name, "click", {
+            Evme.EventHandler.trigger(_name, "click", {
                 "$el": $el,
                 "city": city,
                 "country": country,
@@ -362,7 +353,7 @@ var Location = new function() {
         }
         
         function cbLoad() {
-            EventHandler.trigger(_name, "load", {
+            Evme.EventHandler.trigger(_name, "load", {
                 "value": value,
                 "list": list,
                 "$list": $list
@@ -383,11 +374,12 @@ var Location = new function() {
         
         cbLocationRequest();
         
-        if (!("geolocation" in navigator) || Utils.isB2G()) {
+        // temp hack until GPS works
+        //if (!("geolocation" in navigator)) {
             hadError = true;
             cbError(errorCallback);
             return;
-        }
+        //}
         
         navigator.geolocation.getCurrentPosition(function(position){
             if (!hadError) {
@@ -410,12 +402,13 @@ var Location = new function() {
     }
     
     function showGeoMessage(errorCallback, bActivateLocation) {
-        var shownMessage = Utils.Cookies.get(MESSAGE_COOKIE_NAME);
+        var shownMessage = Evme.Utils.Cookies.get(MESSAGE_COOKIE_NAME);
         var clickedOK = false, timeoutAutoClick = null;
         bActivateLocation = (typeof bActivateLocation != "boolean")? true : bActivateLocation;
         
         if (!shownMessage) {
-            dialog = new Dialog("location");
+            dialog = new Evme.Dialog("location");
+            
             dialog.show({
                 "title": LOCATION_TIP_TITLE,
                 "content": LOCATION_TIP_TEXT,
@@ -460,7 +453,7 @@ var Location = new function() {
                 "tip": true
             });
             
-            Utils.Cookies.set(MESSAGE_COOKIE_NAME, "1", 60*24*30);
+            Evme.Utils.Cookies.set(MESSAGE_COOKIE_NAME, "1", 60*24*30);
             
             if (TIMEOUT_CLICK_LOCATE_ME) {
                 timeoutAutoClick = window.setTimeout(dialog.clickOK, TIMEOUT_CLICK_LOCATE_ME);
@@ -475,13 +468,13 @@ var Location = new function() {
  	function showErrorDialog() {
         dialog && dialog.remove() && (dialog = null);
         
-        var fromCookie = Utils.Cookies.get(COOKIE_NAME);
+        var fromCookie = Evme.Utils.Cookies.get(COOKIE_NAME);
         if (fromCookie && fromCookie ==  "n") {
             cbError();
             return;
         }
         
-        dialog = new Dialog("location_error");
+        dialog = new Evme.Dialog("location_error");
         dialog.show({
             "title": ERROR_TIP_TITLE,
             "content":  '<label>' + ERROR_TIP_LABEL + '</label>' +
@@ -495,7 +488,7 @@ var Location = new function() {
                 "ok": {
                     "text": ERROR_TIP_BUTTON_CANCEL,
                     "callback": function(e) {
-                        Utils.Cookies.set(COOKIE_NAME, "n", COOKIE_EXPIRATION_DO_IT_LATER_MINUTES);
+                        Evme.Utils.Cookies.set(COOKIE_NAME, "n", COOKIE_EXPIRATION_DO_IT_LATER_MINUTES);
                         animateDialogClose(e, dialog);
                     },
                     "remove": false,
@@ -548,14 +541,14 @@ var Location = new function() {
         
         
         if (e && e.keyCode == 13) {
-            EventHandler.trigger(_name, "zipSearch", {
+            Evme.EventHandler.trigger(_name, "zipSearch", {
                 "value": value,
                 "e": e,
                 "dialog": dialog,
                 "callback": zipSet
             });
         } else {
-            EventHandler.trigger(_name, "zipValueChanged", {
+            Evme.EventHandler.trigger(_name, "zipValueChanged", {
                 "value": value,
                 "e": e,
                 "callback": zipSearch
@@ -587,7 +580,7 @@ var Location = new function() {
     function showOSErrorDialog() {
         dialog && dialog.remove() && (dialog = null);
         
-        dialog = new Dialog("location_os_error");
+        dialog = new Evme.Dialog("location_os_error");
         dialog.show({
             "title": ERROR_CANT_LOCATE_TITLE,
             "content": ERROR_CANT_LOCATE_TEXT,
@@ -610,17 +603,17 @@ var Location = new function() {
     
     function cbLocationRequest() {
         _this.showButton();
-        EventHandler.trigger(_name, "requesting");
+        Evme.EventHandler.trigger(_name, "requesting");
     }
     
     function cbLocationGot(data) {
-        EventHandler.trigger(_name, "got", {
+        Evme.EventHandler.trigger(_name, "got", {
             "position": data
         });
     }
     
     function cbLocationSet() {
-        EventHandler.trigger(_name, "set", {
+        Evme.EventHandler.trigger(_name, "set", {
             "lat": lat,
             "lon": lon,
             "name": name
@@ -630,6 +623,6 @@ var Location = new function() {
     function cbError(errorCallback) {
         errorCallback && errorCallback();
         
-        EventHandler.trigger(_name, "error");
+        Evme.EventHandler.trigger(_name, "error");
     }
 };

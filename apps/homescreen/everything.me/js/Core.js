@@ -1,48 +1,59 @@
-var Core = new function() {
+window.Evme = new function() {
     var _name = "Core", _this = this, logger,
         recalculateHeightRetries = 1,
         TIMEOUT_BEFORE_INIT_SESSION = "FROM CONFIG", displayed = false,
-        OPACITY_CHANGE_DURATION = 300;
+        OPACITY_CHANGE_DURATION = 300,
+        head_ts = new Date().getTime();
 
     this.shouldSearchOnInputBlur = true;
 
     this.init = function() {
-        _this.initWithConfig(__config);
+        data = Evme.__config;
+        
+        logger = (typeof Logger !== "undefined") ? new Logger() : console;
+        
+        var apiHost = Evme.Utils.getUrlParam("apiHost") || data.apiHost;
+        apiHost && Evme.api.setHost(apiHost);
 
-        window.addEventListener("message", function(e) {
-            // if event has no message - return
-            if (!e || !e.data) { return }
+        TIMEOUT_BEFORE_INIT_SESSION = data.timeoutBeforeSessionInit;
+        
+        Evme.Brain.init({
+            "numberOfAppsToLoad": data.numberOfAppsToLoad,
+            "logger": logger,
+            "minimumLettersForSearch": data.minimumLettersForSearch,
+            "helper": data.texts.helper,
+            "promptInstallAppText": data.texts.installAppPrompt,
+            "trending": {
+                "itemsPerPage": data.trending.itemsPerPage,
+                "itemsOnFirstPage": data.trending.itemsOnFirstPage,
+                "timeBeforeError": data.trending.timeBeforeError,
+                "timeBeforeCache": data.trending.timeBeforeCache
+            },
+            "timeBeforeAllowingDialogsRemoval": data.timeBeforeAllowingDialogsRemoval,
+            "tips": data.tips,
+            "searchSources": data.searchSources,
+            "pageViewSources": data.pageViewSources
+        });
 
-            var msg = e.data;
+        Evme.DoATAPI.init({
+            "env": data.env.server,
+            "apiKey": data.apiKey,
+            "appVersion": data.appVersion,
+            "authCookieName": data.authCookieName
+        });
 
-            // if mg is string - parse it
-            if (typeof msg === "string") {
-                try {
-                    msg = JSON.parse(msg);
-                } catch (ex) { return }
-            }
-
-            switch (msg.type) {
-                case "visibilitychange":
-                    // change window.hidden value
-                    window.hidden = msg.data.hidden;
-
-                    // fire visibilitychange event
-                    var e = document.createEvent("Events");
-                    e.initEvent("visibilitychange", true, false);
-                    document.dispatchEvent(e);
-                    break;
-            }
-        }, false);
-
-        document.addEventListener("visibilitychange", function() {
-            var method = window.hidden ? "remove" : "add";
-            document.body.classList[method]("evme-displayed");
-        }, false);
+        initObjects(data);
+    };
+    
+    // Gaia communication methods
+    this.visibilityChange = function(visible) {
+        var method = visible ? "add" : "remove";
+        document.body.classList[method]("evme-displayed");
+        displayed = visible;
     };
 
     this.setOpacityBackground = function(value) {
-        BackgroundImage.changeOpacity(value, OPACITY_CHANGE_DURATION, function() {
+        Evme.BackgroundImage.changeOpacity(value, OPACITY_CHANGE_DURATION, function() {
             if (value === 1) {
                 document.body.classList.add("evme-displayed");
                 displayed = true;
@@ -62,53 +73,18 @@ var Core = new function() {
         ratio = Math.floor(ratio*100)/100;
         var value = dir === "in" ? ratio : 1 - ratio;
 
-        BackgroundImage.changeOpacity(value);
+        Evme.BackgroundImage.changeOpacity(value);
     }
 
-    this.initWithConfig = function(data) {
-        logger = (typeof Logger !== "undefined") ? new Logger() : console;
-
-        var apiHost = Utils.getUrlParam("apiHost") || data.apiHost;
-        apiHost && api.setHost(apiHost);
-
-        TIMEOUT_BEFORE_INIT_SESSION = data.timeoutBeforeSessionInit;
-        Brain.init({
-            "numberOfAppsToLoad": data.numberOfAppsToLoad,
-            "logger": logger,
-            "minimumLettersForSearch": data.minimumLettersForSearch,
-            "helper": data.texts.helper,
-            "promptInstallAppText": data.texts.installAppPrompt,
-            "trending": {
-                "itemsPerPage": data.trending.itemsPerPage,
-                "itemsOnFirstPage": data.trending.itemsOnFirstPage,
-                "timeBeforeError": data.trending.timeBeforeError,
-                "timeBeforeCache": data.trending.timeBeforeCache
-            },
-            "timeBeforeAllowingDialogsRemoval": data.timeBeforeAllowingDialogsRemoval,
-            "tips": data.tips,
-            "searchSources": data.searchSources,
-            "pageViewSources": data.pageViewSources
-        });
-
-        DoATAPI.init({
-            "env": data.env.server,
-            "apiKey": data.apiKey,
-            "appVersion": data.appVersion,
-            "authCookieName": data.authCookieName
-        });
-
-        initObjects(data);
-    };
-
     function initObjects(data) {
-        var $container = $("#" + Utils.getID());
+        var $container = $("#" + Evme.Utils.getID());
 
-        Connection.init({
+        Evme.Connection.init({
             "$parent": $container,
             "texts": data.texts.connection
         });
 
-        Location.init({
+        Evme.Location.init({
             "$elName": $(".user-location"),
             "$elButton": $("#button-location"),
             "$elSelectorDialog": $("#location-selector"),
@@ -118,12 +94,12 @@ var Core = new function() {
             "texts": data.texts.location
         });
 
-        Screens.init({
+        Evme.Screens.init({
             "$screens": $(".content_page"),
             "tabs": data.texts.tabs
         });
 
-        Shortcuts.init({
+        Evme.Shortcuts.init({
             "$el": $("#shortcuts"),
             "$loading": $("#shortcuts-loading"),
             "design": data.design.shortcuts,
@@ -131,12 +107,12 @@ var Core = new function() {
             "defaultShortcuts": data._defaultShortcuts
         });
 
-        ShortcutsCustomize.init({
+        Evme.ShortcutsCustomize.init({
             "$parent": $container,
             "texts": data.texts.shortcutsFavorites
         });
 
-        Searchbar.init({
+        Evme.Searchbar.init({
             "$el": $("#search-q"),
             "$form": $("#search-rapper"),
             "$defaultText": $("#default-text"),
@@ -146,15 +122,16 @@ var Core = new function() {
             "setFocusOnClear": false
         });
 
-        Helper.init({
+        Evme.Helper.init({
             "$el": $("#helper"),
             "$elTitle": $("#search-title"),
             "$tip": $("#helper-tip"),
             "defaultSuggestions": data.defaultSuggestions,
             "texts": data.texts.helper
         });
-        Apps.init({
-            "$el": $("#doat-apps"),
+        
+        Evme.Apps.init({
+            "$el": $("#evmeApps"),
             "$buttonMore": $("#button-more"),
             "$header": $("#search #header"),
             "texts": data.texts.apps,
@@ -169,18 +146,32 @@ var Core = new function() {
                 "landscape": 480
             }
         });
-        BackgroundImage.init({
-            "$el": $("#background-image"),
-            "$elementsToFade": $("#doat-apps, #header, #search-header"),
+
+        Evme.BackgroundImage.init({
+            "$el": $("#evmeBackgroundImage"),
+            "$elementsToFade": $("#evmeApps, #header, #search-header"),
             "defaultImage": data.defaultBGImage,
             "texts": data.texts.backgroundImage
         });
-        SearchHistory.init({
+        
+        Evme.SearchHistory.init({
             "maxEntries": data.maxHistoryEntries
         });
+        
+        Evme.Analytics.init({
+            "config": data.analytics,
+            "logger": logger,
+            "DoATAPI": Evme.DoATAPI,
+            "getCurrentAppsRowsCols": Evme.Apps.getCurrentRowsCols,
+            "Brain": Brain,
+            "env": data.env.server,
+            "connectionLow": Evme.Utils.connection().speed != Evme.Utils.connection().SPEED_HIGH,
+            "sessionObj": Evme.DoATAPI.Session.get(),
+            "pageRenderStartTs": head_ts,
+            "SEARCH_SOURCES": data.searchSources,
+            "PAGEVIEW_SOURCES": data.pageViewSources
+        });
 
-        EventHandler.trigger(_name, "init", {"deviceId": DoATAPI.getDeviceId()});
+        Evme.EventHandler.trigger(_name, "init", {"deviceId": Evme.DoATAPI.getDeviceId()});
     }
 };
-
-Core.init();

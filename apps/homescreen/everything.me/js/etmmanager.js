@@ -4,14 +4,21 @@
 var EvmeManager = (function() {
 
   function openApp(params) {
+    var url = params.url;
+
     var evmeApp = new EvmeApp({
-      url: params.url,
+      url: url,
       name: params.title,
       icon: params.icon
     });
 
-    if (!Applications.isInstalled(params.url)) {
-      evmeApp.manifest.bookmarkFeature = true;
+    //TODO Evme guys will provide both URLs (specific search and bookmark URLs)
+    if (url.indexOf('?') !== -1) {
+      url = url.substring(0, url.indexOf('?'));
+    }
+
+    if (!Applications.isInstalled(url)) {
+      evmeApp.manifest.bookmarkURL = url;
     }
 
     evmeApp.launch();
@@ -31,16 +38,13 @@ var EvmeManager = (function() {
   }
 
   function setVisibilityChange(visible) {
-    window.postMessage(JSON.stringify({
-      type: 'visibilitychange',
-      data: { hidden: !visible }
-    }), '*');
+    Evme.visibilityChange(visible);
   }
 
   var footerStyle = document.querySelector('#footer').style;
   footerStyle.MozTransition = '-moz-transform .3s ease';
 
-  document.querySelector('#etmPage').addEventListener('contextmenu',
+  document.querySelector('#evmePage').addEventListener('contextmenu',
     function longPress(evt) {
       evt.stopImmediatePropagation();
     }
@@ -53,12 +57,12 @@ var EvmeManager = (function() {
 
     show: function doShow() {
       footerStyle.MozTransform = 'translateY(75px)';
-      Core.setOpacityBackground(1);
+      Evme.setOpacityBackground(1);
     },
 
     hide: function doHide() {
       footerStyle.MozTransform = 'translateY(0)';
-      Core.setOpacityBackground(0);
+      Evme.setOpacityBackground(0);
     }
   };
 

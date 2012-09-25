@@ -14,6 +14,7 @@ const Homescreen = (function() {
 
   function initUI() {
     setLocale();
+    Evme.init();
     GridManager.init('.apps', function gm_init() {
       Wallpaper.init();
       GridManager.goToPage(GridManager.landingPageIndex);
@@ -25,6 +26,7 @@ const Homescreen = (function() {
         setLocale();
         GridManager.localize();
         DockManager.localize();
+        //Evme.localize();
       });
     });
   }
