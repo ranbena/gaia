@@ -1078,9 +1078,16 @@ var App = new function() {
                     }
                 });
                 
+                function reopenApp() {
+                    navigator.mozApps.getSelf().onsuccess = function getSelfCB(evt) {
+                        var app = evt.target.result;
+                        app.launch();
+                    };
+                };
                 act.onsuccess = function() {
-                    if (!act.result.url)
-                        return;
+                    if (!act.result.url) return;
+                        
+                    reopenApp();
                     
                     onAfterAction && onAfterAction("photo", {
                         "name": "Photo",
@@ -1088,13 +1095,12 @@ var App = new function() {
                         "size": 0
                     });
                 };
-                
-                act.onerror = function() { };
             } else {
                 onAfterAction && onAfterAction("photo", {
                     "name": "DCIM/img_asckjbasckbkasjcnascaschkbascasc.jpg",
                     "src": "http://www.cbc.ca/sevenwonders/images/pic_wonder_prairie_sky_lg.jpg",
-                    "size": 82364
+                    "size": 82364,
+                    "type": "image/jpeg"
                 });
             }
         }
