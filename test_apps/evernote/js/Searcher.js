@@ -58,7 +58,7 @@ var Searcher = new function() {
     };
     
     this.value = function() {
-        return value;
+        return lastValueSearched;
     };
     
     this.focus = function() {
