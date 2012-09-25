@@ -1034,6 +1034,7 @@ var App = new function() {
         function actionPhoto() {
             onBeforeAction && onBeforeAction("photo");
             
+            
             /*
             onAfterAction && onAfterAction("photo", {
                 "name": "DCIM/img_asckjbasckbkasjcnascaschkbascasc.jpg",
@@ -1043,13 +1044,39 @@ var App = new function() {
             });
             return;
             */
-           
-            DeviceImagesGallery.show({
-                "title": TEXTS.ADD_IMAGE_TITLE,
-                "onSelect": function(image) {
-                    onAfterAction && onAfterAction("photo", image);
+            
+            
+            var activityRequestPhoto = new MozActivity({
+                'name': 'pick',
+                'data': {
+                    'type': 'image/jpeg',
+                    'width': 320,
+                    'height': 480
                 }
             });
+            
+            activityRequestPhoto.onsuccess = function onWallpaperSuccess() {
+                if (!activityRequestPhoto.result.url)
+                    return;
+                
+                
+                var s = "";
+                for (var k in activityRequestPhoto.result) {
+                    s += k + "\n"; //": " + activityRequestPhoto.result[k] + "\n";
+                }
+                alert(s);
+                
+                onAfterAction && onAfterAction("photo", {
+                    "name": "Photo",
+                    "src": activityRequestPhoto.result.url,
+                    "size": 0,
+                    "type": ""
+                });
+            };
+            
+            activityRequestPhoto.onerror = function onWallpaperError() {
+                alert("error")
+            };
         }
         
         function actionInfo() {
@@ -1061,20 +1088,21 @@ var App = new function() {
         function actionShare() {
             onBeforeAction && onBeforeAction("share");
             
+            
             var act = new MozActivity({
-                "name": "email",
-                "data": {
-                    "URI": "mailto:evyatron@gmail.com?subject=hi!"
-                }
+              name: 'new',
+              data: {
+                type: 'mail',
+                URI: "mailto:?subject=My+Note&body=" + encodeURIComponent($("note-content").value)
+              }
             });
             
+            act.onsuccess = function(e){
+                alert("email OK");
+            };
+            
             act.onerror = function(e){
-                var s = "";
-                for (var k in e) {
-                    s += k + ": " + e[k] + "\n";
-                }
-                
-                $("note-content").value = "Activity Error!\n" + e.message + "\n" + s;
+                alert("email error");
             };
             
             onAfterAction && onAfterAction("share");
