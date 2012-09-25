@@ -31,7 +31,7 @@ var Searcher = new function() {
     
     this.search = function(keyword) {
         var results = [],
-            regexMatch = new RegExp("(" + keyword + ")", "i");
+            regexMatch = new RegExp("(" + keyword + ")", "ig");
         
         if (!keyword) {
             return results;
@@ -39,20 +39,26 @@ var Searcher = new function() {
         
         for (var i=0,il=searchNotes.length; i<il; i++) {
             var item = searchNotes[i],
-                match = false;
+                match = 0;
             
             for (var j=0,jl=searchFields.length; j<jl; j++) {
-                var val = item.getProperty(searchFields[j]);
-                if (val.match(regexMatch)) {
-                    match = true;
-                    break;
+                var val = item.getProperty(searchFields[j]),
+                    matches = val.match(regexMatch);
+                    
+                if (matches && matches.length) {
+                    match += matches.length;
                 }
             }
             
             if (match) {
+                item._matches = match;
                 results.push(item);
             }
         }
+        
+        results.sort(function(a, b){
+            return a._matches > b._matches? -1 : a._matches < b._matches? 1 : 0;
+        });
         
         return results;
     };

@@ -1046,7 +1046,7 @@ var App = new function() {
             */
             
             
-            var activityRequestPhoto = new MozActivity({
+            var act = new MozActivity({
                 'name': 'pick',
                 'data': {
                     'type': 'image/jpeg',
@@ -1062,20 +1062,13 @@ var App = new function() {
                 };
             };
             
-            activityRequestPhoto.onsuccess = function onWallpaperSuccess() {
-                if (!activityRequestPhoto.result.url)
+            act.onsuccess = function() {
+                if (!act.result.url)
                     return;
-                
-                
-                var s = "";
-                for (var k in activityRequestPhoto.result) {
-                    s += k + "\n"; //": " + activityRequestPhoto.result[k] + "\n";
-                }
-                alert(s);
                 
                 onAfterAction && onAfterAction("photo", {
                     "name": "Photo",
-                    "src": activityRequestPhoto.result.url,
+                    "src": act.result.url,
                     "size": 0,
                     "type": ""
                 });
@@ -1083,9 +1076,7 @@ var App = new function() {
                 reopenApp();
             };
             
-            activityRequestPhoto.onerror = function onWallpaperError() {
-                alert("error")
-            };
+            act.onerror = function() { };
         }
         
         function actionInfo() {
@@ -1099,20 +1090,15 @@ var App = new function() {
             
             
             var act = new MozActivity({
-              name: 'new',
-              data: {
-                type: 'mail',
-                URI: "mailto:?subject=My+Note&body=" + encodeURIComponent($("note-content").value)
-              }
+                'name': 'new',
+                'data': {
+                    'type': 'mail',
+                    'URI': "mailto:?subject=My+Note&body=" + encodeURIComponent($("note-content").value)
+                }
             });
+            act.onsuccess = function(e){ };
+            act.onerror = function(e){ };
             
-            act.onsuccess = function(e){
-                alert("email OK");
-            };
-            
-            act.onerror = function(e){
-                alert("email error");
-            };
             
             onAfterAction && onAfterAction("share");
         }

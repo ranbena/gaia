@@ -140,9 +140,10 @@ body {
 .card > .content {
     position: absolute;
     top: 49px;
-    bottom: 40px;
+    bottom: 0;
     left: 0;
     right: 0;
+    padding-bottom: 40px;
     z-index: 30;
     overflow-y: auto;
 }
@@ -150,6 +151,7 @@ body {
 .notebook-notes {
     list-style-type: none;
     min-height: 100%;
+    padding-bottom: 40px;
 }
     .notebook-notes li {
         position: relative;
@@ -186,7 +188,6 @@ body {
 }
 #note.card > .content {
     top: 85px;
-    bottom: 0;
 }
 #note.card > .footer {
     display: none;
@@ -263,7 +264,6 @@ body {
     
 #note.card.readonly > .content {
     top: 49px;
-    bottom: 40px;
 }
     #note.readonly #note-edit-actions {
         display: none;
@@ -508,7 +508,6 @@ body {
 }
 .search-results #main .content {
     top: 0;
-    bottom: 0;
 }
 .search-results .trashed {
     opacity: .6;
