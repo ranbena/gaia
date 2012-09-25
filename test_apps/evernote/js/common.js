@@ -1068,36 +1068,35 @@ var App = new function() {
         function actionPhoto() {
             onBeforeAction && onBeforeAction("photo");
             
-            
-            onAfterAction && onAfterAction("photo", {
-                "name": "DCIM/img_asckjbasckbkasjcnascaschkbascasc.jpg",
-                "src": "http://www.cbc.ca/sevenwonders/images/pic_wonder_prairie_sky_lg.jpg",
-                "size": 82364
-            });
-            return;
-            
-            
-            var act = new MozActivity({
-                'name': 'pick',
-                'data': {
-                    'type': 'image/jpeg',
-                    'width': 320,
-                    'height': 480
-                }
-            });
-            
-            act.onsuccess = function() {
-                if (!act.result.url)
-                    return;
-                
-                onAfterAction && onAfterAction("photo", {
-                    "name": "Photo",
-                    "src": act.result.url,
-                    "size": 0
+            if ("MozActivity" in window) {
+                var act = new MozActivity({
+                    'name': 'pick',
+                    'data': {
+                        'type': 'image/jpeg',
+                        'width': 320,
+                        'height': 480
+                    }
                 });
-            };
-            
-            act.onerror = function() { };
+                
+                act.onsuccess = function() {
+                    if (!act.result.url)
+                        return;
+                    
+                    onAfterAction && onAfterAction("photo", {
+                        "name": "Photo",
+                        "src": act.result.url,
+                        "size": 0
+                    });
+                };
+                
+                act.onerror = function() { };
+            } else {
+                onAfterAction && onAfterAction("photo", {
+                    "name": "DCIM/img_asckjbasckbkasjcnascaschkbascasc.jpg",
+                    "src": "http://www.cbc.ca/sevenwonders/images/pic_wonder_prairie_sky_lg.jpg",
+                    "size": 82364
+                });
+            }
         }
         
         function actionInfo() {
