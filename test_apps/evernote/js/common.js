@@ -137,8 +137,12 @@ var App = new function() {
             _this.newNote();
         });
         
-        _this.getUserNotes(function() {
-            Console.info("Init done!");
+        User.init({
+            "id": localStorage["userId"]
+        }, function() {
+            _this.getUserNotes(function() {
+                Console.info("Init done!");
+            });
         });
     };
     
@@ -152,12 +156,13 @@ var App = new function() {
                     cb && cb();
                 });
             } else {
+                _this.showNotes(notebooks[0]);
                 NotebooksList.refresh(notebooks);
                 cb && cb();
             }
         });
     }
-
+    
     this.newNotebook = function(name, cb) {
         User.newNotebook({
             "name": name
@@ -200,6 +205,7 @@ var App = new function() {
         NoteView.show(note, notebook);
         cards.goTo(cards.CARDS.NOTE);
     };
+    
     this.showNotes = function(notebook) {
         NotebookView.show(notebook);
         cards.goTo(cards.CARDS.MAIN);
@@ -276,15 +282,19 @@ var App = new function() {
     }
     
     function onNoteRestore(noteAffected) {
-        _this.showNotes();
+        _this.showTrashedNotes();
         NotebooksList.refresh();
         
-        var txt = TEXTS.NOTE_RESTORED.replace("{{notebook}}", noteAffected.getNotebook().getName());
-        Notification.show(txt);
+        noteAffected.getNotebook(function onSuccess(notebook){
+            var txt = TEXTS.NOTE_RESTORED.replace("{{notebook}}", notebook.getName());
+            Notification.show(txt);
+        }, function onError() {
+            
+        });
     }
     
     function onNoteDelete(noteAffected) {
-        _this.showNotes();
+        _this.showTrashedNotes();
         NotebooksList.refresh();
     }
     
@@ -788,9 +798,15 @@ var App = new function() {
         }
         
         function printDate(date) {
-            var s = "";
+            if (typeof date == "number") {
+                date = new Date(date);
+            }
             
-            s += date.getHours() + ":" + date.getMinutes();
+            var s = "",
+                h = date.getHours(),
+                m = date.getMinutes();
+                
+            s += (h<10? '0' : '') + h + ":" + (m<10? '0' : '') + m;
             s += " ";
             s += date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear();
             
@@ -860,11 +876,15 @@ var App = new function() {
             currentIsDesc = isDesc;
             
             if (currentNotebook) {
-                currentNotebook.getNotes(false, function(notes){
-                    _this.printNotes(notes);
-                }, function onError() {
-                    
-                });
+                if (currentNotebook.getNumberOfNotes() == 0) {
+                    _this.printNotes([]);
+                } else {
+                    currentNotebook.getNotes(false, function(notes){
+                        _this.printNotes(notes);
+                    }, function onError() {
+                        
+                    });
+                }
             } else {
                 User.getNotes(filters, function onSuccess(notes){
                     _this.printNotes(notes);
@@ -1271,7 +1291,6 @@ var App = new function() {
             }
         }
     };
-    
 };
 
 function readableFilesize(size) {

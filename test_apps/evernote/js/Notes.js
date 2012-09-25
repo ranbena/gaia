@@ -1,28 +1,73 @@
 var DB = new function() {
     var tables = {
-        "notes": {},
-        "notebooks": {},
-        "noteResources": {}
+        "Note": {},
+        "Notebook": {},
+        "NoteResource": {}
     };
     
     this.get = function() { return tables; };
     
-    this.getNotebooks = function(filters, c, e) { get("notebooks", filters, c, e); };
-    this.getNotes = function(filters, c, e) { get("notes", filters, c, e); };
-    this.getNoteResources = function(filters, c, e) { get("noteResources", filters, c, e); };
+    this.getNotebooks = function(filters, c, e) { get("Notebook", filters, c, e); };
+    this.getNotes = function(filters, c, e) { get("Note", filters, c, e); };
+    this.getNoteResources = function(filters, c, e) { get("NoteResource", filters, c, e); };
     
-    this.addNotebook = function(obj, c, e) { add("notebooks", obj, c, e); };
-    this.addNote = function(obj, c, e) { add("notes", obj, c, e); };
-    this.addNoteResource = function(obj, c, e) { add("noteResources", obj, c, e); };
+    this.addNotebook = function(obj, c, e) { add("Notebook", obj, c, e); };
+    this.addNote = function(obj, c, e) { add("Note", obj, c, e); };
+    this.addNoteResource = function(obj, c, e) { add("NoteResource", obj, c, e); };
     
-    this.updateNotebook = function(obj, c, e) { update("notebooks", obj, c, e); };
-    this.updateNote = function(obj, c, e) { update("notes", obj, c, e); };
-    this.updateNoteResource = function(obj, c, e) { update("noteResources", obj, c, e); };
+    this.updateNotebook = function(obj, c, e) { update("Notebook", obj, c, e); };
+    this.updateNote = function(obj, c, e) { update("Note", obj, c, e); };
+    this.updateNoteResource = function(obj, c, e) { update("NoteResource", obj, c, e); };
     
-    this.removeNotebook = function(obj, c, e) { remove("notebooks", obj, c, e); };
-    this.removeNote = function(obj, c, e) { remove("notes", obj, c, e); };
-    this.removeNoteResource = function(obj, c, e) { remove("noteResources", obj, c, e); };
+    this.removeNotebook = function(obj, c, e) { remove("Notebook", obj, c, e); };
+    this.removeNote = function(obj, c, e) { remove("Note", obj, c, e); };
+    this.removeNoteResource = function(obj, c, e) { remove("NoteResource", obj, c, e); };
     
+    this.write = function() {
+        var _db = {};
+        
+        for (var tableName in tables) {
+            var table = tables[tableName];
+            
+            _db[tableName] = {};
+            
+            for (var itemKey in table) {
+                var item = table[itemKey],
+                    obj = {};
+                
+                for (var prop in item) {
+                    if (prop.indexOf("data_") == 0) {
+                        obj[prop.replace(/data_/gi, "")] = item[prop];
+                    }
+                }
+                
+                _db[tableName][itemKey] = obj;
+            }
+        }
+        
+        localStorage["db"] = JSON.stringify(_db);
+        
+        return _db;
+    };
+    
+    this.read = function() {
+        var _db = JSON.parse(localStorage["db"] || "{}");
+        
+        for (var tableName in _db) {
+            var table = _db[tableName];
+            
+            tables[tableName] = {};
+            
+            for (var itemKey in table) {
+                var itemData = table[itemKey],
+                    item = new window[tableName](itemData);
+                
+                tables[tableName][itemKey] = item;
+            }
+        }
+        
+        return tables;
+    };
     
     function get(table, filters, c, e) {
         var ret = [];
@@ -68,16 +113,25 @@ var DB = new function() {
 var User = new function() {
     var _this = this;
     
-    this.data_id = "user_" + Math.round(Math.random()*100000);
+    this.data_id = "";
+    
+    this.init = function(options, cbSuccess) {
+        updateObject(_this, options);
+        validate();
+        
+        localStorage["userId"] = _this.data_id;
+        DB.read();
+        
+        cbSuccess && cbSuccess();
+    };
     
     this.newNotebook = function(options, cbSuccess, cbError) {
         options.userId = _this.getId();
         
-        new Notebook(options, function(obj){
-            DB.addNotebook(obj, function(){
-                cbSuccess && cbSuccess(obj);
-            });
-        }, cbError);
+        var notebook = new Notebook(options);
+        DB.addNotebook(notebook, function(){
+            cbSuccess && cbSuccess(notebook);
+        });
     };
     
     this.getNotebooks = function(cbSuccess, cbError) {
@@ -93,38 +147,32 @@ var User = new function() {
     };
     
     this.getId = function() { return _this.data_id; };
+    
+    function validate() {
+        if (!_this.data_id) {
+            _this.data_id = "user_" + Math.round(Math.random()*100000);
+        }
+    }
 };
 
-var Notebook = function(_options, _cbSuccess, _cbError) {
+var Notebook = function(_options) {
     var _this = this;
     
-    this._numberOfNotes = 0;
-    this._numberOfTrashedNotes = 0;
+    this.data_numberOfNotes = 0;
+    this.data_numberOfTrashedNotes = 0;
     
     this.data_id = "";
     this.data_name = "";
     this.data_userId = "";
     
     function init(options) {
-        !options && (options = {});
-        
-        _this.data_id = options.id || "nb_" + new Date().getTime() + "_" + Math.round(Math.random()*100000);
-        _this.data_name = options.name || "";
-        _this.data_userId = options.userId || "";
-        
-        _cbSuccess && _cbSuccess(_this);
+        updateObject(_this, options);
+        validate();
     }
     
     this.set = function(options, cbSuccess, cbError) {
-        !options && (options = {});
-        
-        options.name && (_this.data_name = options.name);
-        options.userId && (_this.data_userId = options.userId);
-        (typeof options.numberOfNotes == "number") && (_this._numberOfNotes = options.numberOfNotes);
-        (typeof options.numberOfTrashedNotes == "number") && (_this._numberOfTrashedNotes = options.numberOfTrashedNotes);
-        
-        (_this._numberOfNotes < 0) && (_this._numberOfNotes = 0);
-        (_this._numberOfTrashedNotes < 0) && (_this._numberOfTrashedNotes = 0);
+        updateObject(_this, options);
+        validate();
         
         DB.updateNotebook(_this, cbSuccess, cbError);
         
@@ -136,12 +184,12 @@ var Notebook = function(_options, _cbSuccess, _cbError) {
         
         options.notebookId = _this.getId();
         
-        new Note(options, function(obj) {
-            DB.addNote(obj, function(){
-                _this._numberOfNotes++;
-                cbSuccess && cbSuccess(obj);
-            });
-        }, cbError);
+        var note = new Note(options);
+        
+        DB.addNote(note, function(){
+            _this.data_numberOfNotes++;
+            cbSuccess && cbSuccess(note);
+        });
     };
     
     this.getNotes = function(bIncludeTrashed, cbSuccess, cbError) {
@@ -170,13 +218,22 @@ var Notebook = function(_options, _cbSuccess, _cbError) {
     this.getId = function() { return _this.data_id; };
     this.getName = function() { return _this.data_name; };
     this.getUserId = function() { return _this.data_userId; };
-    this.getNumberOfNotes = function() { return _this._numberOfNotes; };
-    this.getNumberOfTrashedNotes = function() { return _this._numberOfTrashedNotes; };
+    this.getNumberOfNotes = function() { return _this.data_numberOfNotes; };
+    this.getNumberOfTrashedNotes = function() { return _this.data_numberOfTrashedNotes; };
 
     init(_options);
+    
+    function validate() {
+        if (!_this.data_id){
+            _this.data_id = "nb_" + new Date().getTime() + "_" + Math.round(Math.random()*100000);
+        }
+        
+        (_this.data_numberOfNotes < 0) && (_this.data_numberOfNotes = 0);
+        (_this.data_numberOfTrashedNotes < 0) && (_this.data_numberOfTrashedNotes = 0);
+    }
 };
 
-var Note = function(_options, _cbSuccess, _cbError) {
+var Note = function(_options) {
     var _this = this;
     
     this.data_id = "";
@@ -188,35 +245,15 @@ var Note = function(_options, _cbSuccess, _cbError) {
     this.data_notebookId = null;
         
     function init(options) {
-        !options && (options = {});
-        
-        _this.data_id = options.id || "note_" + new Date().getTime() + "_" + Math.round(Math.random()*100000);
-        _this.data_name = options.name || "";
-        _this.data_content = options.content || "";
-        _this.data_trashed = options.trashed || false;
-        _this.data_dateCreated = options.dateCreated || new Date();
-        _this.data_dateUpdated = options.dateUpdated || new Date();
-        _this.data_notebookId = options.notebookId || "";
-        
-        if (typeof _this.data_dateCreated == "number") {
-            _this.data_dateCreated = new Date(dateCreated);
-        }
-        if (typeof _this.data_dateUpdated == "number") {
-            _this.data_dateUpdated = new Date(dateUpdated);
-        }
-        
-        _cbSuccess && _cbSuccess(_this);
+        updateObject(_this, options);
+        validate();
     }
     
     this.set = function(options, cbSuccess, cbError) {
-        !options && (options = {});
+        updateObject(_this, options);
+        validate();
         
-        (typeof options.id !== "undefined") && (_this.data_id = options.id);
-        (typeof options.name !== "undefined") && (_this.data_name = options.name);
-        (typeof options.content !== "undefined") && (_this.data_content = options.content);
-        (typeof options.notebookId !== "undefined") && (_this.data_notebookId = options.notebookId);
-        
-        _this.data_dateUpdated = new Date();
+        _this.data_dateUpdated = new Date().getTime();
         
         DB.updateNote(_this, cbSuccess, cbError);
         
@@ -251,15 +288,12 @@ var Note = function(_options, _cbSuccess, _cbError) {
     
     this.remove = function(cbSuccess, cbError) {
         DB.removeNote(_this, function() {
-            if (_this.data_trashed) {
-                cbSuccess && cbSuccess();
-            } else {
-                _this.getNotebook(function(notebook){
-                    notebook.set({
-                        "numberOfNotes": notebook.getNumberOfNotes()-1
-                    }, cbSuccess, cbError);
-                }, cbError);
-            }
+            _this.getNotebook(function(notebook){
+                notebook.set({
+                    "numberOfNotes": notebook.getNumberOfNotes() - (_this.data_trashed? 0 : 1),
+                    "numberOfTrashedNotes": notebook.getNumberOfTrashedNotes() - (_this.data_trashed? 1 : 0)
+                }, cbSuccess, cbError);
+            }, cbError);
         }, cbError);
     };
     
@@ -277,11 +311,10 @@ var Note = function(_options, _cbSuccess, _cbError) {
     this.newResource = function(options, cbSuccess, cbError) {
         options.noteId = _this.getId();
         
-        new NoteResource(options, function(obj) {
-            DB.addNoteResource(obj);
-            
-            cbSuccess && cbSuccess(obj);
-        }, cbError);
+        var noteResource = new NoteResource(options);
+        DB.addNoteResource(noteResource, function() {
+            cbSuccess && cbSuccess(noteResource);
+        });
     };
     
     this.getId = function() { return _this.data_id; };
@@ -293,9 +326,23 @@ var Note = function(_options, _cbSuccess, _cbError) {
     this.isTrashed = function() { return _this.data_trashed; };
     
     init(_options);
+    
+    function validate() {
+        if (!_this.data_id) {
+            _this.data_id = "note_" + new Date().getTime() + "_" + Math.round(Math.random()*100000);
+        }
+        
+        if (!_this.data_dateCreated) {
+            _this.data_dateCreated = new Date().getTime();
+        }
+        
+        if (!_this.data_dateUpdated) {
+            _this.data_dateUpdated = new Date().getTime();
+        }
+    }
 };
 
-function NoteResource(_options, _cbSuccess, cbError) {
+function NoteResource(_options) {
     var _this = this;
     
     this.data_id = '';
@@ -306,26 +353,19 @@ function NoteResource(_options, _cbSuccess, cbError) {
     this.data_noteId = '';
         
     function init(options) {
-        !options && (options = {});
-        
-        _this.data_id = options.id || "nr_" + new Date().getTime() + "_" + Math.round(Math.random()*100000);
-        _this.data_name = options.name || "";
-        _this.data_src = options.src || "";
-        _this.data_size = options.size || -1;
-        _this.data_type = options.type || "";
-        _this.data_noteId = options.noteId || "";
-        
-        _cbSuccess && _cbSuccess(_this);
+        updateObject(_this, options);
+        validate();
+    }
+    
+    function validate() {
+        if (!_this.data_id) {
+            _this.date_id = "nr_" + new Date().getTime() + "_" + Math.round(Math.random()*100000);
+        }
     }
     
     this.set = function(options, cbSuccess, cbError) {
-        !options && (options = {});
-        
-        options.name && (_this.data_name = options.name);
-        options.src && (_this.data_src = options.src);
-        options.size && (_this.data_size = options.size);
-        options.type && (_this.data_type = options.type);
-        options.noteId && (_this.data_noteId = options.noteId);
+        updateObject(_this, options);
+        validate();
         
         DB.updateNoteResource(_this, cbSuccess, cbError);
         
@@ -345,3 +385,10 @@ function NoteResource(_options, _cbSuccess, cbError) {
 var ResourceTypes = {
     "IMAGE": "image"
 };
+
+function updateObject(obj, options) {
+    if (!options) return;
+    for (var k in options) {
+        obj['data_' + k] = options[k];
+    }
+}
