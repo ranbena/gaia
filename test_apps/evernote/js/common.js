@@ -1084,7 +1084,7 @@ var App = new function() {
                 'name': 'new',
                 'data': {
                     'type': 'mail',
-                    ': "mailto:?subject=My+Note&body=" + encodeURIComponent($("note-content").value)
+                    'URI': "mailto:?subject=My+Note&body=" + encodeURIComponent($("note-content").value)
                 }
             });
             act.onsuccess = function(e){ };
