@@ -1,4 +1,4 @@
-#background-image {
+#evmeBackgroundImage {
     position: absolute;
     top: 0;
     left: 0;
@@ -6,11 +6,12 @@
     bottom: 0;
     z-index: 1;
     opacity: 0;
+    background: black;
 }
-.evme-displayed #background-image {
+.evme-displayed #evmeBackgroundImage {
     opacity: 1;
 }
-    #background-image .img {
+    #evmeBackgroundImage .img {
         position: absolute;
         top: 0;
         left: 0;
@@ -22,7 +23,7 @@
         background-size: cover;
 
     }
-    #background-image .img {
+    #evmeBackgroundImage .img {
         -moz-transition: opacity .3s linear;
         -webkit-transition: opacity .3s linear;
         -ms-transition: opacity .3s linear;
@@ -32,8 +33,8 @@
         -webkit-box-sizing: border-box;
         -webkit-backface-visibility: hidden;
     }
-    #background-image .img.visible {
-        opacity: 1;
+    #evmeBackgroundImage .img.visible {
+        opacity: 0.4;
     }
 
 #bgimage-overlay {
@@ -127,9 +128,9 @@
     display: none;
 }
 
-#doat-container #background-image .default-image.visible {
+#evmeContainer #evmeBackgroundImage .default-image.visible {
     opacity: 0;
 }
-#doat-container #background-image.default .default-image.visible {
+#evmeContainer #evmeBackgroundImage.default .default-image.visible {
     opacity: 1;
 }

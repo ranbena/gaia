@@ -90,6 +90,10 @@ function MessageListCard(domNode, mode, args) {
     .addEventListener('click', this.onStarMessages.bind(this, true), false);
   domNode.getElementsByClassName('msg-mark-read-btn')[0]
     .addEventListener('click', this.onMarkMessagesRead.bind(this, true), false);
+  domNode.getElementsByClassName('msg-delete-btn')[0]
+    .addEventListener('click', this.onDeleteMessages.bind(this, true), false);
+  domNode.getElementsByClassName('msg-move-btn')[0]
+    .addEventListener('click', this.onMoveMessages.bind(this, true), false);
 
   this.editMode = false;
   this.selectedMessages = null;
@@ -126,7 +130,7 @@ MessageListCard.prototype = {
       var cbs = this.messagesContainer.querySelectorAll('input[type=checkbox]');
       for (var i = 0; i < cbs.length; i++) {
         cbs[i].checked = false;
-      };
+      }
       this.selectedMessagesUpdated();
     }
     else {
@@ -504,6 +508,13 @@ MessageListCard.prototype = {
           case 'msg-edit-menu-mark-unread':
             header.setRead(false);
             break;
+          case 'msg-edit-menu-delete':
+            op = header.deleteMessage();
+            break;
+          case 'msg-edit-menu-move':
+            //TODO: Add folder select panel and apply while move api ready.
+            //op = header.moveMessage(folderName);
+            break;
 
           // Deletion, and moves, on the other hand, require a lot of manual
           // labor, so we need to expose their undo op's.
@@ -528,6 +539,20 @@ MessageListCard.prototype = {
     var op = MailAPI.markMessagesRead(this.selectedMessages, this.setAsRead);
     this.setEditMode(false);
     Toaster.logMutation(op);
+  },
+
+  onDeleteMessages: function() {
+    // TODO: Enable the batch delete when back-end api ready.
+    // var op = MailAPI.deleteMessages(this.selectedMessages);
+    // Toaster.logMutation(op);
+    this.setEditMode(false);
+  },
+
+  onMoveMessages: function() {
+    // TODO: Enable the batch move when back-end api ready.
+    // var op = MailAPI.moveMessages(this.selectedMessages, targetFolder);
+    // Toaster.logMutation(op);
+    this.setEditMode(false);
   },
 
   buildEditMenuForMessage: function(header) {
@@ -616,6 +641,8 @@ function MessageReaderCard(domNode, mode, args) {
     .addEventListener('click', this.onToggleRead.bind(this), false);
   domNode.getElementsByClassName('msg-move-btn')[0]
     .addEventListener('click', this.onMove.bind(this), false);
+  domNode.getElementsByClassName('msg-forward-btn')[0]
+    .addEventListener('click', this.onForward.bind(this), false);
 
   this.envelopeNode = domNode.getElementsByClassName('msg-envelope-bar')[0];
   this.envelopeNode
@@ -665,6 +692,7 @@ MessageReaderCard.prototype = {
   },
 
   onReply: function(event) {
+    Cards.eatEventsUntilNextCard();
     var composer = this.header.replyToMessage(null, function() {
       Cards.pushCard('compose', 'default', 'animate',
                      { composer: composer });
@@ -672,7 +700,16 @@ MessageReaderCard.prototype = {
   },
 
   onReplyAll: function(event) {
+    Cards.eatEventsUntilNextCard();
     var composer = this.header.replyToMessage('all', function() {
+      Cards.pushCard('compose', 'default', 'animate',
+                     { composer: composer });
+    });
+  },
+
+  onForward: function(event) {
+    Cards.eatEventsUntilNextCard();
+    var composer = this.header.forwardMessage('inline', function() {
       Cards.pushCard('compose', 'default', 'animate',
                      { composer: composer });
     });

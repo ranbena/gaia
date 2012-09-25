@@ -71,15 +71,15 @@ const GridManager = (function() {
         break;
 
       case 'contextmenu':
-        if (currentPage > landingPageIndex) {
+        if (currentPage > landingPageIndex && 'origin' in evt.target.dataset) {
+          evt.stopImmediatePropagation();
           Homescreen.setMode('edit');
-          if ('origin' in evt.target.dataset) {
-            DragDropManager.start(evt, {
-              'x': startEvent.clientX,
-              'y': startEvent.clientY
-            });
-          }
+          DragDropManager.start(evt, {
+            'x': startEvent.clientX,
+            'y': startEvent.clientY
+          });
         }
+
         break;
     }
   }
@@ -94,12 +94,12 @@ const GridManager = (function() {
       if (forward) {
         applyEffectOverlay((deltaX / windowWidth) * -opacityMax);
       } else {
-        Core.pageMove("in", deltaX / windowWidth);
+        Evme.pageMove("in", deltaX / windowWidth);
       }
     } else if (currentPage === landingPageIndex + 1 && !forward) {
       applyEffectOverlay(opacityMax - ((deltaX / windowWidth) * opacityMax));
     } else if (currentPage === evmePageIndex && forward) {
-      Core.pageMove("out", -deltaX / windowWidth);
+      Evme.pageMove("out", -deltaX / windowWidth);
     }
   }
 
@@ -130,13 +130,11 @@ const GridManager = (function() {
   }
 
   function attachEvents() {
-    container.addEventListener('contextmenu', handleEvent);
     window.addEventListener('mousemove', handleEvent);
     window.addEventListener('mouseup', handleEvent);
   }
 
   function releaseEvents() {
-    container.removeEventListener('contextmenu', handleEvent);
     window.removeEventListener('mousemove', handleEvent);
     window.removeEventListener('mouseup', handleEvent);
   }
@@ -511,6 +509,7 @@ const GridManager = (function() {
         pages.push(page);
       }
 
+      container.addEventListener('contextmenu', handleEvent);
       container.addEventListener('mousedown', handleEvent, true);
 
       limits.left = container.offsetWidth * 0.05;
