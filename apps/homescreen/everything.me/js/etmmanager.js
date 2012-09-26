@@ -85,8 +85,8 @@ var EvmeApp = function createEvmeApp(params) {
 extend(EvmeApp, Bookmark);
 
 // Initialize Evme
-window.addEventListener("load", function() {
-//document.addEventListener("DOMContentLoaded", function() {
+//window.addEventListener("load", function() {
+document.addEventListener("DOMContentLoaded", function() {
   var host = document.location.host;
   var domain = host.replace(/(^[\w\d]+\.)?([\w\d]+\.[a-z]+)/, '$2');
   Evme.init({
