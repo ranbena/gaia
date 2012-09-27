@@ -114,7 +114,7 @@ var DB = new function() {
         };
         req.onfailure = onerror;
         
-        Console.log("DB remove from -" + table + "-: ", filters);
+        Console.log("DB remove from -" + table + "-: ", key);
     };
     
     this.update = function(table, filters, update, c, e) {

@@ -92,6 +92,6 @@ var Searcher = new function() {
         lastValueSearched = this.value;
         
         var items = _this.search(lastValueSearched);
-        onSearch && onSearch(items, lastValueSearched);
+        onSearch && onSearch(items, lastValueSearched, searchFields);
     }
 };

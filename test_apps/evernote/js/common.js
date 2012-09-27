@@ -69,7 +69,7 @@ var App = new function() {
                 "type": "date"
             }
         ],
-        SEARCH_FIELDS = ["content", "name"];
+        SEARCH_FIELDS = ["text", "title"];
     
     this.init = function() {
         Console.init(LOGGER_NAMESPACE);
@@ -971,6 +971,8 @@ var App = new function() {
                 el.classList.add(EMPTY_CONTENT_CLASS);
                 elEmptyNotes.innerHTML = currentNotebook? TEXTS.EMPTY_NOTEBOOK : TEXTS.EMPTY_TRASH;
             }
+            
+            return $notesList;
         };
         
         this.setTitle = function(title) {
@@ -1016,8 +1018,8 @@ var App = new function() {
             var el = document.createElement("li");
             el.className = "note";
             el.dataset.noteId = note.getId();
-            el.innerHTML = '<div class="name">' + (note.getName() || getNoteNameFromContent(note.getContent())) + ' <span class="time">' + prettyDate(note.getDateUpdated()) + '</span></div>' +
-                            '<div class="content">' + note.getContent() + '</div>';/* +
+            el.innerHTML = '<div><span class="text">' + (note.getName() || getNoteNameFromContent(note.getContent())) + '</span> <span class="time">' + prettyDate(note.getDateUpdated()) + '</span></div>' +
+                            '<div class="title">' + note.getContent() + '</div>';/* +
                             (note.getImages().length > 0? '<div class="image" style="background-image: url(' + note.getImages()[0].src + ')"></div>' : '');*/
             
             if (note.isTrashed()) {
@@ -1248,9 +1250,13 @@ var App = new function() {
             Searcher.focus();
         };
         
-        this.onSearch = function(items, keyword) {
+        this.onSearch = function(items, keyword, fields) {
             if (items.length > 0) {
-                NotebookView.printNotes(items);
+                var elList = NotebookView.printNotes(items);
+                
+                window.setTimeout(function(){
+                    markOccurences(elList, keyword, fields);
+                }, 0);
             } else {
                 if (!keyword) {
                     showPreviousNotebook(true);
@@ -1284,6 +1290,22 @@ var App = new function() {
         
         function showPreviousNotebook(hideSearch) {
             NotebookView.show(notebookBeforeSearch, null, hideSearch);
+        }
+        
+        function markOccurences(elList, keyword, fields) {
+            var els = elList.childNodes,
+                regex = new RegExp("(" + keyword + ")", "ig");
+                
+            for (var i=0,l=els.length; i<l; i++) {
+                for (var j=0; j<fields.length; j++) {
+                    var el = els[i].getElementsByClassName(fields[j]);
+                    console.info(el);
+                    if (el && el.length > 0) {
+                        el = el[0];
+                        el.innerHTML = el.innerHTML.replace(regex, '<b>$1</b>');
+                    }
+                }
+            }
         }
     }
 

@@ -162,7 +162,7 @@ body {
         border-bottom: 1px solid #dbd9d9;
         cursor: pointer;
     }
-        .notebook-notes li .name {
+        .notebook-notes li .title {
             font-size: 18px;
             white-space: nowrap;
             overflow: hidden;
@@ -181,6 +181,9 @@ body {
             background-size: cover;
             background-position: 0 50%;
             background-repeat: no-repeat;
+        }
+        .notebook-notes li b {
+            font-weight: bold;
         }
 
 #note {
