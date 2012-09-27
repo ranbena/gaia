@@ -4,12 +4,13 @@ var App = new function() {
         $notebooksList = null, elButtonNewNote = null,
         createNoteOnTap = false;
 
-    var TIME_FOR_NEW_NOTE_DOUBLECLICK = 200,
+    var DEBUG = false,
+        LOGGER_NAMESPACE = "DOAT-NOTES",
+        TIME_FOR_NEW_NOTE_DOUBLECLICK = 200,
         NUMBER_OF_SCROLL_RETRIES = 10,
         EMPTY_CONTENT_CLASS = "show-empty",
         CLASS_EDIT_TITLE = "edit-title",
         CLASS_SEARCH_RESULTS = "search-results",
-        LOGGER_NAMESPACE = "DOAT-NOTES",
         DEFAULT_USER = {
             "id": "1",
             "username": "default",
@@ -77,7 +78,7 @@ var App = new function() {
         SEARCH_FIELDS = ["text", "title"];
     
     this.init = function() {
-        //Console.init(LOGGER_NAMESPACE);
+        DEBUG && Console.init(LOGGER_NAMESPACE);
         
         cards = new Cards({
             "onMove": onCardMove

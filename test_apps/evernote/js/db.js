@@ -27,32 +27,38 @@ var DB = new function() {
         
     this.init = function(onSuccess) {
         _this.open(onSuccess);
+        
+        // automaticaly create helper methods (like getNotes, or removeNotebook)
+        for (var table in schema) {
+            var obj = schema[table].objectName;
+            
+            (function(tableName, objName) {
+                _this['get' + objName + "s"] = function(filters, c, e) { _this.get(tableName, filters, c, e); };
+                _this['add' + objName] = function(obj, c, e) { _this.add(tableName, obj, c, e); };
+                _this['update' + objName] = function(obj, c, e) { _this.update(tableName, obj, c, e); };
+                _this['remove' + objName] = function(obj, c, e) { _this.remove(tableName, obj.getId(), c, e); };
+            })(table, obj);
+        }
     };
-    
     
     
     this.get = function() { return db; };
     
-    this.getUsers = function(filters, c, e) { get("users", filters, c, e); };
-    this.getNotebooks = function(filters, c, e) { get("notebooks", filters, c, e); };
-    this.getNotes = function(filters, c, e) { get("notes", filters, c, e); };
-    this.getNoteResources = function(filters, c, e) { get("noteResource", filters, c, e); };
+    // update multiple objects (update @table set data=@data where filters=@filters)
+    this.updateMultiple = function(table, filters, data, c, e) {
+        _this.get(table, filters, function(items) {
+            for (var i=0; i<items.length; i++) {
+                var item = items[i];
+                item.set(data);
+            }
+            
+            c && c();
+        });
+        
+        Console.log("DB update -" + table + "-: ", filters, data);
+    };
     
-    this.addUser = function(obj, c, e) { add("users", obj, c, e); };
-    this.addNotebook = function(obj, c, e) { add("notebooks", obj, c, e); };
-    this.addNote = function(obj, c, e) { add("notes", obj, c, e); };
-    this.addNoteResource = function(obj, c, e) { add("noteResource", obj, c, e); };
-    
-    this.updateUser = function(obj, c, e) { update("users", obj, c, e); };
-    this.updateNotebook = function(obj, c, e) { update("notebooks", obj, c, e); };
-    this.updateNote = function(obj, c, e) { update("notes", obj, c, e); };
-    this.updateNoteResource = function(obj, c, e) { update("noteResource", obj, c, e); };
-    
-    this.removeNotebook = function(obj, c, e) { remove("notebooks", obj.getId(), c, e); };
-    this.removeNote = function(obj, c, e) { remove("notes", obj.getId(), c, e); };
-    this.removeNoteResource = function(obj, c, e) { remove("noteResource", obj.getId(), c, e); };
-    
-    function remove(table, key, c, e) {
+    this.remove = function(table, key, c, e) {
         var store = db.transaction(table, IDBTransaction.READ_WRITE).objectStore(table),
             req = store["delete"](key);
             
@@ -64,20 +70,22 @@ var DB = new function() {
         Console.log("DB remove from -" + table + "-: ", key);
     };
     
-    this.update = function(table, filters, update, c, e) {
-        get(table, filters, function(items) {
-            for (var i=0; i<items.length; i++) {
-                var item = items[i];
-                item.set(update);
-            }
-            
-            c && c();
-        });
+    this.update = function(table, obj, c, e) {
+        var transaction = db.transaction(table, IDBTransaction.READ_WRITE);
         
-        Console.log("DB update -" + table + "-: ", filters, update);
-    }
+        transaction.oncomplete = function(e) {
+            c && c(obj);
+        };
+        transaction.onfailure = onerror;
+        
+        var request = transaction.objectStore(table).put(serialize(obj));
+        request.onsuccess = function(e) {};
+        request.onfailure = function(e) {};
+        
+        Console.log("DB update -" + table + "-: ", obj);
+    };
     
-    function get(table, filters, c, e) {
+    this.get = function(table, filters, c, e) {
         var ret = [],
             req = db.transaction(table).objectStore(table).openCursor();
             
@@ -105,7 +113,7 @@ var DB = new function() {
         req.onfailure = onerror;
     }
     
-    function add(table, obj, c, e) {
+    this.add = function(table, obj, c, e) {
         var transaction = db.transaction(table, IDBTransaction.READ_WRITE);
         
         transaction.oncomplete = function(e) {
@@ -118,22 +126,7 @@ var DB = new function() {
         request.onfailure = function(e) {};
         
         Console.log("DB: add to -" + table + "-: ", obj);
-    }
-    
-    function update(table, obj, c, e) {
-        var transaction = db.transaction(table, IDBTransaction.READ_WRITE);
-        
-        transaction.oncomplete = function(e) {
-            c && c(obj);
-        };
-        transaction.onfailure = onerror;
-        
-        var request = transaction.objectStore(table).put(serialize(obj));
-        request.onsuccess = function(e) {};
-        request.onfailure = function(e) {};
-        
-        Console.log("DB update -" + table + "-: ", obj);
-    }
+    };
     
     // convert Object to storable data 
     function serialize(obj) {

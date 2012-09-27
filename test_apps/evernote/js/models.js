@@ -132,7 +132,7 @@ var Notebook = function(_options) {
             "numberOfTrashedNotes": _this.getNumberOfTrashedNotes() + _this.getNumberOfNotes(),
             "numberOfNotes": 0
         }, function onSuccess() {
-            DB.update("notes", {"notebook_id": _this.getId()}, {"trashed": true}, cbSuccess, cbError);
+            DB.updateMultiple("notes", {"notebook_id": _this.getId()}, {"trashed": true}, cbSuccess, cbError);
         }, cbError);
     };
     
