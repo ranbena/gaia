@@ -1,95 +1,88 @@
 
-'use strict';
+"use strict";
 
 var EvmeManager = (function() {
+    var currentWindow = null;
 
-  function openApp(params) {
-    var evmeApp = new EvmeApp({
-      url: params.originUrl,
-      name: params.title,
-      icon: params.icon
-    });
+    function openApp(params) {
+        var evmeApp = new EvmeApp({
+            url: params.originUrl,
+            name: params.title,
+            icon: params.icon
+        });
 
-    if (!Applications.isInstalled(params.originUrl)) {
-      evmeApp.manifest.addBookmarkActivity = true;
+        if (currentWindow) {
+            currentWindow.close();
+        }
+        currentWindow = evmeApp.launch(true);
     }
 
-    evmeApp.launch(params.url);
-    setVisibilityChange(false);
-  }
+    function addBookmark(params) {
+        var data = {
+            url: params.originUrl,
+            name: params.title,
+            icon: params.icon
+        }
 
-  function addBookmark(params) {
-    new MozActivity({
-      name: 'save-bookmark',
-      data: {
-        type: 'url',
-        url: params.originUrl,
-        name: params.title,
-        icon: params.icon
-      }
-    });
-  }
+        function success() {
+           Applications.installBookmark(new Bookmark(data));
+        }
 
-  function setVisibilityChange(visible) {
-    Evme.visibilityChange(visible);
-  }
-  
-  function openUrl(url) {
-    new MozActivity({
-      name: 'view',
-      data: {
-        type: 'url',
-        url: url
-      }
-    });
-  }
+        function error() {
+            // Anything to do in case of error?
+        }
 
-  var footerStyle = document.querySelector('#footer').style;
-  footerStyle.MozTransition = '-moz-transform .3s ease';
-
-  document.querySelector('#evmePage').addEventListener('contextmenu',
-    function longPress(evt) {
-      evt.stopImmediatePropagation();
+        HomeState.saveBookmark(data, success, error);
     }
-  );
 
-  return {
-    openApp: openApp,
+    function openUrl(url) {
+        new MozActivity({
+           name: "view",
+            data: {
+                type: "url",
+                url: url
+            }
+        });
+    }
 
-    addBookmark: addBookmark,
+    var footerStyle = document.querySelector("#footer").style;
+    footerStyle.MozTransition = "-moz-transform .3s ease";
 
-    show: function doShow() {
-      footerStyle.MozTransform = 'translateY(75px)';
-      Evme.setOpacityBackground(1);
-    },
+    var page = document.querySelector("#evmePage");
+    page.addEventListener("contextmenu", function longPress(evt) {
+        evt.stopImmediatePropagation();
+    });
 
-    hide: function doHide() {
-      footerStyle.MozTransform = 'translateY(0)';
-      Evme.setOpacityBackground(0);
-    },
+    page.addEventListener("pageshow", function onPageShow() {
+        footerStyle.MozTransform = "translateY(75px)";
+        Evme.setOpacityBackground(1);
+    });
+
+    page.addEventListener("pagehide", function onPageHide() {
+        footerStyle.MozTransform = "translateY(0)";
+        Evme.setOpacityBackground(0);
+    });
+
+    return {
+        openApp: openApp,
+
+        addBookmark: addBookmark,
+
+        isAppInstalled: function isAppInstalled(url) {
+            return Applications.isInstalled(url);
+        },
     
-    isAppInstalled: function(url) {
-        return Applications.isInstalled(url);
-    },
-    
-    openUrl: openUrl
-  };
-
+        openUrl: openUrl
+    };
 }());
 
 var EvmeApp = function createEvmeApp(params) {
-  Bookmark.call(this, params);
-  this.manifest.wrapperMode = 'reuse';
+    Bookmark.call(this, params);
 };
 
 extend(EvmeApp, Bookmark);
 
 // Initialize Evme
-window.addEventListener("load", function() {
-//document.addEventListener("DOMContentLoaded", function() {
-  var host = document.location.host;
-  var domain = host.replace(/(^[\w\d]+\.)?([\w\d]+\.[a-z]+)/, '$2');
-  Evme.init({
-      "gaiaDomain": domain
-  }); 
+window.addEventListener("DOMContentLoaded", function() {
+    Evme.init();
 });
