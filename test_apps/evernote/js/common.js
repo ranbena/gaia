@@ -9,6 +9,7 @@ var App = new function() {
         EMPTY_CONTENT_CLASS = "show-empty",
         CLASS_EDIT_TITLE = "edit-title",
         CLASS_SEARCH_RESULTS = "search-results",
+        LOGGER_NAMESPACE = "DOAT-NOTES",
         TEXTS = {
             "NEW_NOTEBOOK": "Create Notebook",
             "NOTEBOOK_ALL": "All Notes",
@@ -31,22 +32,22 @@ var App = new function() {
         },
         ORDERS = [
             {
-                "property": "dateUpdated",
+                "property": "date_updated",
                 "label": "Date updated",
                 "descending": true
             },
             {
-                "property": "dateCreated",
+                "property": "date_created",
                 "label": "Date created",
                 "descending": true
             },
             {
-                "property": "name",
+                "property": "title",
                 "label": "Title",
                 "descending": false
             },
             {
-                "property": "notebookId",
+                "property": "notebook_id",
                 "label": "Notebook",
                 "descending": false
             }
@@ -71,7 +72,8 @@ var App = new function() {
         SEARCH_FIELDS = ["content", "name"];
     
     this.init = function() {
-        Console.init("DOAT-NOTES");
+        Console.init(LOGGER_NAMESPACE);
+        
         cards = new Cards({
             "onMove": onCardMove
         });
@@ -146,31 +148,25 @@ var App = new function() {
             _this.newNote();
         });
         
-        User.init({
-            "id": localStorage["userId"]
-        }, function() {
-            _this.getUserNotes(function() {
-                Console.info("Init done!");
-            });
+        DB.init(function(){
+            User.init({
+                "id": localStorage["userId"]
+            }, _this.getUserNotes);
         });
     };
     
     this.getUserNotes = function(cb) {
         User.getNotebooks(function(notebooks) {
-            Console.info("Got user notebooks: ", notebooks);
-            
             if (notebooks.length == 0) {
                 _this.newNotebook(TEXTS.FIRST_NOTEBOOK_NAME, function(notebook, note){
                     NotebooksList.refresh(notebooks);
-                    cb && cb();
                 });
             } else {
                 _this.showNotes(notebooks[0]);
                 NotebooksList.refresh(notebooks);
-                cb && cb();
             }
         });
-    }
+    };
     
     this.newNotebook = function(name, cb) {
         User.newNotebook({
@@ -224,10 +220,10 @@ var App = new function() {
         }
     };
 
-    this.promptNewNotebook = function(cb) {
+    this.promptNewNotebook = function() {
         var notebookName = prompt(TEXTS.NEW_NOTEBOOK, "");
         if (notebookName) {
-            _this.newNotebook(notebookName, cb);
+            _this.newNotebook(notebookName);
         }
     };
     
@@ -342,7 +338,7 @@ var App = new function() {
         });
         
         note.set({
-            "notebookId": newNotebookId
+            "notebook_id": newNotebookId
         }, function onSuccess() {
             note.getNotebook(function(notebook) {
                 notebook.set({
@@ -392,7 +388,6 @@ var App = new function() {
         
         this.refresh = function(notebooks) {
             if (!notebooks) {
-                Console.warn("Called refreshNotebooks without notebooks, going to DB");
                 User.getNotebooks(_this.refresh);
                 return;
             }
@@ -601,8 +596,8 @@ var App = new function() {
                 name = elEditTitle.value;
             
             currentNote.set({
-                "content": content,
-                "name": name
+                "title": name,
+                "text": content
             }, function onSuccess(){
                 onSave && onSave(currentNote);
             }, function onError(){
@@ -1036,8 +1031,8 @@ var App = new function() {
             if (!sortby) return notes;
             
             notes.sort(function(a, b){
-                var valA = a["data_" + sortby],
-                    valB = b["data_" + sortby];
+                var valA = a['data_' + sortby] || (sortby == "title" && a['data_text']) || '',
+                    valB = b['data_' + sortby] || (sortby == "title" && b['data_text']) || '';
                 
                 return valA > valB? (isDesc?-1:1)*1 : valA < valB? (isDesc?1:-1)*1 : 0;
             });
@@ -1336,7 +1331,7 @@ var App = new function() {
                 option.innerHTML = order.label;
                 option.setAttribute("data-descending", order.descending);
                 
-                if (option.value == "notebookId") {
+                if (option.value == "notebook_id") {
                     elOptionNotebook = option;
                 }
                 

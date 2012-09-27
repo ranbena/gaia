@@ -2,20 +2,21 @@ var User = new function() {
     var _this = this;
     
     this.data_id = "";
+    this.data_name = "";
     this.data_date_created = "";
+    this.data_metadata = {};
     
     this.init = function(options, cbSuccess) {
         updateObject(_this, options);
         validate();
         
         localStorage["userId"] = _this.data_id;
-        DB.read();
         
         cbSuccess && cbSuccess();
     };
     
     this.newNotebook = function(options, cbSuccess, cbError) {
-        options.userId = _this.getId();
+        options.user_id = _this.getId();
         
         var notebook = new Notebook(options);
         DB.addNotebook(notebook, function(){
@@ -24,7 +25,7 @@ var User = new function() {
     };
     
     this.getNotebooks = function(cbSuccess, cbError) {
-        DB.getNotebooks({"userId": _this.data_id}, cbSuccess, cbError);
+        DB.getNotebooks({"user_id": _this.data_id}, cbSuccess, cbError);
     };
     
     this.getTrashedNotes = function(cbSuccess, cbError) {
@@ -54,9 +55,11 @@ var Notebook = function(_options) {
     
     this.data_id = "";
     this.data_name = "";
-    this.data_userId = "";
+    this.data_user_id = "";
     this.data_date_created = "";
     this.data_date_updated = "";
+    this.data_metadata = {};
+    
     this.data_trashed = false;
     this.data_numberOfNotes = 0;
     this.data_numberOfTrashedNotes = 0;
@@ -78,19 +81,21 @@ var Notebook = function(_options) {
     this.newNote = function(options, cbSuccess, cbError) {
         !options && (options = {});
         
-        options.notebookId = _this.getId();
+        options.notebook_id = _this.getId();
         
         var note = new Note(options);
         
         DB.addNote(note, function(){
-            _this.data_numberOfNotes++;
+            _this.set({
+                "numberOfNotes": _this.data_numberOfNotes+1
+            });
             cbSuccess && cbSuccess(note);
-        });
+        }, cbError);
     };
     
     this.getNotes = function(bIncludeTrashed, cbSuccess, cbError) {
         var filters = {
-            "notebookId": _this.getId()
+            "notebook_id": _this.getId()
         };
         if (!bIncludeTrashed) {
             filters.trashed = false;
@@ -102,7 +107,7 @@ var Notebook = function(_options) {
     };
     this.getTrashedNotes = function(cbSuccess, cbError) {
         var filters = {
-            "notebookId": _this.getId(),
+            "notebook_id": _this.getId(),
             "trashed": true
         };
         
@@ -119,7 +124,7 @@ var Notebook = function(_options) {
             "numberOfTrashedNotes": _this.getNumberOfTrashedNotes() + _this.getNumberOfNotes(),
             "numberOfNotes": 0
         }, function onSuccess() {
-            DB.update("Note", {"notebookId": _this.getId()}, {"trashed": true}, cbSuccess, cbError);
+            DB.update("notes", {"notebook_id": _this.getId()}, {"trashed": true}, cbSuccess, cbError);
         }, cbError);
     };
     
@@ -133,7 +138,7 @@ var Notebook = function(_options) {
     
     this.getId = function() { return _this.data_id; };
     this.getName = function() { return _this.data_name; };
-    this.getUserId = function() { return _this.data_userId; };
+    this.getUserId = function() { return _this.data_user_id; };
     this.getTrashed = function() { return _this.data_trashed; };
     this.getNumberOfNotes = function() { return _this.data_numberOfNotes; };
     this.getNumberOfTrashedNotes = function() { return _this.data_numberOfTrashedNotes; };
@@ -160,12 +165,15 @@ var Note = function(_options) {
     var _this = this;
     
     this.data_id = "";
-    this.data_name = "";
-    this.data_content = "";
+    this.data_title = "";
+    this.data_text = "";
+    this.data_country = "";
+    this.data_city = "";
     this.data_date_created = null;
     this.data_date_updated = null;
     this.data_trashed = false;
-    this.data_notebookId = null;
+    this.data_notebook_id = null;
+    this.data_metadata = {};
     
     function init(options) {
         updateObject(_this, options);
@@ -242,11 +250,11 @@ var Note = function(_options) {
     };
     
     this.getId = function() { return _this.data_id; };
-    this.getName = function() { return _this.data_name; };
-    this.getContent = function() { return _this.data_content; };
+    this.getName = function() { return _this.data_title; };
+    this.getContent = function() { return _this.data_text; };
     this.getDateCreated = function() { return _this.data_date_created; };
     this.getDateUpdated = function() { return _this.data_date_updated; };
-    this.getNotebookId = function() { return _this.data_notebookId; };
+    this.getNotebookId = function() { return _this.data_notebook_id; };
     this.isTrashed = function() { return _this.data_trashed; };
     
     init(_options);
@@ -275,6 +283,7 @@ function NoteResource(_options) {
     this.data_size = -1;
     this.data_type = '';
     this.data_noteId = '';
+    this.data_metadata = {};
         
     function init(options) {
         updateObject(_this, options);
