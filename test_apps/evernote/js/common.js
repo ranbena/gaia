@@ -299,7 +299,6 @@ var App = new function() {
         if (confirm(TEXTS.PROMPT_DELETE_NOTEBOOK)) {
             notebook.trash(function onSuccess() {
                 NotebooksList.refresh();
-                _this.showTrashedNotes();
             });
         }
     }
