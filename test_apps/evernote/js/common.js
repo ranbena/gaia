@@ -13,6 +13,11 @@ var App = new function() {
             "NEW_NOTEBOOK": "Create Notebook",
             "NOTEBOOK_ALL": "All Notes",
             "NOTEBOOK_TRASH": "Trash",
+            "NOTEBOOK_ACTION_TITLE": "Edit Notebook",
+            "NOTEBOOK_ACTION_RENAME": "Rename",
+            "NOTEBOOK_ACTION_DELETE": "Delete",
+            "PROMPT_RENAME_NOTEBOOK": "Rename Notebook:",
+            "PROMPT_DELETE_NOTEBOOK": "Tap OK to delete this notebook.\n NOTE: This will delete all of the notes inside!",
             "NOTE_RESTORED": "Restored to {{notebook}}",
             "NEW_NOTE": "New Note",
             "EMPTY_NOTEBOOK": "no notes recorded<br />start writing now",
@@ -123,7 +128,9 @@ var App = new function() {
         NotebooksList.init({
             "container": $("notebooks"),
             "onClick": onNotebookClick,
-            "onRefresh": NoteInfoView.refreshNotebooks
+            "onRefresh": NoteInfoView.refreshNotebooks,
+            "onRename": onNotebookRename,
+            "onDelete": onNotebookDelete
         });
         
         
@@ -258,6 +265,21 @@ var App = new function() {
         }
     }
     
+    function onNotebookRename(notebook) {
+        var newName = prompt(TEXTS.PROMPT_RENAME_NOTEBOOK, notebook.getName() || "");
+        if (newName) {
+            notebook.set({
+                "name": newName
+            }, function onSuccess() {
+                NotebooksList.refresh();
+            });
+        }
+    }
+    
+    function onNotebookDelete(notebook) {
+        
+    }
+    
     function onNoteSave(noteAffected) {
         _this.showNotes();
         NotebooksList.refresh();
@@ -340,7 +362,9 @@ var App = new function() {
     var NotebooksList = new function() {
         var _this = this,
             el = null, elList = null,
-            onClick = null, onRefresh = null;
+            onClick = null, onRefresh = null, onRename = null, onDelete = null;
+            
+        var TIMEOUT_BEFORE_EDITING_NOTEBOOK = 400;
             
         this.init = function(options) {
             !options && (options = {});
@@ -350,6 +374,8 @@ var App = new function() {
             
             onClick = options.onClick;
             onRefresh = options.onRefresh;
+            onRename = options.onRename;
+            onDelete = options.onDelete;
         };
         
         this.refresh = function(notebooks) {
@@ -378,8 +404,18 @@ var App = new function() {
                 numberOfApps = notebook.getNumberOfNotes();
                 
             el.innerHTML = notebook.getName() + (numberOfApps? " (" + numberOfApps + ")" : "");
-            el.addEventListener("click", function(){
-                clickNotebook(notebook);
+            el.addEventListener("touchstart", function(){
+                this.timeoutHold = window.setTimeout(function(){
+                    el.edited = true;
+                    onEditNotebook(notebook);
+                }, TIMEOUT_BEFORE_EDITING_NOTEBOOK);
+            });
+            el.addEventListener("touchend", function(){
+                window.clearTimeout(this.timeoutHold);
+                if (!this.edited) {
+                    clickNotebook(notebook);
+                }
+                this.edited = false;
             });
             
             elList.appendChild(el);
@@ -402,6 +438,16 @@ var App = new function() {
             el.addEventListener("click", clickTrash);
             
             elList.appendChild(el);
+        }
+    
+        function onEditNotebook(notebook) {
+            dialog(TEXTS.NOTEBOOK_ACTION_TITLE, [TEXTS.NOTEBOOK_ACTION_RENAME, TEXTS.NOTEBOOK_ACTION_DELETE], function(optionClicked) {
+                if (optionClicked == 0) {
+                    onRename && onRename(notebook);
+                } else if (optionClicked == 1) {
+                    onDelete && onDelete(notebook);
+                }
+            });
         }
     
         function clickNotebook(notebook) {
