@@ -872,7 +872,7 @@ var App = new function() {
     var NotebookView = new function() {
         var _this = this,
             el = null, elTitle = null, elEditTitle = null, elEmptyNotes = null, $notesList = null,
-            currentNotebook = null, currentSort = "", currentIsDesc = false,
+            currentNotebook = null, currentFilters = null, currentSort = "", currentIsDesc = false,
             onClickNote = null, notebookScrollOffset = 0,
             onChange = null;
         
@@ -903,7 +903,13 @@ var App = new function() {
                 notebook = null;
                 currentNotebook = null;
             } else if(!notebook) {
-                 notebook = currentNotebook;
+                if (currentFilters) {
+                    filters = currentFilters;
+                    notebook = null;
+                } else {
+                    filters = null;
+                    notebook = currentNotebook;
+                }
             }
             
             el.classList.remove("notebook-real");
@@ -918,6 +924,7 @@ var App = new function() {
             }
             
             currentNotebook = notebook;
+            currentFilters = filters;
             
             _this.showNotes(currentSort, currentIsDesc, filters);
             
@@ -1023,8 +1030,8 @@ var App = new function() {
             if (!sortby) return notes;
             
             notes.sort(function(a, b){
-                var valA = a.getProperty(sortby),
-                    valB = b.getProperty(sortby);
+                var valA = a["data_" + sortby],
+                    valB = b["data_" + sortby];
                 
                 return valA > valB? (isDesc?-1:1)*1 : valA < valB? (isDesc?1:-1)*1 : 0;
             });
