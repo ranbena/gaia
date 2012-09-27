@@ -4,20 +4,13 @@
 var EvmeManager = (function() {
 
   function openApp(params) {
-    // TODO Evme guys will provide both URLs (specific search and origin)
-    // params.origin is null currently, only specific search url
-    var origin = params.origin || params.url;
-    if (origin.indexOf('?') !== -1) {
-      origin = origin.substring(0, origin.indexOf('?'));
-    }
-
     var evmeApp = new EvmeApp({
-      url: origin,
+      url: params.originUrl,
       name: params.title,
       icon: params.icon
     });
 
-    if (!Applications.isInstalled(origin)) {
+    if (!Applications.isInstalled(params.originUrl)) {
       evmeApp.manifest.addBookmarkActivity = true;
     }
 
@@ -26,18 +19,11 @@ var EvmeManager = (function() {
   }
 
   function addBookmark(params) {
-    var origin = params.url;
-    // TODO Evme guys will provide the origin here -> This code should be
-    // removed
-    if (origin.indexOf('?') !== -1) {
-      origin = origin.substring(0, origin.indexOf('?'));
-    }
-
     new MozActivity({
       name: 'save-bookmark',
       data: {
         type: 'url',
-        url: origin,
+        url: params.originUrl,
         name: params.title,
         icon: params.icon
       }
@@ -46,6 +32,16 @@ var EvmeManager = (function() {
 
   function setVisibilityChange(visible) {
     Evme.visibilityChange(visible);
+  }
+  
+  function openUrl(url) {
+    new MozActivity({
+      name: 'view',
+      data: {
+        type: 'url',
+        url: url
+      }
+    });
   }
 
   var footerStyle = document.querySelector('#footer').style;
@@ -70,7 +66,13 @@ var EvmeManager = (function() {
     hide: function doHide() {
       footerStyle.MozTransform = 'translateY(0)';
       Evme.setOpacityBackground(0);
-    }
+    },
+    
+    isAppInstalled: function(url) {
+        return Applications.isInstalled(url);
+    },
+    
+    openUrl: openUrl
   };
 
 }());
@@ -81,3 +83,13 @@ var EvmeApp = function createEvmeApp(params) {
 };
 
 extend(EvmeApp, Bookmark);
+
+// Initialize Evme
+window.addEventListener("load", function() {
+//document.addEventListener("DOMContentLoaded", function() {
+  var host = document.location.host;
+  var domain = host.replace(/(^[\w\d]+\.)?([\w\d]+\.[a-z]+)/, '$2');
+  Evme.init({
+      "gaiaDomain": domain
+  }); 
+});

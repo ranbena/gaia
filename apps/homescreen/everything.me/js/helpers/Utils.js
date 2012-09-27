@@ -11,9 +11,11 @@ Evme.Utils = new function() {
         COOKIE_NAME_CREDENTIALS = "credentials",
         DYNAMIC_TITLE = false;
 
-    this.FFOSMessages = {
+    var FFOSMessages = this.FFOSMessages = {
         "APP_CLICK": "open-in-app",
-        "APP_INSTALL": "add-bookmark"
+        "APP_INSTALL": "add-bookmark",
+        "IS_APP_INSTALLED": "is-app-installed",
+        "OPEN_URL": "open-url"
     };
 
     this.log = function(message) {
@@ -21,11 +23,17 @@ Evme.Utils = new function() {
     };
     this.sendToFFOS = function(type, data) {
         switch (type) {
-            case Evme.Utils.FFOSMessages.APP_CLICK:
+            case FFOSMessages.APP_CLICK:
                 EvmeManager.openApp(data);
                 break;
-            case Evme.Utils.FFOSMessages.APP_INSTALL:
+            case FFOSMessages.APP_INSTALL:
                 EvmeManager.addBookmark(data);
+                break;
+            case FFOSMessages.IS_APP_INSTALLED:
+                return EvmeManager.isAppInstalled(data.url)
+                break;
+            case FFOSMessages.OPEN_URL:
+                return EvmeManager.openUrl(data.url)
                 break;
         }
     };
@@ -59,31 +67,10 @@ Evme.Utils = new function() {
             // send to get shadow
             var data = canvas.toDataURL();
             callback(data);
-            //getShadow(data, size, shadowOffset, callback)
         };
         img.src = imageSrc;
     };
-
-    var getShadow = function(imageSrc, size, shadowOffset, callback) {
-        var canvas = document.createElement("canvas"),
-            ctx = canvas.getContext("2d");
-
-        canvas.setAttribute("width", size+shadowOffset);
-        canvas.setAttribute("height", size+shadowOffset);
-
-        ctx.shadowColor="rgba(0,0,0,0.3)";
-        ctx.shadowOffsetY = shadowOffset;
-
-        // generate image
-        var img = new Image()
-        img.onload = function() {
-            ctx.drawImage(img,0,0, size, size);
-            var data = canvas.toDataURL();
-            callback(data);
-        };
-        img.src = imageSrc;
-    }
-
+    
     this.init = function() {
         userAgent = navigator.userAgent;
         cssPrefix = _getCSSPrefix();
@@ -325,63 +312,21 @@ Evme.Utils = new function() {
                     "name": "3g",
                     "speed": consts.SPEED_MED
                 }
-            ],
-            onLine = true, imageToPoll = "", pollingInterval = 0, timeoutPolling = null,
-            ERROR_TIMEOUT = 0,
-            EVENT_ONLINE = "ononline", EVENT_OFFLINE = "onoffline";
+            ];
 
         this.init = function() {
-            imageToPoll = "http://corp.everything.me/img/bg-pages.png";
-            pollingInterval = 2000;
-            ERROR_TIMEOUT = 5000;
-
-            window.addEventListener(EVENT_ONLINE, function(){
-                onLine = true;
-                window.clearTimeout(timeoutPolling);
+            window.addEventListener("online", function() {
+                Evme.EventHandler.trigger("Connection", "online");
             });
-            window.addEventListener(EVENT_OFFLINE, function(){
-                onLine = false;
-                checkConnection();
+            window.addEventListener("offline", function() {
+                Evme.EventHandler.trigger("Connection", "offline");
             });
-
-            if (imageToPoll && pollingInterval) {
-                checkConnection();
-            }
-
+                
             _this.set();
         };
 
-        function checkConnection(cb) {
-            window.clearTimeout(timeoutPolling);
-
-            var img = new Image();
-            img.timeout = null;
-            img.onload = function() {
-                window.clearTimeout(img.timeout);
-                if (!onLine) {
-                    fireEvent(EVENT_ONLINE);
-                }
-                cb && cb(true);
-            };
-            img.onerror = function() {
-                window.clearTimeout(img.timeout);
-                timeoutPolling = window.setTimeout(checkConnection, pollingInterval);
-                if (onLine) {
-                    fireEvent(EVENT_OFFLINE);
-                }
-                cb && cb(false);
-            };
-
-            img.timeout = window.setTimeout(function(){
-                img.onload = null;
-                img.onerror();
-            }, ERROR_TIMEOUT);
-
-            img.src = imageToPoll + "?ts=" + new Date().getTime();
-        }
-
         this.online = function(callback) {
-            checkConnection(callback);
+            callback(navigator.onLine);
         };
 
         this.get = function(){
@@ -392,12 +337,6 @@ Evme.Utils = new function() {
              currentIndex = index || (navigator.connection && navigator.connection.type) || 0;
              return getCurrent();
         };
-
-        function fireEvent(ev) {
-            var e = document.createEvent("Events");
-            e.initEvent(ev, true, false);
-            window.dispatchEvent(e);
-        }
 
         function getCurrent(){
             return aug({}, consts, types[currentIndex]);

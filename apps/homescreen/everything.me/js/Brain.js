@@ -103,11 +103,11 @@ Evme.Brain = new function() {
             if (Evme.Searchbar.getValue() !== "") {
                 Evme.Helper.showSuggestions();
             } else {
-                Brain.Evme.Helper.showDefault();
+                Brain.Helper.showDefault();
             }
 
             if (!tipKeyboard) {
-                tipKeyboard = new Tip(TIPS.SEARCHBAR_FOCUS).show();
+                tipKeyboard = new Evme.Tip(TIPS.SEARCHBAR_FOCUS).show();
             }
         };
 
@@ -152,9 +152,10 @@ Evme.Brain = new function() {
             Searcher.cancelRequests();
             Evme.Apps.clear();
             Evme.Helper.setTitle();
-            Brain.Evme.Helper.showDefault();
+            Brain.Helper.showDefault();
 
             Evme.DoATAPI.cancelQueue();
+
             Evme.Connection.hide();
         };
 
@@ -602,8 +603,13 @@ Evme.Brain = new function() {
         };
 
         this.hold = function(data) {
-            if (Applications.isInstalled(data.data.appUrl)) {
-                new Tip({
+            var isAppInstalled = Evme.Utils.sendToFFOS(
+                Evme.Utils.FFOSMessages.IS_APP_INSTALLED,
+                { "url": data.data.appUrl }
+            );
+
+            if (isAppInstalled) {
+                new Evme.Tip({
                     "id": "install-app-exists",
                     "text": "This bookmark was added previously",
                     "closeAfter": 2000
@@ -620,9 +626,9 @@ Evme.Brain = new function() {
             var appIcon = Evme.Utils.formatImageData(data.data.icon);
             // make it round
             Evme.Utils.getRoundIcon(appIcon, 58, 2, function(appIcon) {
-                // bookmark in ffos
+                // bookmark
                 Evme.Utils.sendToFFOS(Evme.Utils.FFOSMessages.APP_INSTALL, {
-                    "url": data.data.appUrl,
+                    "originUrl": data.app.getFavLink(),
                     "title": data.data.name,
                     "icon": appIcon
                 });
@@ -665,11 +671,13 @@ Evme.Brain = new function() {
 
             loadingApp = true;
             var $app = data.$el;
+            
             loadingAppAnalyticsData = {
                 "index": data.index,
                 "keyboardVisible": data.keyboardVisible,
                 "isMore": data.isMore,
                 "appUrl": data.app.getLink(),
+                "favUrl": data.app.getFavLink(),
                 "name": data.data.name,
                 "id": data.appId,
                 "query": Searcher.getDisplayedQuery(),
@@ -751,17 +759,18 @@ Evme.Brain = new function() {
             Evme.EventHandler.trigger("Core", "redirectedToApp", data);
 
             window.setTimeout(function(){
-                _this.appRedirectExecute(data["appUrl"], data);
+                _this.appRedirectExecute(data);
             }, delay);
         }
 
-        this.appRedirectExecute = function(appUrl, data){
+        this.appRedirectExecute = function(data){
             var appIcon = Evme.Utils.formatImageData(data.icon);
 
             Evme.Utils.getRoundIcon(appIcon, 58, 2, function(appIcon) {
                 // bookmark in ffos
                 Evme.Utils.sendToFFOS(Evme.Utils.FFOSMessages.APP_CLICK, {
-                    "url": appUrl,
+                    "url": data.appUrl,
+                    "originUrl": data.favUrl,
                     "title": data.name,
                     "icon": appIcon
                 });
@@ -784,8 +793,6 @@ Evme.Brain = new function() {
                 $("#loading-app").remove();
                 Evme.BackgroundImage.cancelFullScreenFade();
                 $body.removeClass("loading-app");
-
-                Brain.Core.onresize();
 
                 if (Evme.Storage.get(STORAGE_KEY_CLOSE_WHEN_RETURNING)) {
                     Searcher.searchAgain();
@@ -845,7 +852,7 @@ Evme.Brain = new function() {
         };
 
         this.show = function() {
-            new Tip(TIPS.APP_EXPLAIN, function(tip) {
+            new Evme.Tip(TIPS.APP_EXPLAIN, function(tip) {
                 $(document.body).bind("touchstart", tip.hide);
             }).show();
 
@@ -870,10 +877,6 @@ Evme.Brain = new function() {
             } else {
                 callback && callback(Evme.Shortcuts.get());
             }
-        };
-
-        this.load = function() {
-            checkForMissingShortcutIcons();
         };
 
         function checkForMissingShortcutIcons() {
@@ -1042,7 +1045,7 @@ Evme.Brain = new function() {
         this.done = function(data) {
             Evme.Shortcuts.show();
             Evme.ShortcutsCustomize.hide();
-                        
+
             Evme.DoATAPI.Shortcuts.set({
                 "shortcuts": JSON.stringify(data.shortcuts)
             }, function(data){
@@ -1060,7 +1063,9 @@ Evme.Brain = new function() {
             $el.find(".shortcut.add").remove();
 
             $elCustomize.bind("click", function(){
-                Evme.ShortcutsCustomize.show(false);
+                //if (!EvmePageMoved) {
+                    Evme.ShortcutsCustomize.show(false);    
+                //}
             });
 
             $el.append($elCustomize);
@@ -1157,7 +1162,7 @@ Evme.Brain = new function() {
 
     this.Connection = new function() {
         this.online = function() {
-            Connection.hide();
+            Evme.Connection.hide();
             Evme.DoATAPI.backOnline();
         };
         this.offline = function() {
@@ -1174,7 +1179,7 @@ Evme.Brain = new function() {
             if (Evme.Searchbar.getValue()) {
                 message = "To get apps for \""+Evme.Searchbar.getValue()+"\" please connect to the internet";
             }
-            Connection.show(message);
+            Evme.Connection.show(message);
         };
     };
 
@@ -1405,7 +1410,7 @@ Evme.Brain = new function() {
                 if (query.match(/apps/i)) {
                     tip.text = tip.text.replace("apps for ", "");
                 }
-                new Tip(tip).show();
+                new Evme.Tip(tip).show();
             }
 
             Evme.Searchbar.endRequest();
@@ -1434,8 +1439,8 @@ Evme.Brain = new function() {
                 "feature": source,
                 "exact": exact,
                 "prevQuery": lastQueryForImage,
-                "width": screen.width,
-                "height": screen.height
+                "width": Evme.__config.bgImageSize[0] || screen.width,
+                "height": Evme.__config.bgImageSize[1] || screen.height
             }, getBackgroundImageComplete);
         };
 

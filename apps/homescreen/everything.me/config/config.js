@@ -18,6 +18,7 @@ Evme.__config = {
     "minHeightForMoreButton": 470,
     "minimumLettersForSearch": 1,
     "defaultBGImage": "/everything.me/images/clouds.jpg?1",
+    "bgImageSize": [320, 460],
     "defaultSuggestions": [
         "News",
         "Music",
@@ -137,8 +138,9 @@ Evme.__config = {
             "errorTipButtonCancel": "Do it Later",
             "errorTipButtonOK": "Locate me",
             "errorCantLocateTitle": "Still can’t locate you :(",
-            "errorCantLocateText": "Please allow location services in your Settings screen.",
-            "errorCantLocateButton": "Continue..."
+            "errorCantLocateText": "Please allow GPS in your Settings screen.",
+            "errorCantLocateButtonCancel": "Cancel",
+            "errorCantLocateButtonSettings": "Go to Settings"
         },
         "connection": {
             "defaultMessage": "You need to be connected to the internet to use this app"
