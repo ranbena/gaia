@@ -72,7 +72,9 @@ var App = new function() {
     
     this.init = function() {
         Console.init("DOAT-NOTES");
-        cards = new Cards();
+        cards = new Cards({
+            "onMove": onCardMove
+        });
         
         // handler of the notebook card (list of notes)
         NotebookView.init({
@@ -250,6 +252,10 @@ var App = new function() {
         
         cards.goTo(cards.CARDS.MAIN);
     };
+    
+    function onCardMove() {
+        Notification.hide();
+    }
     
     function onNotebookClick(type, notebook) {
         switch(type) {
@@ -1221,6 +1227,8 @@ var App = new function() {
         };
         
         this.show = function(message) {
+            if (!el) return;
+            
             window.clearTimeout(timeoutHide);
             
             el.innerHTML = message;
@@ -1230,6 +1238,8 @@ var App = new function() {
         };
         
         this.hide = function() {
+            if (!el) return;
+            
             window.clearTimeout(timeoutHide);
             el.classList.remove(CLASS_WHEN_VISIBLE);
         };
