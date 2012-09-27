@@ -222,10 +222,10 @@ var App = new function() {
         }
     };
 
-    this.promptNewNotebook = function() {
+    this.promptNewNotebook = function(cb) {
         var notebookName = prompt(TEXTS.NEW_NOTEBOOK, "");
         if (notebookName) {
-            _this.newNotebook(notebookName);
+            _this.newNotebook(notebookName, cb);
         }
     };
     
@@ -236,7 +236,7 @@ var App = new function() {
     this.showAllNotes = function() {
         NotebookView.show(null, {"trashed": false});
         
-        elButtonNewNote.style.display = "block";
+        elButtonNewNote.style.display = "none";
         NotebookView.setTitle(TEXTS.NOTEBOOK_ALL);
         
         cards.goTo(cards.CARDS.MAIN);
