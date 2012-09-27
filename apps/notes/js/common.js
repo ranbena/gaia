@@ -24,7 +24,7 @@ var App = new function() {
             "NOTEBOOK_ACTION_RENAME": "Rename",
             "NOTEBOOK_ACTION_DELETE": "Delete",
             "PROMPT_RENAME_NOTEBOOK": "Rename Notebook:",
-            "PROMPT_DELETE_NOTEBOOK": "Tap OK to delete this notebook.\n\nNOTE: All its note will be moved to the Trash.",
+            "PROMPT_DELETE_NOTEBOOK": "Tap OK to delete this notebook.\n\nNOTE: All its notes will be moved to the Trash.",
             "NOTE_RESTORED": "Restored to {{notebook}}",
             "NEW_NOTE": "New Note",
             "EMPTY_NOTEBOOK": "no notes recorded<br />start writing now",
