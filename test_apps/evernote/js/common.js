@@ -17,7 +17,7 @@ var App = new function() {
             "NOTEBOOK_ACTION_RENAME": "Rename",
             "NOTEBOOK_ACTION_DELETE": "Delete",
             "PROMPT_RENAME_NOTEBOOK": "Rename Notebook:",
-            "PROMPT_DELETE_NOTEBOOK": "Tap OK to delete this notebook.\n NOTE: This will delete all of the notes inside!",
+            "PROMPT_DELETE_NOTEBOOK": "Tap OK to delete this notebook.\n\nNOTE: All its note will be moved to the Trash.",
             "NOTE_RESTORED": "Restored to {{notebook}}",
             "NEW_NOTE": "New Note",
             "EMPTY_NOTEBOOK": "no notes recorded<br />start writing now",
@@ -279,9 +279,9 @@ var App = new function() {
     
     function onNotebookDelete(notebook) {
         if (confirm(TEXTS.PROMPT_DELETE_NOTEBOOK)) {
-            notebook.remove(function onSuccess() {
+            notebook.trash(function onSuccess() {
                 NotebooksList.refresh();
-                NotebookView.show(notebook);
+                _this.showTrashedNotes();
             });
         }
     }
@@ -398,7 +398,10 @@ var App = new function() {
             createNotebookEntry_All();
             for (var i=0; i<notebooks.length; i++) {
                 numberOfTrashedNotes += notebooks[i].getNumberOfTrashedNotes();
-                createNotebookEntry(notebooks[i]);
+                
+                if (!notebooks[i].getTrashed()) {
+                    createNotebookEntry(notebooks[i]);
+                }
             }
             createNotebookEntry_Trash(numberOfTrashedNotes);
             
@@ -410,13 +413,13 @@ var App = new function() {
                 numberOfApps = notebook.getNumberOfNotes();
                 
             el.innerHTML = notebook.getName() + (numberOfApps? " (" + numberOfApps + ")" : "");
-            el.addEventListener("touchstart", function(){
+            el.addEventListener("mousedown", function(){
                 this.timeoutHold = window.setTimeout(function(){
                     el.edited = true;
                     onEditNotebook(notebook);
                 }, TIMEOUT_BEFORE_EDITING_NOTEBOOK);
             });
-            el.addEventListener("touchend", function(){
+            el.addEventListener("mouseup", function(){
                 window.clearTimeout(this.timeoutHold);
                 if (!this.edited) {
                     clickNotebook(notebook);

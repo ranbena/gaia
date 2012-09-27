@@ -46,6 +46,30 @@ var DB = new function() {
         c && c();
     };
     
+    this.update = function(table, filters, update, c, e) {
+        for (var id in tables[table]) {
+            var obj = tables[table][id],
+                ok = true;
+                
+            for (var k in filters) {
+                if (obj['data_' + k] !== filters[k])  {
+                    ok = false;
+                    break;
+                }
+            }
+            
+            if (ok) {
+                for (var k in update) {
+                    tables[table][id]["data_" + k] = update[k];
+                }
+            }
+        }
+        
+        Console.log("DB update -" + table + "-: ", filters, update);
+        
+        c && c();
+    }
+    
     this.write = function() {
         var _db = {};
         
@@ -175,12 +199,12 @@ var User = new function() {
 var Notebook = function(_options) {
     var _this = this;
     
-    this.data_numberOfNotes = 0;
-    this.data_numberOfTrashedNotes = 0;
-    
     this.data_id = "";
     this.data_name = "";
     this.data_userId = "";
+    this.data_trashed = false;
+    this.data_numberOfNotes = 0;
+    this.data_numberOfTrashedNotes = 0;
     
     function init(options) {
         updateObject(_this, options);
@@ -232,17 +256,30 @@ var Notebook = function(_options) {
         return _this;
     };
     
-    this.remove = function(cbSuccess, cbError) {
-        DB.remove("Note", {"notebookId": _this.getId()}, function onSuccess() {
-            DB.removeNotebook(_this, cbSuccess, cbError);
-        }, function onError() {
-            
-        });
+    this.trash = function(cbSuccess, cbError) {
+        if (_this.data_trashed) return;
+        
+        _this.set({
+            "trashed": true,
+            "numberOfTrashedNotes": _this.getNumberOfTrashedNotes() + _this.getNumberOfNotes(),
+            "numberOfNotes": 0
+        }, function onSuccess() {
+            DB.update("Note", {"notebookId": _this.getId()}, {"trashed": true}, cbSuccess, cbError);
+        }, cbError);
+    };
+    
+    this.restore = function(cbSuccess, cbError) {
+        if (!_this.data_trashed) return;
+        
+        _this.set({
+            "trashed": false
+        }, cbSuccess, cbError);
     };
     
     this.getId = function() { return _this.data_id; };
     this.getName = function() { return _this.data_name; };
     this.getUserId = function() { return _this.data_userId; };
+    this.getTrashed = function() { return _this.data_trashed; };
     this.getNumberOfNotes = function() { return _this.data_numberOfNotes; };
     this.getNumberOfTrashedNotes = function() { return _this.data_numberOfTrashedNotes; };
 
@@ -268,7 +305,7 @@ var Note = function(_options) {
     this.data_dateUpdated = null;
     this.data_trashed = false;
     this.data_notebookId = null;
-        
+    
     function init(options) {
         updateObject(_this, options);
         validate();
@@ -288,26 +325,27 @@ var Note = function(_options) {
     this.trash = function(cbSuccess, cbError) {
         if (_this.data_trashed) return;
         
-        _this.data_trashed = true;
-        
-        _this.getNotebook(function(notebook){
-            notebook.set({
-                "numberOfNotes": notebook.getNumberOfNotes()-1,
-                "numberOfTrashedNotes": notebook.getNumberOfTrashedNotes()+1
-            }, cbSuccess, cbError);
+        _this.set({"trashed": true}, function onSuccess() {
+            _this.getNotebook(function(notebook){
+                notebook.set({
+                    "numberOfNotes": notebook.getNumberOfNotes()-1,
+                    "numberOfTrashedNotes": notebook.getNumberOfTrashedNotes()+1
+                }, cbSuccess, cbError);
+            }, cbError);
         }, cbError);
     };
     
     this.restore = function(cbSuccess, cbError) {
         if (!_this.data_trashed) return;
         
-        _this.data_trashed = false;
-        
-        _this.getNotebook(function(notebook){
-            notebook.set({
-                "numberOfNotes": notebook.getNumberOfNotes()+1,
-                "numberOfTrashedNotes": notebook.getNumberOfTrashedNotes()-1
-            }, cbSuccess, cbError);
+        _this.set({"trashed": false}, function onSuccess() {
+            _this.getNotebook(function(notebook){
+                notebook.set({
+                    "trashed": false,
+                    "numberOfNotes": notebook.getNumberOfNotes()+1,
+                    "numberOfTrashedNotes": notebook.getNumberOfTrashedNotes()-1
+                }, cbSuccess, cbError);
+            }, cbError);
         }, cbError);
     };
     
