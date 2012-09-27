@@ -1,6 +1,6 @@
 var App = new function() {
     var _this = this,
-        cards = null,
+        cards = null, user = null,
         $notebooksList = null, elButtonNewNote = null,
         createNoteOnTap = false;
 
@@ -10,6 +10,11 @@ var App = new function() {
         CLASS_EDIT_TITLE = "edit-title",
         CLASS_SEARCH_RESULTS = "search-results",
         LOGGER_NAMESPACE = "DOAT-NOTES",
+        DEFAULT_USER = {
+            "id": "1",
+            "username": "default",
+            "name": "default"
+        },
         TEXTS = {
             "NEW_NOTEBOOK": "Create Notebook",
             "NOTEBOOK_ALL": "All Notes",
@@ -148,15 +153,26 @@ var App = new function() {
             _this.newNote();
         });
         
-        DB.init(function(){
-            User.init({
-                "id": localStorage["userId"]
-            }, _this.getUserNotes);
-        });
+        
+        DB.init(initUser);
     };
     
-    this.getUserNotes = function(cb) {
-        User.getNotebooks(function(notebooks) {
+    function initUser(){
+        DB.getUsers({"id": DEFAULT_USER.id}, function onSuccess(users) {
+            if (users.length == 0) {
+                user = new User(DEFAULT_USER);
+                DB.addUser(user, function onSuccess() {
+                    _this.getUserNotes();
+                });
+            } else {
+                user = users[0];
+                _this.getUserNotes();
+            }
+        });
+    }
+    
+    this.getUserNotes = function() {
+        user.getNotebooks(function(notebooks) {
             if (notebooks.length == 0) {
                 _this.newNotebook(TEXTS.FIRST_NOTEBOOK_NAME, function(notebook, note){
                     NotebooksList.refresh(notebooks);
@@ -169,7 +185,7 @@ var App = new function() {
     };
     
     this.newNotebook = function(name, cb) {
-        User.newNotebook({
+        user.newNotebook({
             "name": name
         }, function(notebook) {
             NotebookView.show(notebook);
@@ -388,7 +404,7 @@ var App = new function() {
         
         this.refresh = function(notebooks) {
             if (!notebooks) {
-                User.getNotebooks(_this.refresh);
+                user.getNotebooks(_this.refresh);
                 return;
             }
             
@@ -949,7 +965,7 @@ var App = new function() {
                     });
                 }
             } else {
-                User.getNotes(filters, function onSuccess(notes){
+                user.getNotes(filters, function onSuccess(notes){
                     _this.printNotes(notes);
                 }, function onError() {
                     
@@ -1274,7 +1290,7 @@ var App = new function() {
                 notebookBeforeSearch = _currentNotebook;
             }
             
-            User.getNotes({}, function onSuccess(notes){
+            user.getNotes({}, function onSuccess(notes){
                 Searcher.setData(notes);
             }, function onError() {
                 
@@ -1299,7 +1315,6 @@ var App = new function() {
             for (var i=0,l=els.length; i<l; i++) {
                 for (var j=0; j<fields.length; j++) {
                     var el = els[i].getElementsByClassName(fields[j]);
-                    console.info(el);
                     if (el && el.length > 0) {
                         el = el[0];
                         el.innerHTML = el.innerHTML.replace(regex, '<b>$1</b>');

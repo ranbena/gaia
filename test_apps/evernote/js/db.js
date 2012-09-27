@@ -21,7 +21,7 @@ var DB = new function() {
                 "indexes": ["user_id"]
             },
             "users": {
-                "objectname": "User"
+                "objectName": "User"
             }
         };
         
@@ -89,14 +89,17 @@ var DB = new function() {
     
     this.get = function() { return db; };
     
+    this.getUsers = function(filters, c, e) { get("users", filters, c, e); };
     this.getNotebooks = function(filters, c, e) { get("notebooks", filters, c, e); };
     this.getNotes = function(filters, c, e) { get("notes", filters, c, e); };
     this.getNoteResources = function(filters, c, e) { get("noteResource", filters, c, e); };
     
+    this.addUser = function(obj, c, e) { add("users", obj, c, e); };
     this.addNotebook = function(obj, c, e) { add("notebooks", obj, c, e); };
     this.addNote = function(obj, c, e) { add("notes", obj, c, e); };
     this.addNoteResource = function(obj, c, e) { add("noteResource", obj, c, e); };
     
+    this.updateUser = function(obj, c, e) { update("users", obj, c, e); };
     this.updateNotebook = function(obj, c, e) { update("notebooks", obj, c, e); };
     this.updateNote = function(obj, c, e) { update("notes", obj, c, e); };
     this.updateNoteResource = function(obj, c, e) { update("noteResource", obj, c, e); };

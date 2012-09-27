@@ -1,18 +1,24 @@
-var User = new function() {
+var User = function(_options) {
     var _this = this;
     
     this.data_id = "";
+    this.data_username = "";
     this.data_name = "";
     this.data_date_created = "";
     this.data_metadata = {};
     
-    this.init = function(options, cbSuccess) {
+    function init(options) {
+        updateObject(_this, options);
+        validate();
+    };
+    
+    this.set = function(options, cbSuccess, cbError) {
         updateObject(_this, options);
         validate();
         
-        localStorage["userId"] = _this.data_id;
+        DB.updateUser(_this, cbSuccess, cbError);
         
-        cbSuccess && cbSuccess();
+        return _this;
     };
     
     this.newNotebook = function(options, cbSuccess, cbError) {
@@ -48,6 +54,8 @@ var User = new function() {
             _this.data_date_created = new Date().getTime();
         }
     }
+    
+    init(_options);
 };
 
 var Notebook = function(_options) {
