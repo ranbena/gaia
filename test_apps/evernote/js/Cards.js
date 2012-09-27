@@ -2,7 +2,8 @@
 var Cards = function(_options) {
     var _this = this,
         elContainer = null, cardElements = [], drawerWidth = 0, cardWidth = 0, currentIndex = -1,
-        hasDrawer = false, transitionDuration = 0, transitionEasing = "";
+        hasDrawer = false, transitionDuration = 0, transitionEasing = "",
+        onMove = null;
 
     var CLASS_WHEN_ACTIVE = "active",
         CLASS_DRAWER = "drawer",
@@ -14,6 +15,7 @@ var Cards = function(_options) {
     this.init = function(options) {
         !options && (options = {});
         
+        onMove = options.onMove;
         elContainer = options.container || document.querySelector(".cards");
         
         elContainer.style.cssText += '; position: relative; overflow: hidden; min-height: 100%;';
@@ -66,6 +68,8 @@ var Cards = function(_options) {
         currentIndex = index;
         cardElements[currentIndex].classList.add(CLASS_WHEN_ACTIVE);
         document.body.classList.add("card-" + cardElements[currentIndex].id);
+        
+        onMove && onMove(currentIndex);
 
         return _this;
     };
