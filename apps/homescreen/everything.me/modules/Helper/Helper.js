@@ -444,14 +444,15 @@ Evme.Helper = new function() {
             
             if (!loading) {
                 var opts = {
-                  "lines": 8,
-                  "length": 3,
-                  "width": 2,
-                  "radius": 3,
-                  "color": "#333",
-                  "speed": 1,
-                  "trail": 60,
-                  "shadow": false
+                    "image": "/everything.me/images/spin-dark.png",
+                    "lines": 8,
+                    "length": 3,
+                    "width": 2,
+                    "radius": 3,
+                    "color": "#333",
+                    "speed": 1,
+                    "trail": 60,
+                    "shadow": false
                 };
                 loading = new Spinner(opts).spin($loading[0]);
             } else {

@@ -9,7 +9,7 @@ function Spinner(options) {
         
     var STYLE_ID = "doat-spinner-style",
         ANIMATION_NAME = 'doat-spinner',
-        IMAGE = '/everything.me/images/spin.png';
+        IMAGE = options && options.image || '/everything.me/images/spin.png';
         
     this.config = function() {
         el = document.createElement('span');
@@ -34,15 +34,15 @@ function Spinner(options) {
         style.id = STYLE_ID;
         style.type = "text/css";
         var html = [
-                    '@-moz-keyframes ' + ANIMATION_NAME + ' {',
-                        'from {',
-                            '-moz-transform: rotate(0);',
-                        '}',
-                        'to {',
-                            '-moz-transform: rotate(360deg);',
-                        '}',
-                    '}'
-                   ];
+            '@-moz-keyframes ' + ANIMATION_NAME + ' {',
+                'from {',
+                    '-moz-transform: rotate(0);',
+                '}',
+                'to {',
+                    '-moz-transform: rotate(360deg);',
+                '}',
+            '}'
+        ];
         
         style.innerHTML = style.innerText = style.text = html.join("\n");
         
