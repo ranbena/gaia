@@ -59,17 +59,17 @@ var App = new function() {
         ],
         INFO_FIELDS = [
             {
-                "key": "notebookId",
+                "key": "notebook_id",
                 "label": "Notebook",
                 "type": "options"
             },
             {
-                "key": "dateCreated",
+                "key": "date_created",
                 "label": "Created on",
                 "type": "date"
             },
             {
-                "key": "dateUpdated",
+                "key": "date_updated",
                 "label": "Modified on",
                 "type": "date"
             }
@@ -77,7 +77,7 @@ var App = new function() {
         SEARCH_FIELDS = ["text", "title"];
     
     this.init = function() {
-        Console.init(LOGGER_NAMESPACE);
+        //Console.init(LOGGER_NAMESPACE);
         
         cards = new Cards({
             "onMove": onCardMove
@@ -587,7 +587,7 @@ var App = new function() {
         this.getCurrentNotebook = function() { return currentNotebook; };
         
         this.setTitle = function(title) {
-            elTitle.innerHTML = title || getNoteNameFromContent(elContent.value) || TEXTS.NEW_NOTE;
+            html(elTitle, title || getNoteNameFromContent(elContent.value) || TEXTS.NEW_NOTE);
             elEditTitle.value = title || "";
         };
         
@@ -666,7 +666,7 @@ var App = new function() {
         function onContentKeyUp(e) {
             if (elContent.value) {
                 elSave.classList.add(CLASS_WHEN_VISIBLE);
-                !elEditTitle.value && (elTitle.innerHTML = getNoteNameFromContent(elContent.value));
+                !elEditTitle.value && (html(elTitle, getNoteNameFromContent(elContent.value)));
             } else {
                 elSave.classList.remove(CLASS_WHEN_VISIBLE);
                 _this.setTitle();
@@ -718,7 +718,7 @@ var App = new function() {
                 
             el.className = resource.getType();
             el.innerHTML = '<span style="background-image: url(' + resource.getSrc() + ')"></span> ' +
-                            resource.getName() + (size? ' (' + readableFilesize(size) + ')' : '');
+                            (resource.getName() || "").replace(/</g, '&lt;') + (size? ' (' + readableFilesize(size) + ')' : '');
                             
                             
             el.addEventListener("click", function(){
@@ -801,7 +801,7 @@ var App = new function() {
                 switch(f.type) {
                     case "date":
                         value = printDate(value);
-                        elValue.innerHTML = value;
+                        html(elValue, value);
                         break;
                     case "options":
                         elValue.value = value;
@@ -821,14 +821,14 @@ var App = new function() {
             for (var i=0; i<notebooks.length; i++) {
                 html += '<option value="' + notebooks[i].getId() + '">' + notebooks[i].getName() + '</option>';
             }
-            elFields.querySelector(".notebookId").innerHTML = html;
+            elFields.querySelector(".notebook_id").innerHTML = html;
         };
         
         this.selectNotebook = function(notebookId) {
-            elFields.querySelector(".notebookId").value = notebookId;
+            elFields.querySelector(".notebook_id").value = notebookId;
         };
         
-        this.onChange_notebookId = function(e) {
+        this.onChange_notebook_id = function(e) {
             onNotebookChange && onNotebookChange(this.value);
         };
         
@@ -840,7 +840,10 @@ var App = new function() {
                     type = f.type;
                 
                 if (type == "options") {
-                    html += '<li>' + getNotebookSelect(f) + '</li>';
+                    html += '<li>' +
+                                '<label>' + f.label + '</label>' +
+                                '<select class="' + f.key + '"></select>' +
+                            '</li>';
                 } else {
                     html += '<li>' +
                                 '<label>' + f.label + '</label>' +
@@ -859,14 +862,6 @@ var App = new function() {
                     elFields.querySelector("select." + f.key).addEventListener("change", _this["onChange_" + f.key]);
                 }
             }
-        }
-        
-        function getNotebookSelect(field) {
-            var html = '' +
-                        '<label>' + field.label + '</label>' +
-                        '<select class="' + field.key + '"></select>';
-            
-            return html;
         }
         
         function printDate(date) {
@@ -992,7 +987,7 @@ var App = new function() {
         };
         
         this.setTitle = function(title) {
-            elTitle.innerHTML = title || TEXTS.EMPTY_NOTEBOOK_NAME;
+            html(elTitle, title || TEXTS.EMPTY_NOTEBOOK_NAME);
             elEditTitle.value = title || "";
         };
         
@@ -1034,8 +1029,8 @@ var App = new function() {
             var el = document.createElement("li");
             el.className = "note";
             el.dataset.noteId = note.getId();
-            el.innerHTML = '<div><span class="text">' + (note.getName() || getNoteNameFromContent(note.getContent())) + '</span> <span class="time">' + prettyDate(note.getDateUpdated()) + '</span></div>' +
-                            '<div class="title">' + note.getContent() + '</div>';/* +
+            el.innerHTML = '<div><span class="text">' + (note.getName() || getNoteNameFromContent(note.getContent())).replace(/</g, '&lt;') + '</span> <span class="time">' + prettyDate(note.getDateUpdated()) + '</span></div>' +
+                            '<div class="title">' + note.getContent().replace(/</g, '&lt;') + '</div>';/* +
                             (note.getImages().length > 0? '<div class="image" style="background-image: url(' + note.getImages()[0].src + ')"></div>' : '');*/
             
             if (note.isTrashed()) {
@@ -1101,7 +1096,7 @@ var App = new function() {
         
         this.show = function(resource) {
             elImage.style.backgroundImage = 'url(' + resource.getSrc() + ')';
-            elName.innerHTML = resource.getName();
+            html(elName, resource.getName());
             
             el.classList.add(CLASS_WHEN_VISIBLE);
             
@@ -1448,3 +1443,4 @@ function prettyDate(time) {
 }
 
 function $(s) { return document.getElementById(s); }
+function html(el, s) { el.innerHTML = (s || "").replace(/</g, '&lt;'); }
