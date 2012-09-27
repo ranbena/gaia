@@ -29,62 +29,6 @@ var DB = new function() {
         _this.open(onSuccess);
     };
     
-    this.destroy = function() {
-        var req = indexedDB.deleteDatabase(DB_NAME);
-        
-        req.onsuccess = function() {
-            console.log("Database destroyed.")
-        };
-        req.onerror = req.onblocked = function(ev) {
-            console.log("Database destroy failed: ", ev)
-        };
-    };
-    
-    this.open = function(cbSuccess) {
-        var request = indexedDB.open(DB_NAME, DB_VERSION);
-        Console.log("DB: Opening " + DB_NAME + "(" + DB_VERSION + ")...");
-        
-        request.onupgradeneeded = function(e) {
-            Console.log("DB: Upgrading version...");
-            
-            var transaction = e.target.transaction;
-            
-            for (var table in schema) {
-                var store = null,
-                    indexes = schema[table].indexes || [];
-                    
-                if (transaction.objectStoreNames.contains(table)) {
-                    store = transaction.objectStore(table);
-                } else {
-                    store = transaction.db.createObjectStore(table, {keyPath: "id"})
-                }
-                
-                for (var i=0; i<indexes.length; i++) {
-                    store.createIndex(indexes[i], indexes[i], {'unique': false});
-                }
-            }
-            
-            transaction.oncomplete = function() {
-                Console.log("DB: Upgrade success!");
-            };
-            transaction.onfailure = _this.onerror;
-        };
-    
-        request.onsuccess = function(e) {
-            db = e.target.result;
-            
-            Console.log("DB: Open success!", db);
-            
-            cbSuccess && cbSuccess(db);
-        };
-        
-        request.onfailure = _this.onerror;
-    };
-    
-    this.onerror = function(e) {
-        Console.error("DB: Error!", e);
-    };
-    
     
     
     this.get = function() { return db; };
@@ -208,4 +152,62 @@ var DB = new function() {
         var objName = schema[table].objectName;
         return new window[objName](data);
     }
+    
+    
+    
+    this.destroy = function() {
+        var req = indexedDB.deleteDatabase(DB_NAME);
+        
+        req.onsuccess = function() {
+            console.log("Database destroyed.")
+        };
+        req.onerror = req.onblocked = function(ev) {
+            console.log("Database destroy failed: ", ev)
+        };
+    };
+    
+    this.open = function(cbSuccess) {
+        var request = indexedDB.open(DB_NAME, DB_VERSION);
+        Console.log("DB: Opening " + DB_NAME + "(" + DB_VERSION + ")...");
+        
+        request.onupgradeneeded = function(e) {
+            Console.log("DB: Upgrading version...");
+            
+            var transaction = e.target.transaction;
+            
+            for (var table in schema) {
+                var store = null,
+                    indexes = schema[table].indexes || [];
+                    
+                if (transaction.objectStoreNames.contains(table)) {
+                    store = transaction.objectStore(table);
+                } else {
+                    store = transaction.db.createObjectStore(table, {keyPath: "id"})
+                }
+                
+                for (var i=0; i<indexes.length; i++) {
+                    store.createIndex(indexes[i], indexes[i], {'unique': false});
+                }
+            }
+            
+            transaction.oncomplete = function() {
+                Console.log("DB: Upgrade success!");
+            };
+            transaction.onfailure = _this.onerror;
+        };
+    
+        request.onsuccess = function(e) {
+            db = e.target.result;
+            
+            Console.log("DB: Open success!", db);
+            
+            cbSuccess && cbSuccess(db);
+        };
+        
+        request.onfailure = _this.onerror;
+    };
+    
+    this.onerror = function(e) {
+        Console.error("DB: Error!", e);
+    };
 };

@@ -300,7 +300,7 @@ function NoteResource(_options) {
     
     function validate() {
         if (!_this.data_id) {
-            _this.date_id = "nr_" + new Date().getTime() + "_" + Math.round(Math.random()*100000);
+            _this.data_id = "nr_" + new Date().getTime() + "_" + Math.round(Math.random()*100000);
         }
     }
     
@@ -311,6 +311,10 @@ function NoteResource(_options) {
         DB.updateNoteResource(_this, cbSuccess, cbError);
         
         return _this;        
+    };
+    
+    this.remove = function(cbSuccess, cbError) {
+        DB.removeNoteResource(_this, cbSuccess, cbError);
     };
     
     this.getId = function() { return _this.data_id; };

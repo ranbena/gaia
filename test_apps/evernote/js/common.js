@@ -375,8 +375,10 @@ var App = new function() {
     }
     
     function onResourceDelete(resource) {
-        alert("Need to implement - actually delete the resource");
-        ResourceView.hide();
+        resource.remove(function onSuccess() {
+            NoteView.loadResources();
+            ResourceView.hide();
+        });
     }
     
     function getNoteNameFromContent(content) {
@@ -568,6 +570,8 @@ var App = new function() {
         };
         
         this.loadResources = function(note) {
+            !note && (note = currentNote);
+            
             elResources.innerHTML = '';
             
             note.getResources(function onSuccess(resources) {
