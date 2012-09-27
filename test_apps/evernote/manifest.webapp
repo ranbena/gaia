@@ -10,6 +10,7 @@
     "device-storage:pictures",
     "location"
   ],
+  "orientation": "portrait-primary",
   "locales": {},
   "default_locale": "en-US",
   "icons": {
