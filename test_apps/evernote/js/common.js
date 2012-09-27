@@ -272,12 +272,18 @@ var App = new function() {
                 "name": newName
             }, function onSuccess() {
                 NotebooksList.refresh();
+                NotebookView.show(notebook);
             });
         }
     }
     
     function onNotebookDelete(notebook) {
-        
+        if (confirm(TEXTS.PROMPT_DELETE_NOTEBOOK)) {
+            notebook.remove(function onSuccess() {
+                NotebooksList.refresh();
+                NotebookView.show(notebook);
+            });
+        }
     }
     
     function onNoteSave(noteAffected) {
@@ -328,7 +334,7 @@ var App = new function() {
                 "numberOfNotes": notebook.getNumberOfNotes()-1
             });
         });
-            
+        
         note.set({
             "notebookId": newNotebookId
         }, function onSuccess() {

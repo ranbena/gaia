@@ -1,9 +1,10 @@
 var DB = new function() {
-    var tables = {
-        "Note": {},
-        "Notebook": {},
-        "NoteResource": {}
-    };
+    var _this = this,
+        tables = {
+            "Note": {},
+            "Notebook": {},
+            "NoteResource": {}
+        };
     
     this.get = function() { return tables; };
     
@@ -19,9 +20,31 @@ var DB = new function() {
     this.updateNote = function(obj, c, e) { update("Note", obj, c, e); };
     this.updateNoteResource = function(obj, c, e) { update("NoteResource", obj, c, e); };
     
-    this.removeNotebook = function(obj, c, e) { remove("Notebook", obj, c, e); };
-    this.removeNote = function(obj, c, e) { remove("Note", obj, c, e); };
-    this.removeNoteResource = function(obj, c, e) { remove("NoteResource", obj, c, e); };
+    this.removeNotebook = function(obj, c, e) { _this.remove("Notebook", {"id": obj.getId()}, c, e); };
+    this.removeNote = function(obj, c, e) { _this.remove("Note", {"id": obj.getId()}, c, e); };
+    this.removeNoteResource = function(obj, c, e) { _this.remove("NoteResource", {"id": obj.getId()}, c, e); };
+    
+    this.remove = function(table, filters, c, e) {
+        for (var id in tables[table]) {
+            var obj = tables[table][id],
+                ok = true;
+                
+            for (var k in filters) {
+                if (obj['data_' + k] !== filters[k])  {
+                    ok = false;
+                    break;
+                }
+            }
+            
+            if (ok) {
+                delete tables[table][id];
+            }
+        }
+        
+        Console.log("DB remove from -" + table + "-: ", filters);
+        
+        c && c();
+    };
     
     this.write = function() {
         var _db = {};
@@ -88,18 +111,12 @@ var DB = new function() {
         
         Console.log("DB: get from -" + table + "-: ", filters, ret);
         
-        c(ret);
+        c && c(ret);
     }
     
     function add(table, obj, c, e) {
         tables[table][obj.getId()] = obj;
         Console.log("DB: add to -" + table + "-: ", obj);
-        c && c(obj);
-    }
-    
-    function remove(table, obj, c, e) {
-        delete tables[table][obj.getId()];
-        Console.log("DB remove from -" + table + "-: ", obj);
         c && c(obj);
     }
     
@@ -213,6 +230,14 @@ var Notebook = function(_options) {
         DB.getNotes(filters, cbSuccess, cbError);
         
         return _this;
+    };
+    
+    this.remove = function(cbSuccess, cbError) {
+        DB.remove("Note", {"notebookId": _this.getId()}, function onSuccess() {
+            DB.removeNotebook(_this, cbSuccess, cbError);
+        }, function onError() {
+            
+        });
     };
     
     this.getId = function() { return _this.data_id; };
