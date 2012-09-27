@@ -1,160 +1,8 @@
-var DB = new function() {
-    var _this = this,
-        tables = {
-            "Note": {},
-            "Notebook": {},
-            "NoteResource": {}
-        };
-    
-    this.get = function() { return tables; };
-    
-    this.getNotebooks = function(filters, c, e) { get("Notebook", filters, c, e); };
-    this.getNotes = function(filters, c, e) { get("Note", filters, c, e); };
-    this.getNoteResources = function(filters, c, e) { get("NoteResource", filters, c, e); };
-    
-    this.addNotebook = function(obj, c, e) { add("Notebook", obj, c, e); };
-    this.addNote = function(obj, c, e) { add("Note", obj, c, e); };
-    this.addNoteResource = function(obj, c, e) { add("NoteResource", obj, c, e); };
-    
-    this.updateNotebook = function(obj, c, e) { update("Notebook", obj, c, e); };
-    this.updateNote = function(obj, c, e) { update("Note", obj, c, e); };
-    this.updateNoteResource = function(obj, c, e) { update("NoteResource", obj, c, e); };
-    
-    this.removeNotebook = function(obj, c, e) { _this.remove("Notebook", {"id": obj.getId()}, c, e); };
-    this.removeNote = function(obj, c, e) { _this.remove("Note", {"id": obj.getId()}, c, e); };
-    this.removeNoteResource = function(obj, c, e) { _this.remove("NoteResource", {"id": obj.getId()}, c, e); };
-    
-    this.remove = function(table, filters, c, e) {
-        for (var id in tables[table]) {
-            var obj = tables[table][id],
-                ok = true;
-                
-            for (var k in filters) {
-                if (obj['data_' + k] !== filters[k])  {
-                    ok = false;
-                    break;
-                }
-            }
-            
-            if (ok) {
-                delete tables[table][id];
-            }
-        }
-        
-        Console.log("DB remove from -" + table + "-: ", filters);
-        
-        c && c();
-    };
-    
-    this.update = function(table, filters, update, c, e) {
-        for (var id in tables[table]) {
-            var obj = tables[table][id],
-                ok = true;
-                
-            for (var k in filters) {
-                if (obj['data_' + k] !== filters[k])  {
-                    ok = false;
-                    break;
-                }
-            }
-            
-            if (ok) {
-                for (var k in update) {
-                    tables[table][id]["data_" + k] = update[k];
-                }
-            }
-        }
-        
-        Console.log("DB update -" + table + "-: ", filters, update);
-        
-        c && c();
-    }
-    
-    this.write = function() {
-        var _db = {};
-        
-        for (var tableName in tables) {
-            var table = tables[tableName];
-            
-            _db[tableName] = {};
-            
-            for (var itemKey in table) {
-                var item = table[itemKey],
-                    obj = {};
-                
-                for (var prop in item) {
-                    if (prop.indexOf("data_") == 0) {
-                        obj[prop.replace(/data_/gi, "")] = item[prop];
-                    }
-                }
-                
-                _db[tableName][itemKey] = obj;
-            }
-        }
-        
-        localStorage["db"] = JSON.stringify(_db);
-        
-        return _db;
-    };
-    
-    this.read = function() {
-        var _db = JSON.parse(localStorage["db"] || "{}");
-        
-        for (var tableName in _db) {
-            var table = _db[tableName];
-            
-            tables[tableName] = {};
-            
-            for (var itemKey in table) {
-                var itemData = table[itemKey],
-                    item = new window[tableName](itemData);
-                
-                tables[tableName][itemKey] = item;
-            }
-        }
-        
-        return tables;
-    };
-    
-    function get(table, filters, c, e) {
-        var ret = [];
-        
-        for (var id in tables[table]) {
-            var obj = tables[table][id],
-                ok = true;
-                
-            for (var k in filters) {
-                if (obj['data_' + k] !== filters[k])  {
-                    ok = false;
-                    break;
-                }
-            }
-            
-            ok && ret.push(obj);
-        }
-        
-        Console.log("DB: get from -" + table + "-: ", filters, ret);
-        
-        c && c(ret);
-    }
-    
-    function add(table, obj, c, e) {
-        tables[table][obj.getId()] = obj;
-        Console.log("DB: add to -" + table + "-: ", obj);
-        c && c(obj);
-    }
-    
-    function update(table, obj, c, e) {
-        tables[table][obj.getId()] && (tables[table][obj.getId()] = obj);
-        Console.log("DB update -" + table + "-: ", obj);
-        c && c(obj);
-    }
-};
-
 var User = new function() {
     var _this = this;
     
     this.data_id = "";
+    this.data_date_created = "";
     
     this.init = function(options, cbSuccess) {
         updateObject(_this, options);
@@ -188,10 +36,15 @@ var User = new function() {
     };
     
     this.getId = function() { return _this.data_id; };
+    this.getDateCreated = function() { return _this.data_date_created; };
     
     function validate() {
         if (!_this.data_id) {
             _this.data_id = "user_" + Math.round(Math.random()*100000);
+        }
+        
+        if (!_this.data_date_created) {
+            _this.data_date_created = new Date().getTime();
         }
     }
 };
@@ -202,6 +55,8 @@ var Notebook = function(_options) {
     this.data_id = "";
     this.data_name = "";
     this.data_userId = "";
+    this.data_date_created = "";
+    this.data_date_updated = "";
     this.data_trashed = false;
     this.data_numberOfNotes = 0;
     this.data_numberOfTrashedNotes = 0;
@@ -289,6 +144,12 @@ var Notebook = function(_options) {
         if (!_this.data_id){
             _this.data_id = "nb_" + new Date().getTime() + "_" + Math.round(Math.random()*100000);
         }
+        if (!_this.data_date_created) {
+            _this.data_date_created = new Date().getTime();
+        }
+        if (!_this.data_date_modified) {
+            _this.data_date_updated = new Date().getTime();
+        }
         
         (_this.data_numberOfNotes < 0) && (_this.data_numberOfNotes = 0);
         (_this.data_numberOfTrashedNotes < 0) && (_this.data_numberOfTrashedNotes = 0);
@@ -301,8 +162,8 @@ var Note = function(_options) {
     this.data_id = "";
     this.data_name = "";
     this.data_content = "";
-    this.data_dateCreated = null;
-    this.data_dateUpdated = null;
+    this.data_date_created = null;
+    this.data_date_updated = null;
     this.data_trashed = false;
     this.data_notebookId = null;
     
@@ -315,7 +176,7 @@ var Note = function(_options) {
         updateObject(_this, options);
         validate();
         
-        _this.data_dateUpdated = new Date().getTime();
+        _this.data_date_updated = new Date().getTime();
         
         DB.updateNote(_this, cbSuccess, cbError);
         
@@ -383,8 +244,8 @@ var Note = function(_options) {
     this.getId = function() { return _this.data_id; };
     this.getName = function() { return _this.data_name; };
     this.getContent = function() { return _this.data_content; };
-    this.getDateCreated = function() { return _this.data_dateCreated; };
-    this.getDateUpdated = function() { return _this.data_dateUpdated; };
+    this.getDateCreated = function() { return _this.data_date_created; };
+    this.getDateUpdated = function() { return _this.data_date_updated; };
     this.getNotebookId = function() { return _this.data_notebookId; };
     this.isTrashed = function() { return _this.data_trashed; };
     
@@ -395,12 +256,12 @@ var Note = function(_options) {
             _this.data_id = "note_" + new Date().getTime() + "_" + Math.round(Math.random()*100000);
         }
         
-        if (!_this.data_dateCreated) {
-            _this.data_dateCreated = new Date().getTime();
+        if (!_this.data_date_created) {
+            _this.data_date_created = new Date().getTime();
         }
         
-        if (!_this.data_dateUpdated) {
-            _this.data_dateUpdated = new Date().getTime();
+        if (!_this.data_date_updated) {
+            _this.data_date_updated = new Date().getTime();
         }
     }
 };
