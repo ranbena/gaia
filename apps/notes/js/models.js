@@ -31,7 +31,7 @@ var User = function(_options) {
     };
     
     this.getNotebooks = function(cbSuccess, cbError) {
-        DB.getNotebooks({"user_id": _this.data_id}, cbSuccess, cbError);
+        DB.getNotebooks({"user_id": _this.data_id, "trashed": false}, cbSuccess, cbError);
     };
     
     this.getTrashedNotes = function(cbSuccess, cbError) {
@@ -93,11 +93,10 @@ var Notebook = function(_options) {
         
         var note = new Note(options);
         
-        DB.addNote(note, function(){
-            _this.set({
-                "numberOfNotes": _this.data_numberOfNotes+1
-            });
-            cbSuccess && cbSuccess(note);
+        DB.addNote(note, function onSuccess(){
+            _this.updateNotesCount(function onSuccess() {
+                cbSuccess && cbSuccess(note);
+            }, cbError);
         }, cbError);
     };
     
@@ -127,12 +126,8 @@ var Notebook = function(_options) {
     this.trash = function(cbSuccess, cbError) {
         if (_this.data_trashed) return;
         
-        _this.set({
-            "trashed": true,
-            "numberOfTrashedNotes": _this.getNumberOfTrashedNotes() + _this.getNumberOfNotes(),
-            "numberOfNotes": 0
-        }, function onSuccess() {
-            DB.updateMultiple("notes", {"notebook_id": _this.getId()}, {"trashed": true}, cbSuccess, cbError);
+        DB.updateMultiple("notes", {"notebook_id": _this.getId()}, {"trashed": true}, function(){
+            _this.updateNotesCount(cbSuccess, cbError, {"trashed": true});
         }, cbError);
     };
     
@@ -142,6 +137,25 @@ var Notebook = function(_options) {
         _this.set({
             "trashed": false
         }, cbSuccess, cbError);
+    };
+    
+    this.updateNotesCount = function(cbSuccess, cbError, options) {
+        !options && (options = {});
+        
+        _this.getNotes(true, function(notes) {
+            options.numberOfNotes = 0;
+            options.numberOfTrashedNotes = 0;
+            
+            for (var i=0; i<notes.length; i++) {
+                if (notes[i].isTrashed()) {
+                    options.numberOfTrashedNotes++;
+                } else {
+                    options.numberOfNotes++;
+                }
+            }
+            
+            _this.set(options, cbSuccess, cbError);
+        }, cbError);
     };
     
     this.getId = function() { return _this.data_id; };
@@ -203,12 +217,7 @@ var Note = function(_options) {
         if (_this.data_trashed) return;
         
         _this.set({"trashed": true}, function onSuccess() {
-            _this.getNotebook(function(notebook){
-                notebook.set({
-                    "numberOfNotes": notebook.getNumberOfNotes()-1,
-                    "numberOfTrashedNotes": notebook.getNumberOfTrashedNotes()+1
-                }, cbSuccess, cbError);
-            }, cbError);
+            _this.updateNotebookNotesCount(cbSuccess, cbError);
         }, cbError);
     };
     
@@ -216,30 +225,25 @@ var Note = function(_options) {
         if (!_this.data_trashed) return;
         
         _this.set({"trashed": false}, function onSuccess() {
-            _this.getNotebook(function(notebook){
-                notebook.set({
-                    "trashed": false,
-                    "numberOfNotes": notebook.getNumberOfNotes()+1,
-                    "numberOfTrashedNotes": notebook.getNumberOfTrashedNotes()-1
-                }, cbSuccess, cbError);
-            }, cbError);
+            _this.updateNotebookNotesCount(cbSuccess, cbError, {"trashed": false});
         }, cbError);
     };
     
     this.remove = function(cbSuccess, cbError) {
         DB.removeNote(_this, function() {
-            _this.getNotebook(function(notebook){
-                notebook.set({
-                    "numberOfNotes": notebook.getNumberOfNotes() - (_this.data_trashed? 0 : 1),
-                    "numberOfTrashedNotes": notebook.getNumberOfTrashedNotes() - (_this.data_trashed? 1 : 0)
-                }, cbSuccess, cbError);
-            }, cbError);
+            _this.updateNotebookNotesCount(cbSuccess, cbError);
         }, cbError);
     };
     
     this.getNotebook = function(cbSuccess, cbError) {
         DB.getNotebooks({"id": _this.getNotebookId()}, function(notebooks){
             cbSuccess && cbSuccess(notebooks[0]);
+        }, cbError);
+    };
+    
+    this.updateNotebookNotesCount = function(cbSuccess, cbError, additionalOptions) {
+        _this.getNotebook(function(notebook){
+            notebook.updateNotesCount(cbSuccess, cbError, additionalOptions);
         }, cbError);
     };
     

@@ -5,7 +5,7 @@ var DB = new function() {
         
         db = null,
         DB_NAME = "EVME_Notes",
-        DB_VERSION = 1,
+        DB_VERSION = 2,
         
         schema = {
             "notes": {
@@ -178,8 +178,11 @@ var DB = new function() {
                     store = transaction.db.createObjectStore(table, {keyPath: "id"})
                 }
                 
+                var currentIndexes = store.indexNames;
                 for (var i=0; i<indexes.length; i++) {
-                    store.createIndex(indexes[i], indexes[i], {'unique': false});
+                    if (!currentIndexes.contains(indexes[i])) {
+                        store.createIndex(indexes[i], indexes[i], {'unique': false});
+                    }
                 }
             }
             
