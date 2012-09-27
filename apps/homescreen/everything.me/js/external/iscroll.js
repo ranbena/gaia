@@ -184,6 +184,10 @@ iScroll.prototype = {
         
         if (that.options.useTransition) that._transitionTime(0);
         
+        if (that.hScroll) {
+            e.preventDefault();
+        }
+        
         that.moved = false;
         that.animating = false;
         that.zoomed = false;

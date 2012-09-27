@@ -31,3 +31,4 @@ manifest.appcache
 /local.mk
 
 /tools/xpcwindow/vendor/
+/.project
