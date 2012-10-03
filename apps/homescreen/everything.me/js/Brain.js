@@ -869,7 +869,7 @@ Evme.Brain = new function() {
             if (!_this.loaded || bForce) {
                 Evme.DoATAPI.Shortcuts.get({
                     "iconFormat": Evme.Utils.getIconsFormat(),
-                }, function(data, methodNamespace, methodName, url) {
+                }, function onSuccess(data, methodNamespace, methodName, url) {
                     Evme.Shortcuts.load(data.response, callback);
                 });
             } else {
@@ -1010,11 +1010,10 @@ Evme.Brain = new function() {
         };
         
         this.hide = function() {
+            
         };
         
         this.done = function(data) {
-            Evme.Shortcuts.show();
-            Evme.ShortcutsCustomize.hide();
             Evme.ShortcutsCustomize.Loading.show();
             
             Evme.DoATAPI.Shortcuts.set({
@@ -1022,7 +1021,7 @@ Evme.Brain = new function() {
             }, function(data){
                 Brain.Shortcuts.loadFromAPI(function(){
                     _this.addCustomizeButton();
-                    Evme.ShortcutsCustomize.Loading.hide();
+                    window.setTimeout(Evme.ShortcutsCustomize.Loading.hide, 50);
                 }, true);
             });
         };
@@ -1057,13 +1056,12 @@ Evme.Brain = new function() {
                         
                         Evme.ShortcutsCustomize.load(shortcutsToFavorite);
                         isFirstShow = false;
-                        Brain.ShortcutsCustomize.showUI();
                         isRequesting = false;
+                        Brain.ShortcutsCustomize.showUI();
                     });
                 });
             } else {
                 Evme.ShortcutsCustomize.show();
-                Evme.ShortcutsCustomize.Loading.hide();
             }
         };
         

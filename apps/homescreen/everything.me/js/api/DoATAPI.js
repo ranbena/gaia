@@ -183,28 +183,14 @@ Evme.DoATAPI = new function() {
     
     this.Shortcuts = new function() {
         var _this = this,
-            width = 110, height = 90, SHORTCUT_CACHE_VERSION = "1",
-            cacheKeyGet = "";
-        
-        this.size = function() {
-            return {
-                "width": width,
-                "height": height
-            };
-        };
+            SHORTCUT_CACHE_VERSION = "1";
         
         this.get = function(_options, callback) {
             !_options && (_options = {});
             
             var options = {
-                "width": width,
-                "height": height,
-                "iconFormat": _options.iconFormat,
-                "queries": _options.queries,
                 "cacheVersion": SHORTCUT_CACHE_VERSION
             };
-            
-            !cacheKeyGet && (cacheKeyGet = getCacheKey("Shortcuts", "get", options));
             
             return request({
                 "methodNamespace": "Shortcuts",
@@ -234,40 +220,18 @@ Evme.DoATAPI = new function() {
         this.suggest = function(_options, callback) {
             !_options && (_options = {});
             
-            var options = {
-                "width": width,
-                "height": height
-            };
-            
             return request({
                 "methodNamespace": "Shortcuts",
                 "methodName": "suggestions",
-                "params": options,
+                "params": {},
                 "callback": callback
             }, _options._NOCACHE);
         };
         
-        this.image = function(_options, callback) {
-            !_options && (_options = {});
-            
-            var options = {
-                "query": _options.query,
-                "feature": "csht",
-                "exact": true,
-                "width": width,
-                "height": height
-            };
-            
-            return request({
-                "methodNamespace": "Search",
-                "methodName": "bgimage",
-                "params": options,
-                "callback": callback
-            }, _options._NOCACHE);
-        }
-        
         this.cleanCache = function() {
-            Evme.DoATAPI.removeFromCache(cacheKeyGet);
+            Evme.DoATAPI.removeFromCache(getCacheKey("Shortcuts", "get", {
+                "cacheVersion": SHORTCUT_CACHE_VERSION
+            }));
         };
     }
     

@@ -1,30 +1,21 @@
 Evme.ShortcutsCustomize = new function() {
     var _name = 'ShortcutsCustomize', _this = this,
-        $el = null, $title = null, $subTitle = null, $list = null, $buttonDone = null,
-        scroll = null, numSelectedStartedWith = 0, numSuggestedStartedWith = 0, clicked = null, moved = null,
-        
-        title = 'FROM CONFIG',
-        titleCustomize = 'FROM CONFIG',
-        subTitle = 'FROM CONFIG',
-        buttonDone = 'FROM CONFIG',
-        buttonDoneSaving = 'FROM CONFIG';
+        $list = null,
+        numSelectedStartedWith = 0, numSuggestedStartedWith = 0;
         
     this.init = function(options) {
         $parent = options.$parent;
         
         $list = $('<select multiple="multiple" id="shortcuts-select"></select>');
         $list.bind('change', done);
-        
-        $el = $('<div></div>');
+        $list.bind('blur', onHide);
         
         $parent.append($list);
-        $parent.append($el);
         
         Evme.EventHandler.trigger(_name, 'init');
     };
     
     this.show = function() {
-        $el.addClass('visible');
         $list.focus();
         
         Evme.EventHandler.trigger(_name, 'show', {
@@ -34,9 +25,7 @@ Evme.ShortcutsCustomize = new function() {
     };
     
     this.hide = function() {
-        $el.removeClass('visible');
-        
-        Evme.EventHandler.trigger(_name, 'hide');
+        $list.blur();
     };
     
     this.get = function() {
@@ -83,19 +72,28 @@ Evme.ShortcutsCustomize = new function() {
     
     this.Loading = new function() {
         var _this = this,
+            active = false,
             ID = 'shortcuts-customize-loading';
         
         this.show = function() {
-            _this.hide();
+            if (active) return;
             
             var $el = $('<div id="' + ID + '"></div>');
             $('#' + Evme.Utils.getID()).append($el);
+            active = true;
         };
         
         this.hide = function() {
+            if (!active) return;
+            
             $('#' + ID).remove();
+            active = false;
         };
     };
+    
+    function onHide() {
+        Evme.EventHandler.trigger(_name, 'hide');
+    }
     
     function done() {
         var shortcuts = _this.get();
