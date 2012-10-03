@@ -918,7 +918,7 @@ Evme.Brain = new function() {
         };
 
         this.handleCustomizeClick = function() {
-            Evme.ShortcutsCustomize.show(false);
+            Brain.ShortcutsCustomize.showUI();
         };
 
         this.click = function(data) {
@@ -985,7 +985,7 @@ Evme.Brain = new function() {
                 Evme.ShortcutsCustomize.add(data.data);
             }
         };
-
+        
         this.load = function(data) {
             _this.loaded = true;
         };
@@ -999,73 +999,81 @@ Evme.Brain = new function() {
 
     this.ShortcutsCustomize = new function() {
         var _this = this,
+            isRequesting = false,
             isFirstShow = true;
-
+        
         this.init = function() {
 
         };
-
+        
         this.show = function() {
-            if (isFirstShow) {
-                isFirstShow = false;
-
-                // load user/default shortcuts from API
-                Brain.Shortcuts.loadFromAPI(function(userShortcuts) {
-                    var shortcutsToFavorite = {};
-
-                    for (var i=0; i<userShortcuts.length; i++) {
-                        shortcutsToFavorite[userShortcuts[i].getQuery()] = true;
-                    }
-
-                    Evme.ShortcutsCustomize.load(shortcutsToFavorite);
-
-                    // load suggested shortcuts from API
-                    Evme.DoATAPI.Shortcuts.suggest({}, function(data) {
-                        var suggestedShortcuts = data.response.shortcuts;
-
-                        shortcutsToFavorite = {};
-
-                        for (var i=0; i<suggestedShortcuts.length; i++) {
-                            if (!shortcutsToFavorite[suggestedShortcuts[i].query]) {
-                                shortcutsToFavorite[suggestedShortcuts[i].query] = false;
-                            }
-                        }
-
-                        Evme.ShortcutsCustomize.add(shortcutsToFavorite);
-                    });
-                });
-            }
         };
-
+        
         this.hide = function() {
         };
-
+        
         this.done = function(data) {
             Evme.Shortcuts.show();
             Evme.ShortcutsCustomize.hide();
-
+            Evme.ShortcutsCustomize.Loading.show();
+            
             Evme.DoATAPI.Shortcuts.set({
                 "shortcuts": JSON.stringify(data.shortcuts)
             }, function(data){
                 Brain.Shortcuts.loadFromAPI(function(){
                     _this.addCustomizeButton();
+                    Evme.ShortcutsCustomize.Loading.hide();
                 }, true);
             });
         };
-
-
+        
+        this.showUI = function() {
+            if (isFirstShow) {
+                if (isRequesting) return;
+                
+                isRequesting = true;
+                
+                Evme.ShortcutsCustomize.Loading.show();
+                
+                // load user/default shortcuts from API
+                Brain.Shortcuts.loadFromAPI(function(userShortcuts) {
+                    var shortcutsToFavorite = {};
+                    
+                    for (var i=0; i<userShortcuts.length; i++) {
+                        shortcutsToFavorite[userShortcuts[i].getQuery().toLowerCase()] = true;
+                    }
+                    
+                    // load suggested shortcuts from API
+                    Evme.DoATAPI.Shortcuts.suggest({}, function(data) {
+                        var suggestedShortcuts = data.response.shortcuts;
+                        
+                        for (var i=0; i<suggestedShortcuts.length; i++) {
+                            var query = suggestedShortcuts[i].query.toLowerCase();
+                            
+                            if (!shortcutsToFavorite[query]) {
+                                shortcutsToFavorite[query] = false;
+                            }
+                        }
+                        
+                        Evme.ShortcutsCustomize.load(shortcutsToFavorite);
+                        isFirstShow = false;
+                        Brain.ShortcutsCustomize.showUI();
+                        isRequesting = false;
+                    });
+                });
+            } else {
+                Evme.ShortcutsCustomize.show();
+                Evme.ShortcutsCustomize.Loading.hide();
+            }
+        };
+        
         this.addCustomizeButton = function() {
             var $el = Evme.Shortcuts.getElement(),
                 $elCustomize = $('<li class="shortcut add"><div class="c"><span class="thumb"></span><b>More</b></div></li>');
-
+            
+            $elCustomize.bind("click", _this.showUI);
+            
             $el.find(".shortcut.add").remove();
-
-            $elCustomize.bind("click", function(){
-                //if (!EvmePageMoved) {
-                    Evme.ShortcutsCustomize.show(false);    
-                //}
-            });
-
             $el.append($elCustomize);
         };
     };
