@@ -14,6 +14,7 @@ const GridManager = (function() {
   var opacityOnAppGridPageMax = .7;
   var kPageTransitionDuration = .3;
   var landingOverlay = document.querySelector('#landing-overlay');
+  var searchOverlay = document.querySelector('#search-overlay');
 
   var pages = [];
   var currentPage = 1;
@@ -160,17 +161,29 @@ const GridManager = (function() {
     }
   }
 
-  function setOverlayPanning(index, deltaX, backward, duration) {
-    if (index === 1 && !backward) {
-      applyEffectOverlay(landingOverlay,
-                         (deltaX / windowWidth) * -opacityOnAppGridPageMax,
-                         duration);
-    } else if (index === 2 && backward) {
-      applyEffectOverlay(landingOverlay, opacityOnAppGridPageMax -
-                         ((deltaX / windowWidth) * opacityOnAppGridPageMax),
-                         duration);
+    function setOverlayPanning(index, deltaX, backward, duration) {
+      if (index > 2) {
+        return;
+      }
+
+      if (!backward) {
+        if (index === 0) {
+          applyEffectOverlay(searchOverlay, 1 - (-deltaX / windowWidth));
+        } else if (index === 1) {
+          applyEffectOverlay(landingOverlay,
+            (deltaX / windowWidth) * -opacityOnAppGridPageMax,
+            duration);
+          }
+        } else {
+          if (index === 1) {
+            applyEffectOverlay(searchOverlay, deltaX / windowWidth);
+          } else if (index === 2) {
+            applyEffectOverlay(landingOverlay, opacityOnAppGridPageMax -
+              ((deltaX / windowWidth) * opacityOnAppGridPageMax),
+              duration);
+          }
+        }
     }
-  }
 
   function applyEffectOverlay(overlay, value, duration) {
     if (duration) {
