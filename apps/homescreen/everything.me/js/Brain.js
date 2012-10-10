@@ -1,7 +1,10 @@
 Evme.Brain = new function() {
-    var _this = Brain = this,
+    var _this = this,
+        Brain = this,
         _config = {},
         logger = null,
+        $body = null,
+        $container = null,
         QUERIES_TO_NOT_CACHE = "",
         DEFAULT_NUMBER_OF_APPS_TO_LOAD = 16,
         NUMBER_OF_APPS_TO_LOAD = DEFAULT_NUMBER_OF_APPS_TO_LOAD,
@@ -83,7 +86,7 @@ Evme.Brain = new function() {
 
         this.focus = function(data) {
             Evme.Utils.setKeyboardVisibility(true);
-
+            
             if (!Evme.Screens.Search.active()) {
                 if (data && data.e && data.e.type === "touchstart"){
                     data.e.preventDefault();
@@ -114,14 +117,15 @@ Evme.Brain = new function() {
         this.blur = function(data) {
             // Gaia bug workaround because of this http://b2g.everything.me/tests/input-blur.html
             data && data.stopPropagation && data.stopPropagation();
-
+            
             if (Brain.Dialog.isActive()) {
                 return;
             }
-
+            
             window.setTimeout(_this.hideKeyboardTip, 500);
-
+            
             Evme.Utils.setKeyboardVisibility(false);
+            _this.setEmptyClass();
             Evme.Location.showButton();
             Evme.Apps.refreshScroll();
 
@@ -1112,7 +1116,7 @@ Evme.Brain = new function() {
             !options && (options = {});
 
             if (activeTip) {
-                return;
+                return null;
             }
 
             var onHelper = false;
@@ -1188,14 +1192,14 @@ Evme.Brain = new function() {
             hasMoreApps = false,
             iconsCachedFromLastRequest = [],
             autocompleteCache = {},
-            timeoutShowExactTip = null;
+            timeoutShowExactTip = null,
 
             requestSearch = null,
             requestImage = null,
             requestIcons = null,
             requestAutocomplete = null,
 
-            timeoutShowDefaultImage = null
+            timeoutShowDefaultImage = null,
             timeoutHideHelper = null,
             timeoutSearchImageWhileTyping = null,
             timeoutSearch = null,

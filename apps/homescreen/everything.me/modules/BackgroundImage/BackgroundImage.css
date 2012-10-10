@@ -25,13 +25,8 @@
     }
     #search-overlay .img {
         -moz-transition: opacity .3s linear;
-        -webkit-transition: opacity .3s linear;
-        -ms-transition: opacity .3s linear;
-        -o-transition: opacity .3s linear;
         transition: opacity .3s linear;
-        -webkit-transform: translate3d(0px, 0px, 0px) rotate(0deg) scale(1);
-        -webkit-box-sizing: border-box;
-        -webkit-backface-visibility: hidden;
+        -moz-transform: translate3d(0px, 0px, 0px) rotate(0deg) scale(1);
     }
     #search-overlay .img.visible {
         opacity: 0.4;
@@ -45,9 +40,6 @@
     bottom: 0;
     opacity: 0;
     -moz-transition: opacity .5s linear;
-    -webkit-transition: opacity .5s linear;
-    -ms-transition: opacity .5s linear;
-    -o-transition: opacity .5s linear;
     transition: opacity .5s linear;
     z-index: 1;
 }
@@ -79,7 +71,6 @@
         text-shadow: 0 1px 3px #000, 0 1px 1px #000;
         background: #1a1a1a;
         background: -moz-linear-gradient(center top, #3b3b3b 0%, #030303 100%);
-        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #3b3b3b), color-stop(100%, #030303));
     }
         #bgimage-overlay .content .image-title {
             font-weight: 600;
@@ -91,7 +82,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            -ms-text-overflow: ellipsis;
         }
         #bgimage-overlay.nosource .content .image-title {
             margin-top: 0;

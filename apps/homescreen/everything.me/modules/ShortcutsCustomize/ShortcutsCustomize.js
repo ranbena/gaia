@@ -1,11 +1,12 @@
 Evme.ShortcutsCustomize = new function() {
     var _name = "ShortcutsCustomize", _this = this,
-        $el = null, $title = null, $subTitle = null, $list = null, $buttonDone = null,
+        $el = null, $parent = null, $title = null, $subTitle = null, $list = null, $buttonDone = null,
         scroll = null, numSelectedStartedWith = 0, numSuggestedStartedWith = 0, clicked = null, moved = null,
         
         title = "FROM CONFIG",
         titleCustomize = "FROM CONFIG",
         subTitle = "FROM CONFIG",
+        subTitleCustomize = "FROM CONFIG",
         buttonDone = "FROM CONFIG",
         buttonDoneSaving = "FROM CONFIG";
         
