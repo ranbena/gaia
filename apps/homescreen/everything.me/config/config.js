@@ -53,6 +53,7 @@ Evme.__config = {
         "SHORTCUT": "shrt",
         "SHORTCUT_ENTITY": "enty",
         "SHORTCUT_CONTINUE_BUTTON": "shrb",
+        "SHORTCUT_SMART_FOLDER": "fldr",
         "RETURN_KEY": "rtrn",
         "SUGGESTION": "sugg",
         "SPELLING": "spel",

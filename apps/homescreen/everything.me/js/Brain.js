@@ -7,6 +7,7 @@ Evme.Brain = new function() {
         $container = null,
         QUERIES_TO_NOT_CACHE = "",
         DEFAULT_NUMBER_OF_APPS_TO_LOAD = 16,
+        NUMBER_OF_APPS_TO_LOAD_IN_FOLDER = 15,
         NUMBER_OF_APPS_TO_LOAD = DEFAULT_NUMBER_OF_APPS_TO_LOAD,
         TIME_BEFORE_INVOKING_HASH_CHANGE = 200,
         TIMEOUT_BEFORE_ALLOWING_DIALOG_REMOVE = "FROM CONFIG",
@@ -31,7 +32,7 @@ Evme.Brain = new function() {
 
         timeoutSetUrlAsActive = null,
         timeoutHashChange = null,
-        _ = navigator.mozL10n.get;;
+        _ = navigator.mozL10n.get;
 
     this.init = function(options) {
         Evme.EventHandler && Evme.EventHandler.bind(catchCallback);
@@ -650,7 +651,7 @@ Evme.Brain = new function() {
                 if (!Searcher.searchedExact()) {
                     Evme.Storage.set(STORAGE_KEY_CLOSE_WHEN_RETURNING, true);
 
-                    Evme.Searchbar.setValue(Searcher.getDisplayedQuery(), false, true);
+                    Evme.Searchbar.setValue(data.data.installed? data.data.name : Searcher.getDisplayedQuery(), false, true);
 
                     Evme.Searchbar.blur();
                     Brain.Searchbar.cancelBlur();
@@ -685,7 +686,8 @@ Evme.Brain = new function() {
                 "id": data.appId,
                 "query": Searcher.getDisplayedQuery(),
                 "source": Searcher.getDisplayedSource(),
-                "icon": data.data.icon
+                "icon": data.data.icon,
+                "installed": data.data.installed
             };
 
             loadingApp = data.app;
@@ -768,17 +770,21 @@ Evme.Brain = new function() {
 
         this.appRedirectExecute = function(data){
             var appIcon = Evme.Utils.formatImageData(data.icon);
-
-            Evme.Utils.getRoundIcon(appIcon, 58, 2, function(appIcon) {
-                // bookmark in ffos
-                Evme.Utils.sendToFFOS(Evme.Utils.FFOSMessages.APP_CLICK, {
-                    "url": data.appUrl,
-                    "originUrl": data.favUrl,
-                    "title": data.name,
-                    "icon": appIcon,
-                    "urlTitle": Evme.Searchbar.getValue()
+            
+            if (data.installed) {
+                Applications.launch(data.appUrl, '');
+            } else {
+                Evme.Utils.getRoundIcon(appIcon, 58, 2, function(appIcon) {
+                    // bookmark in ffos
+                    Evme.Utils.sendToFFOS(Evme.Utils.FFOSMessages.APP_CLICK, {
+                        "url": data.appUrl,
+                        "originUrl": data.favUrl,
+                        "title": data.name,
+                        "icon": appIcon,
+                        "urlTitle": Evme.Searchbar.getValue()
+                    });
                 });
-            });
+            }
 
             setTimeout(returnFromOutside, 2000);
         };
@@ -931,26 +937,114 @@ Evme.Brain = new function() {
             }
 
             if (!Evme.Shortcuts.customizing() && !Evme.Shortcuts.isSwiping()) {
-                var query = data.data.query,
-                    tips = Evme.__config.categoriesDialogs;
+                var query = data.data.query;
 
                 data.query = query;
 
                 Evme.EventHandler.trigger("Shortcut", "click", data);
-
-                if (tips[query] && !data.force) {
-                    tips[query].query = query;
-                    Evme.Shortcuts.showPage(tips[query]);
-
-                    if ($("#category-options li").length == 1) {
-                        $("#page-category").addClass("one-option");
-                    } else {
-                        $("#page-category").removeClass("one-option");
-                    }
-                } else {
-                    searchShortcut(data);
-                }
+                
+                _this.showSmartFolder({
+                    "query": data.query
+                });   
             }
+        };
+        
+        
+        function folderLoadMore(folder) {
+            try {
+             
+            folder.appsPaging.offset += folder.appsPaging.limit;
+            if (folder.appsPaging.offset >= folder.appsPaging.max) {
+                return;
+            }
+            
+            folder.MoreIndicator.show();
+            
+            var iconsFormat = Evme.Utils.getIconsFormat();
+                
+            Evme.DoATAPI.search({
+                "query": folder.getName(),
+                "feature": SEARCH_SOURCES.SHORTCUT_SMART_FOLDER,
+                "exact": true,
+                "spellcheck": false,
+                "suggest": false,
+                "limit": folder.appsPaging.limit,
+                "first": folder.appsPaging.offset,
+                "iconFormat": iconsFormat
+            }, function(data) {
+                var apps = data.response.apps;
+                
+                folder.MoreIndicator.hide();
+                folder.loadApps({
+                    "apps": apps,
+                    "iconsFormat": iconsFormat,
+                    "offset": folder.appsPaging.offset
+                });
+            });
+               
+            } catch(ex) {
+                alert(ex.message);
+            }
+        }
+        
+        this.showSmartFolder = function(options) {
+            var folder = new Evme.SmartFolder({
+                            "name": options.query,
+                            "parent": $container,
+                            "onScrollEnd": folderLoadMore
+                        });
+            
+            folder.show();
+            
+            Evme.DoATAPI.bgimage({
+                "query": options.query,
+                "feature": SEARCH_SOURCES.SHORTCUT_SMART_FOLDER,
+                "exact": true,
+                "width": screen.width,
+                "height": screen.height
+            }, function(data) {
+                folder.setImage({
+                    "image": Evme.Utils.formatImageData(data.response.image),
+                    "query": options.query,
+                    "source": data.response.source
+                });
+            });
+            
+            var iconsFormat = Evme.Utils.getIconsFormat();
+                
+            folder.appsPaging = {
+                "offset": 0,
+                "limit": NUMBER_OF_APPS_TO_LOAD_IN_FOLDER
+            };
+            
+            if (options.limit) {
+                folder.appsPaging.limit += options.limit*1;
+            }
+            
+            Evme.DoATAPI.search({
+                "query": options.query,
+                "feature": SEARCH_SOURCES.SHORTCUT_SMART_FOLDER,
+                "exact": true,
+                "spellcheck": false,
+                "suggest": false,
+                "limit": folder.appsPaging.limit,
+                "first": folder.appsPaging.offset,
+                "iconFormat": iconsFormat
+            }, function(data) {
+                var apps = data.response.apps;
+                
+                if (options.limit) {
+                    folder.appsPaging.offset = folder.appsPaging.limit;
+                }
+                folder.appsPaging.limit = NUMBER_OF_APPS_TO_LOAD_IN_FOLDER;
+                folder.appsPaging.max = data.response.paging.max;
+                
+                folder.loadApps({
+                    "apps": apps,
+                    "iconsFormat": iconsFormat,
+                    "offset": folder.appsPaging.offset
+                });
+            });
         };
 
         function searchShortcut(data) {
@@ -1283,7 +1377,12 @@ Evme.Brain = new function() {
             }
 
             cancelSearch();
-
+            
+            var installedApps = getInstalledApps({
+                "query": Evme.Searchbar.getValue(),
+                "type": type
+            });
+            
             requestSearch = Evme.DoATAPI.search({
                 "query": query,
                 "typeHint": type,
@@ -1292,21 +1391,60 @@ Evme.Brain = new function() {
                 "exact": exact,
                 "spellcheck": getSpelling,
                 "suggest": !onlyDidYouMean,
-                "limit": NUMBER_OF_APPS_TO_LOAD,
+                "limit": NUMBER_OF_APPS_TO_LOAD - installedApps.length,
                 "first": appsCurrentOffset,
                 "cachedIcons": Evme.Utils.convertIconsToAPIFormat(iconsCachedFromLastRequest),
                 "iconFormat": iconsFormat,
                 "prevQuery": prevQuery,
                 "_NOCACHE": _NOCACHE
             }, function(data) {
-                getAppsComplete(data, options);
-
+                getAppsComplete(data, options, installedApps);
                 requestSearch = null;
                 NUMBER_OF_APPS_TO_LOAD = DEFAULT_NUMBER_OF_APPS_TO_LOAD;
             }, removeSession);
-        };
 
-        function getAppsComplete(data, options) {
+        };
+        
+        function getInstalledApps(options, cb) {
+            var MAX_INSTALLED_APPS_TO_SHOW = 4;
+            
+            var query = options.query,
+                type = options.type,
+                regex = new RegExp('(' + query + ')', 'i'),
+                apps = [],
+                _apps = Applications.getAll();
+                
+            for (var i=0; i<_apps.length; i++) {
+                var app = _apps[i],
+                    manifest = app.manifest,
+                    name = manifest.name;
+                
+                if (regex.test(name)) {
+                    apps.push({
+                       'installed': true,
+                       'appUrl': app.origin,
+                       'preferences': '',
+                       'icon': manifest._icon,
+                       'requiresLocation': false,
+                       'appNativeUrl': '',
+                       'numShares': 0,
+                       'hasAppStore': false,
+                       'id': app._id,
+                       'name': manifest.name
+                    });
+                
+                    if (apps.length >= MAX_INSTALLED_APPS_TO_SHOW) {
+                       break;
+                    }
+                }
+            }
+            
+            return apps;
+            
+            Evme.Apps.loadInstalled(apps, cb);
+        }
+
+        function getAppsComplete(data, options, installedApps) {
             var _query = options.query,
                 _type = options.type,
                 _source = options.source,
@@ -1315,7 +1453,8 @@ Evme.Brain = new function() {
                 isExactMatch = options.exact,
                 iconsFormat = options.iconsFormat,
                 queryTyped = options.queryTyped, // used for searching for exact results if user stopped typing for X seconds
-                onlyDidYouMean = options.onlyDidYouMean;
+                onlyDidYouMean = options.onlyDidYouMean,
+                installedApps = installedApps || [];
 
             if (data.errorCode !== Evme.DoATAPI.ERROR_CODES.SUCCESS) {
                 return false;
@@ -1334,6 +1473,8 @@ Evme.Brain = new function() {
             var isMore = (appsCurrentOffset > 0);
             var bSameQuery = (lastSearch.query === query);
             var tipShownOnHelper = false;
+            
+            apps = installedApps.concat(apps);
 
             // searching after a timeout while user it typing
             if (onlyDidYouMean || options.automaticSearch) {

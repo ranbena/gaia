@@ -98,7 +98,7 @@ Evme.Apps = new function() {
     this.getAppTapAndHoldTime = function() {
         return TIMEOUT_BEFORE_REPORTING_APP_HOLD;
     };
-
+    
     this.load = function(apps, appOffset, iconsFormat) {
         var isMore = appOffset > 0;
         
@@ -129,6 +129,7 @@ Evme.Apps = new function() {
         defaultIconToUse = 0;
         numberOfApps = 0;
         $list[0].innerHTML = "";
+        $list.removeClass("has-installed");
         _this.More.hide();
         _this.More.hideButton();
         scroll.scrollTo(0, 0);
@@ -311,71 +312,37 @@ Evme.Apps = new function() {
         }
     }
     
-    function drawApps(apps, isMore, iconsFormat) {
-        var iconsResult = {
-            "cached": [],
-            "missing": []
-        };
-        var doLater = [];
-        
-        window.clearTimeout(timeoutAppsToDrawLater);
-        
+    function drawApps(apps, isMore, iconsFormat, cb) {
         var numOfApps = 0; for (var i in appsArray){ numOfApps++; }
         
+        numberOfApps += apps.length;
         for (var i=0; i<apps.length; i++) {
-            var app = new Evme.App(apps[i], numOfApps+i, isMore, _this);
-            var id = apps[i].id;
-            var icon = app.getIcon();
-            
-            icon = Evme.IconManager.parse(id, icon, iconsFormat);
-            app.setIcon(icon);
-            
-            if (Evme.Utils.isKeyboardVisible() && (isMore || i<Math.max(apps.length/2, 8))) {
-                var $app = app.draw();
-                $list.append($app);
-            } else {
-                doLater.push(app);
-            }
-            
-            if (app.missingIcon()) {
-                if (!icon) {
-                    icon = id;
-                }
-                iconsResult["missing"].push(icon);
-            } else {
-                iconsResult["cached"].push(icon);
-            }
-
-            appsArray[id] = app;
             appsDataArray.push(apps[i]);
-            numberOfApps++;
         }
         
-        if (doLater.length > 0) {
-            timeoutAppsToDrawLater = window.setTimeout(function(){
-                for (var i=0; i<doLater.length; i++) {
-                    var $app = doLater[i].draw();
-                    $list.append($app);
+        var iconsResult = Evme.Utils.Apps.print({
+            "apps": apps,
+            "numAppsOffset": numOfApps,
+            "isMore": isMore,
+            "iconsFormat": iconsFormat,
+            "$list": $list,
+            "onDone": function(group, appsList) {
+                _this.setAppsClasses();
+                
+                if (group > 1 || !isMore) {
+                    _this.refreshScroll();
                 }
                 
-                _this.setAppsClasses();
-                _this.refreshScroll();
-                
-                window.setTimeout(function(){
-                    $list.find(".new").removeClass("new");
-                }, 10);
-            }, TIMEOUT_BEFORE_DRAWING_REST_OF_APPS);
-        }
+                if (appsList) {
+                    for (var i=0; i<appsList.length; i++) {
+                        appsArray[appsList[i].getId()] = appsList[i];
+                    }
+                    
+                    cb && cb();
+                }
+            }
+        });
         
-        _this.setAppsClasses();
-        
-        window.setTimeout(function(){
-            $list.find(".new").removeClass("new");
-        }, 10);
-        
-        if (!isMore) {
-            _this.refreshScroll();
-        }
         return iconsResult;
     }
     
@@ -733,6 +700,10 @@ Evme.App = function(__cfg, __index, __isMore, parent) {
         $el = $('<li class="new" id="app_' + cfg.id + '"></li>');
         _this.update();
         
+        if (cfg.installed) {
+            $el.addClass("installed");
+        }
+        
         $el.bind("touchstart", touchstart)
            .bind("touchmove", touchmove)
            .bind("touchend", touchend);
@@ -778,6 +749,10 @@ Evme.App = function(__cfg, __index, __isMore, parent) {
 
     this.getElement = function() {
         return $el;
+    };
+    
+    this.getId = function() {
+        return cfg.id;
     };
     
     this.getLink = function() {

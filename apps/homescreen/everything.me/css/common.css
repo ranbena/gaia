@@ -138,7 +138,8 @@
 .shortcut.add .thumb:before,
 #shortcuts-favorites li.on:before,
 #close-category,
-.keyboard-visible .clear-visible #button-clear
+.keyboard-visible .clear-visible #button-clear,
+#evmeContainer .smart-folder .close
 {
     background-image: url('/everything.me/images/sprite.png');
     background-repeat: no-repeat;

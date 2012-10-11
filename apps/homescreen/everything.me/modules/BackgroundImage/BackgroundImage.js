@@ -96,30 +96,7 @@ Evme.BackgroundImage = new function() {
         window.setTimeout(function(){
             $fullScreenFade.css("opacity", 0);
         }, 0);
-        $elFullScreen = $('<div id="bgimage-overlay">' +
-                                '<div class="img" style="background-image: url(' + currentImage.image + ')"></div>' +
-                                '<div class="content">' +
-                                    ((currentImage.query)? '<div class="image-title">' + currentImage.query + '</div>' : '') +
-                                    ((currentImage.source)? '<div class="image-source">' + SOURCE_LABEL + ' <span>' + currentImage.source + '</span></div>' : '') +
-                                    '<b class="close"></b>' +
-                                '</div>' +
-                            '</div>');
-
-        $elFullScreen.find(".close, .img").bind("touchstart", function(e){
-            e.preventDefault();
-            e.stopPropagation();
-            _this.closeFullScreen();
-        });
-
-        if (currentImage.source) {
-            $elFullScreen.find(".content").bind("touchstart", function(e){
-                Evme.Utils.sendToFFOS(Evme.Utils.FFOSMessages.OPEN_URL, {
-                    "url": currentImage.source
-                });
-            });
-        } else {
-            $elFullScreen.addClass("nosource");
-        }
+        $elFullScreen = _this.getFullscreenElement(currentImage, _this.closeFullScreen);
 
         $el.parent().append($elFullScreen);
 
@@ -130,6 +107,35 @@ Evme.BackgroundImage = new function() {
         active = true;
 
         cbShowFullScreen();
+    };
+    
+    this.getFullscreenElement = function(data, onClose) {
+        !data && (data = currentImage);
+        
+        var $el = $('<div id="bgimage-overlay">' +
+                        '<div class="img" style="background-image: url(' + data.image + ')"></div>' +
+                        '<div class="content">' +
+                            ((data.query)? '<h2>' + data.query + '</h2>' : '') +
+                            ((data.source)? '<div class="source">' + SOURCE_LABEL + ' <span>' + data.source + '</span></div>' : '') +
+                            '<b class="close"></b>' +
+                        '</div>' +
+                    '</div>');
+                    
+        $el.find(".close, .img").bind("touchstart", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            onClose && onClose();
+        });
+        
+        if (data.source) {
+            $el.find(".content").bind("touchstart", function(e){
+                window.location.href = data.source;
+            });
+        } else {
+            $el.addClass("nosource");
+        }
+        
+        return $el;
     };
 
     this.closeFullScreen = function(e) {

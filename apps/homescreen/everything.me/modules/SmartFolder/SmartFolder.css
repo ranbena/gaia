@@ -1,0 +1,196 @@
+#evmeContainer .smart-folder {
+    position: absolute;
+    top: 20px;
+    left: 25px;
+    right: 25px;
+    bottom: 20px;
+    z-index: 600;
+    
+    padding: 20px 25px 0 25px;
+    color: #fff;
+    border-radius: 10px;
+    
+    background: #000;
+    box-shadow: 0 5px 15px 0 rgba(0, 0, 0, .5);
+    
+    opacity: 0;
+    
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    
+    -moz-transform: scale(.97);
+    transform: scale(.97);
+    -moz-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+    -moz-transition: all .15s ease-in;
+    transition: all .15s ease-in;
+}
+#evmeContainer .smart-folder.maxheight {
+    bottom: auto;
+    top: 50%;
+}
+#evmeContainer .smart-folder.visible {
+    opacity: 1;
+    -moz-transform: scale(1);
+    transform: scale(1);
+}
+#evmeContainer .smart-folder-screen {
+    -moz-transition: opacity .4s ease-out;
+    transition: opacity .4s ease-out;
+    opacity: 0;
+    background: rgba(0, 0, 0, .3);
+}
+#evmeContainer .smart-folder-screen.visible {
+    opacity: 1;
+}
+    #evmeContainer .smart-folder.animate h2,
+    #evmeContainer .smart-folder.animate .close,
+    #evmeContainer .smart-folder.animate .apps
+    {
+        -moz-transition: opacity .4s ease;
+        transition: opacity .4s ease;
+    }
+    #evmeContainer .smart-folder h2 {
+        position: relative;
+        font-size: 17px;
+        font-weight: normal;
+        height: 30px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellisis;
+        text-transform: capitalize;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, .3);
+        z-index: 50;
+    }
+        #evmeContainer .smart-folder h2 span {
+            color: #b4dae7;
+        }
+    
+    #evmeContainer .smart-folder .image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10;
+        border-radius: 11px;
+        background-position: 50% 0;
+        background-size: cover;
+    }
+    #evmeContainer .smart-folder .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 20;
+        border-radius: 11px;
+        background: rgba(0, 0, 0, .55);
+    }
+    #evmeContainer .smart-folder .close {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 29px;
+        height: 31px;
+        cursor: pointer;
+        z-index: 100;
+        background-position: 0 -220px;
+    }
+    #evmeContainer .smart-folder .apps {
+        position: absolute;
+        top: 55px;
+        left: 25px;
+        right: 25px;
+        bottom: 0;
+        z-index: 50;
+        width: auto;
+        height: auto;
+    }
+        #evmeContainer .smart-folder .apps ul {
+            padding-bottom: 25px;
+        }
+        #evmeContainer .smart-folder .apps ul.loading-more {
+            padding-bottom: 65px;
+        }
+        #evmeContainer .smart-folder .apps li {
+            position: static;
+            display: inline-block;
+            vertical-align: top;
+            width: 33%;
+        }
+    
+    #evmeContainer .smart-folder #bgimage-overlay {
+        z-index: 50;
+        pointer-events: none;
+        border-radius: 11px;
+        overflow: hidden;
+    }
+        #evmeContainer .smart-folder #bgimage-overlay .img {
+            border-radius: 11px;
+        }
+        #evmeContainer .smart-folder #bgimage-overlay .content {
+        }
+        
+        
+#evmeContainer .smart-folder .apps .loadmore {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0;
+    margin: 10px 0 0 0;
+    z-index: 50;
+    cursor: default;
+    box-shadow: 0 -1px 0 0 rgba(255, 255, 255, .4), 0 -2px 0 0 rgba(0, 0, 0, .4);
+    -moz-transition: none;
+    transition: none;
+    display: none;
+}
+#evmeContainer .smart-folder .loading-more .loadmore {
+    display: block;
+}
+    #evmeContainer .smart-folder .apps .loadmore span {
+        position: relative;
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        vertical-align: middle;
+        margin-right: 3px;
+        top: -2px;
+    }
+    
+#evmeContainer .smart-folder.full-image {
+    
+}
+    #evmeContainer .smart-folder.full-image h2,
+    #evmeContainer .smart-folder.full-image .apps,
+    #evmeContainer .smart-folder.full-image .image-overlay {
+        pointer-events: none;
+    }
+    #evmeContainer .smart-folder.full-image #bgimage-overlay {
+        opacity: 1;
+        pointer-events: inherit;
+    }
+
+#evmeContainer.loading-app .smart-folder h2,
+#evmeContainer.loading-app .smart-folder .close,
+#evmeContainer.loading-app .smart-folder .apps li,
+#evmeContainer.loading-app.empty-query:not(.keyboard-visible) #shortcuts
+{
+    opacity: 0;
+    pointer-events: none;
+}
+#evmeContainer.loading-app .smart-folder .apps {
+    pointer-events: none;
+}
+#evmeContainer.loading-app .smart-folder .apps li#loading-app {
+    opacity: 1;
+}

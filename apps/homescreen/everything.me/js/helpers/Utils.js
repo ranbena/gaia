@@ -193,6 +193,90 @@ Evme.Utils = new function() {
 
         return true;
     };
+    
+    this.Apps = new function() {
+        var _this = this,
+            timeoutAppsToDrawLater = null;
+            
+        var TIMEOUT_BEFORE_DRAWING_REST_OF_APPS = 100;
+        
+        this.print = function(options) {
+            var apps = options.apps,
+                numAppsOffset = options.numAppsOffset || 0,
+                isMore = options.isMore,
+                iconsFormat = options.iconsFormat,
+                $list = options.$list,
+                onDone = options.onDone,
+                hasInstalled = false,
+                
+                appsList = {},
+                iconsResult = {
+                    "cached": [],
+                    "missing": []
+                },
+                doLater = [];
+            
+            window.clearTimeout(timeoutAppsToDrawLater);
+            
+            for (var i=0; i<apps.length; i++) {
+                var app = new Evme.App(apps[i], numAppsOffset+i, isMore, _this);
+                var id = apps[i].id;
+                var icon = app.getIcon();
+                
+                icon = Evme.IconManager.parse(id, icon, iconsFormat);
+                app.setIcon(icon);
+                
+                if (Evme.Utils.isKeyboardVisible() && (isMore || i<Math.max(apps.length/2, 8))) {
+                    var $app = app.draw();
+                    $list.append($app);
+                } else {
+                    doLater.push(app);
+                }
+                
+                if (app.missingIcon()) {
+                    if (!icon) {
+                        icon = id;
+                    }
+                    iconsResult["missing"].push(icon);
+                } else {
+                    iconsResult["cached"].push(icon);
+                }
+                
+                appsList[id] = appsList;
+                
+                if (apps[i].installed) {
+                    hasInstalled = true;
+                }
+            }
+            
+            if (doLater.length > 0) {
+                timeoutAppsToDrawLater = window.setTimeout(function(){
+                    for (var i=0; i<doLater.length; i++) {
+                        var $app = doLater[i].draw();
+                        $list.append($app);
+                    }
+                    
+                    window.setTimeout(function(){
+                        $list.find(".new").removeClass("new");
+                    }, 10);
+                    
+                    onDone && onDone(2);
+                }, TIMEOUT_BEFORE_DRAWING_REST_OF_APPS);
+            }
+            
+            window.setTimeout(function(){
+                $list.find(".new").removeClass("new");
+            }, 10);
+            
+            if (hasInstalled) {
+                $list.addClass("has-installed");
+            }
+            
+            onDone && onDone(1, appsList);
+            
+            return iconsResult;
+        }
+    };
 
     this.User = new function() {
         this.creds = function() {
