@@ -45,7 +45,7 @@
 }
     #evmeContainer .smart-folder.animate h2,
     #evmeContainer .smart-folder.animate .close,
-    #evmeContainer .smart-folder.animate .apps
+    #evmeContainer .smart-folder.animate .evme-apps
     {
         -moz-transition: opacity .4s ease;
         transition: opacity .4s ease;
@@ -97,7 +97,7 @@
         z-index: 100;
         background-position: 0 -220px;
     }
-    #evmeContainer .smart-folder .apps {
+    #evmeContainer .smart-folder .evme-apps {
         position: absolute;
         top: 55px;
         left: 25px;
@@ -107,13 +107,13 @@
         width: auto;
         height: auto;
     }
-        #evmeContainer .smart-folder .apps ul {
+        #evmeContainer .smart-folder .evme-apps ul {
             padding-bottom: 25px;
         }
-        #evmeContainer .smart-folder .apps ul.loading-more {
+        #evmeContainer .smart-folder .evme-apps ul.loading-more {
             padding-bottom: 65px;
         }
-        #evmeContainer .smart-folder .apps li {
+        #evmeContainer .smart-folder .evme-apps li {
             position: static;
             display: inline-block;
             vertical-align: top;
@@ -133,7 +133,7 @@
         }
         
         
-#evmeContainer .smart-folder .apps .loadmore {
+#evmeContainer .smart-folder .evme-apps .loadmore {
     position: absolute;
     bottom: 10px;
     left: 0;
@@ -157,7 +157,7 @@
 #evmeContainer .smart-folder .loading-more .loadmore {
     display: block;
 }
-    #evmeContainer .smart-folder .apps .loadmore span {
+    #evmeContainer .smart-folder .evme-apps .loadmore span {
         position: relative;
         display: inline-block;
         width: 20px;
@@ -171,7 +171,7 @@
     
 }
     #evmeContainer .smart-folder.full-image h2,
-    #evmeContainer .smart-folder.full-image .apps,
+    #evmeContainer .smart-folder.full-image .evme-apps,
     #evmeContainer .smart-folder.full-image .image-overlay {
         pointer-events: none;
     }
@@ -182,15 +182,15 @@
 
 #evmeContainer.loading-app .smart-folder h2,
 #evmeContainer.loading-app .smart-folder .close,
-#evmeContainer.loading-app .smart-folder .apps li,
+#evmeContainer.loading-app .smart-folder .evme-apps li,
 #evmeContainer.loading-app.empty-query:not(.keyboard-visible) #shortcuts
 {
     opacity: 0;
     pointer-events: none;
 }
-#evmeContainer.loading-app .smart-folder .apps {
+#evmeContainer.loading-app .smart-folder .evme-apps {
     pointer-events: none;
 }
-#evmeContainer.loading-app .smart-folder .apps li#loading-app {
+#evmeContainer.loading-app .smart-folder .evme-apps li#loading-app {
     opacity: 1;
 }

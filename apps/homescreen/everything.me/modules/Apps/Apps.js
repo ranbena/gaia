@@ -19,7 +19,6 @@ Evme.Apps = new function() {
         MIN_WIDTH_FOR_FIVE_APPS = "FROM CONFIG",
         HEIGHT_TO_ADD_INCASE_OF_EXTERNAL_RESULTS = 80,
         ICONS_STYLE_ID = "apps-icons",
-        TIMEOUT_BEFORE_DRAWING_REST_OF_APPS = 100,
         MIN_HEIGHT_FOR_MORE_BUTTON = "FROM CONFIG",
         DEFAULT_ICON_URL = "FROM CONFIG",
         TIMEOUT_BEFORE_REPORTING_APP_HOLD = 800,
@@ -143,6 +142,10 @@ Evme.Apps = new function() {
         var numRows = Math.ceil(numberOfApps/APPS_PER_ROW) + iRowsToAdd;
         var height = numRows * APP_HEIGHT,
             elHeight = $el.height();
+            
+        if ($list.hasClass("has-installed")) {
+            height += APP_HEIGHT;
+        }
         
         $list.css("height", height + "px");
         
@@ -226,16 +229,9 @@ Evme.Apps = new function() {
         setAppsPerRow(width);
         
         var prefix = Evme.Utils.cssPrefix(),
-            rules = "#evmeApps ul li { width: " + 100/APPS_PER_ROW + "%; }\n";
-            /*
-        for (var i=0; i<MAX_APPS_CLASSES; i++) {
-            var posX = i%APPS_PER_ROW*width/APPS_PER_ROW;
-            var posY = Math.floor(i/APPS_PER_ROW)*APP_HEIGHT;
-            rules += '#evmeApps ul li.pos' + i + ' { ' + prefix + 'transform: translate(' + posX + 'px, ' + posY + 'px); }\n';
-        }
-        */
-        
-        var $currStyle = $('<style type="text/css">' + rules + '</style>');
+            rules = "#evmeApps ul li { width: " + 100/APPS_PER_ROW + "%; }\n",
+            $currStyle = $('<style type="text/css">' + rules + '</style>');
+            
         $("head").append($currStyle);
         
         _this.refreshScroll();
@@ -422,8 +418,10 @@ Evme.Apps = new function() {
         this.show = function() {
             if (!$el) {
                 visible = true;
-                var $to = Evme.Apps.getList();
-                $el = $('<li id="' + id + '" style="top: ' + $to.css("height") + '"><span></span>' + TEXT_LOADING + '</li>');
+                var $to = Evme.Apps.getList(),
+                    top = $to.css("height");
+                
+                $el = $('<li id="' + id + '" style="top: ' + top + '"><span></span>' + TEXT_LOADING + '</li>');
                 $to.append($el);
                 loading.spin($el.find("span")[0]);
                 Evme.Apps.refreshScroll(1);

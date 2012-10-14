@@ -1,4 +1,4 @@
-#evmeContainer #evmeApps {
+#evmeContainer .evme-apps {
     position: absolute;
     top: 81px;
     left: 0;
@@ -7,7 +7,7 @@
     z-index: 50;
     overflow: hidden;
 }
-#evmeContainer.loading-app #evmeApps {
+#evmeContainer.loading-app .evme-apps {
     pointer-events: none;
 }
 
@@ -48,15 +48,18 @@
     display: block;
 }
 
-#evmeContainer #evmeApps ul {
+#evmeContainer .evme-apps ul {
     position: absolute;
     width: 100%;
     padding-bottom: 30px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
 }
-#evmeContainer #evmeApps ul.has-installed {
+#evmeContainer .evme-apps ul.has-installed {
     padding-top: 104px;
 }
-#evmeContainer #evmeApps ul.has-installed:before {
+#evmeContainer .evme-apps ul.has-installed:before {
     content: '';
     position: absolute;
     left: 15px;
@@ -65,8 +68,7 @@
     height: 1px;
     box-shadow: 0 -1px 0 0 rgba(255, 255, 255, .3), 0 1px 0 0 rgba(0, 0, 0, .3) inset;
 }
-    #evmeContainer #evmeApps ul li,
-    #evmeContainer .apps ul li {
+    #evmeContainer .evme-apps ul li {
         clear: both;
         width: 25%;
         height: 79px;
@@ -80,29 +82,30 @@
         -moz-transition: -moz-transform .2s linear;
         transition: transform .2s linear;
     }
-    #evmeContainer #evmeApps ul.has-installed li.installed {
+    #evmeContainer .evme-apps ul.has-installed li.installed {
         position: absolute;
         top: 6px;
     }
-    #evmeContainer #evmeApps ul.has-installed li.installed.pos0 {
+    #evmeContainer .evme-apps ul.has-installed li.installed .thumb:after {
+        display: none;
+    }
+    #evmeContainer .evme-apps ul.has-installed li.installed.pos0 {
         left: 0;
     }
-    #evmeContainer #evmeApps ul.has-installed li.installed.pos1 {
+    #evmeContainer .evme-apps ul.has-installed li.installed.pos1 {
         left: 25%;
     }
-    #evmeContainer #evmeApps ul.has-installed li.installed.pos2 {
+    #evmeContainer .evme-apps ul.has-installed li.installed.pos2 {
         left: 50%;
     }
-    #evmeContainer #evmeApps ul.has-installed li.installed.pos3 {
+    #evmeContainer .evme-apps ul.has-installed li.installed.pos3 {
         left: 75%;
     }
-    #evmeContainer #evmeApps ul li.new,
-    #evmeContainer .apps ul li.new {
+    #evmeContainer .evme-apps ul li.new {
         -moz-transition: none;
         transition: none;
     }
-    #evmeContainer #evmeApps ul #button-more,
-    #evmeContainer .apps ul #button-more {
+    #evmeContainer .evme-apps ul #button-more {
         position: absolute;
         top: auto;
         bottom: 15px;
@@ -116,23 +119,22 @@
         z-index: 100;
         opacity: 0;
     }
-    #evmeContainer #evmeApps ul #button-more.visible,
-    #evmeContainer .apps ul #button-more.visible {
+    #evmeContainer .evme-apps ul.has-installed #button-more {
+        bottom: 0;
+    }
+    #evmeContainer .evme-apps ul #button-more.visible {
         opacity: 1;
     }
    
-    #evmeContainer #evmeApps ul li:nth-child(4n+1),
-    #evmeContainer .apps ul li:nth-child(4n+1) {
+    #evmeContainer .evme-apps ul li:nth-child(4n+1) {
         clear: both;
     }
-    #evmeContainer #evmeApps ul li .c,
-    #evmeContainer .apps ul li .c {
+    #evmeContainer .evme-apps ul li .c {
         position: relative;
         display: block;
         padding: 44px 2px 0 2px;
     }
-        #evmeContainer #evmeApps ul li .thumb,
-        #evmeContainer .apps ul li .thumb,
+        #evmeContainer .evme-apps ul li .thumb,
         #evmeContainer .app-icon {
             position: absolute;
             top: 0;
@@ -149,13 +151,11 @@
             -moz-transition: -moz-transform .2s linear;
             transition: transform .2s linear;
         }
-        #evmeContainer #evmeApps ul li.new .thumb,
-        #evmeContainer .apps ul li.new .thumb {
+        #evmeContainer .evme-apps ul li.new:not(.installed) .thumb {
             -moz-transform: scale(0);
             transform: scale(0);
         }
-        #evmeContainer #evmeApps ul li .thumb:after,
-        #evmeContainer .apps ul li .thumb:after,
+        #evmeContainer .evme-apps ul li .thumb:after,
         #evmeContainer .app-icon:after {
             content: "";
             background-position: -1px -24px;
@@ -166,15 +166,12 @@
             height: 50px;
             z-index: 10;
         }
-        #evmeContainer #evmeApps ul li .thumb.noicon,
-        #evmeContainer .apps ul li .thumb.noicon {
+        #evmeContainer .evme-apps ul li .thumb.noicon {
             background: transparent;
         }
-        #evmeContainer #evmeApps ul li .thumb.noicon:after,
-        #evmeContainer .apps ul li .thumb.noicon:after {
+        #evmeContainer .evme-apps ul li .thumb.noicon:after {
         }
-        #evmeContainer #evmeApps ul li b,
-        #evmeContainer .apps ul li b {
+        #evmeContainer .evme-apps ul li b {
             display: inline-block;
             font-size: 11px;
             line-height: 12px;
@@ -188,17 +185,11 @@
             font-weight: 600;
             text-shadow: 0 1px 3px rgba(0, 0, 0, .6);
         }
-            #evmeContainer #evmeApps ul li b em,
-            #evmeContainer .apps ul li b em {
+            #evmeContainer .evme-apps ul li b em {
                 font-style: normal;
             }
             
-        #evmeContainer #evmeApps ul li.installed b {
-             font-size: 13px;
-        }
-        
-        #evmeContainer #evmeApps ul li .close,
-        #evmeContainer .apps ul li .close {
+        #evmeContainer .evme-apps ul li .close {
             position: absolute;
             top: -4px;
             left: 50%;
@@ -221,8 +212,7 @@
             -moz-transition: opacity .2s linear;
             transition: opacity .2s linear;
         }
-    #evmeContainer #evmeApps ul li#more-apps,
-    #evmeContainer .apps ul li#more-apps {
+    #evmeContainer .evme-apps ul li#more-apps {
         position: absolute;
         left: 0;
         right: 0;
@@ -240,37 +230,40 @@
         -moz-transition: none;
         transition: none;
     }
-    #evmeContainer #evmeApps ul li#more-apps span,
-    #evmeContainer .apps ul li#more-apps span {
-        position: relative;
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        vertical-align: middle;
-        margin-right: 3px;
-        top: -2px;
-    }
+        #evmeContainer .evme-apps ul li#more-apps span {
+            position: relative;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 3px;
+            top: -2px;
+        }
+        #evmeContainer .evme-apps ul.has-installed li#more-apps {
+            
+        }
     
     
-body:not(.istouch) #evmeApps {
+body:not(.istouch) .evme-apps {
     
 }
-body:not(.istouch) #evmeApps ul {
+body:not(.istouch) .evme-apps ul {
     overflow: hidden;
 }
-body:not(.istouch) #evmeApps ul li:nth-child(4n+1) {
+body:not(.istouch) .evme-apps ul li:nth-child(4n+1) {
     clear: both;
 }
-body:not(.istouch) #evmeApps ul li:nth-child(5n+1) {
+body:not(.istouch) .evme-apps ul li:nth-child(5n+1) {
     clear: none;
 }
 
 /* Loading an app */
-.loading-app #evmeApps ul li,
-.loading-app #evmeApps ul #button-more.visible {
+.loading-app .evme-apps ul li,
+.loading-app .evme-apps ul #button-more.visible,
+.loading-app .evme-apps ul.has-installed:before {
     opacity: 0;
 }
-.loading-app #evmeApps ul li.inplace {
+.loading-app .evme-apps ul li.inplace {
     position: absolute;
     top: 0;
     left: 0;
@@ -280,7 +273,7 @@ body:not(.istouch) #evmeApps ul li:nth-child(5n+1) {
     -moz-transition: -moz-transform .2s linear;
     transition: transform .2s linear;
 }
-.loading-app #evmeApps ul li.inplace .doat-loading {
+.loading-app .evme-apps ul li.inplace .doat-loading {
     position: absolute;
     top: -8px;
     left: 50%;

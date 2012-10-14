@@ -35,7 +35,7 @@
     pointer-events: inherit;
 }
 
-#evmeContainer.connection-error #evmeApps ,
+#evmeContainer.connection-error .evme-apps,
 #evmeContainer.connection-error #shortcuts,
 #evmeContainer.connection-error #shortcuts-favorites .scroll-wrapper
 {

@@ -218,6 +218,7 @@ Evme.Utils = new function() {
             
             window.clearTimeout(timeoutAppsToDrawLater);
             
+            var docFrag = document.createDocumentFragment();
             for (var i=0; i<apps.length; i++) {
                 var app = new Evme.App(apps[i], numAppsOffset+i, isMore, _this);
                 var id = apps[i].id;
@@ -228,7 +229,7 @@ Evme.Utils = new function() {
                 
                 if (Evme.Utils.isKeyboardVisible() && (isMore || i<Math.max(apps.length/2, 8))) {
                     var $app = app.draw();
-                    $list.append($app);
+                    docFrag.appendChild($app[0]);
                 } else {
                     doLater.push(app);
                 }
@@ -248,13 +249,16 @@ Evme.Utils = new function() {
                     hasInstalled = true;
                 }
             }
+            $list[0].appendChild(docFrag);
             
             if (doLater.length > 0) {
                 timeoutAppsToDrawLater = window.setTimeout(function(){
+                    var docFrag = document.createDocumentFragment();
                     for (var i=0; i<doLater.length; i++) {
                         var $app = doLater[i].draw();
-                        $list.append($app);
+                        docFrag.appendChild($app[0]);
                     }
+                    $list[0].appendChild(docFrag);
                     
                     window.setTimeout(function(){
                         $list.find(".new").removeClass("new");
@@ -264,9 +268,11 @@ Evme.Utils = new function() {
                 }, TIMEOUT_BEFORE_DRAWING_REST_OF_APPS);
             }
             
-            window.setTimeout(function(){
-                $list.find(".new").removeClass("new");
-            }, 10);
+            if (docFrag.childNodes.length > 0) {
+                window.setTimeout(function(){
+                    $list.find(".new").removeClass("new");
+                }, 10);
+            }
             
             if (hasInstalled) {
                 $list.addClass("has-installed");

@@ -200,7 +200,7 @@ Evme.SmartFolder = function(_options) {
         $elScreen = $('<div class="screen smart-folder-screen"></div>');
         $el = $('<div class="smart-folder">' +
                     '<h2></h2>' +
-                    '<div class="apps">' +
+                    '<div class="evme-apps">' +
                         '<ul></ul>' +
                     '</div>' +
                     '<div class="image"><div class="image-overlay"></div></div>' +
@@ -208,7 +208,7 @@ Evme.SmartFolder = function(_options) {
                 '</div>');
                 
         $elTitle = $el.find("h2");
-        $elAppsContainer = $el.find(".apps");
+        $elAppsContainer = $el.find(".evme-apps");
         $elApps = $elAppsContainer.find("ul");
         $elImage = $el.find(".image");
         $elImageOverlay = $el.find(".image-overlay");
