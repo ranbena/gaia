@@ -33,7 +33,8 @@ Evme.Brain = new function() {
         INSTALLED_APPS_TO_TYPE = {
             "music": ["Music"],
             "movies": ["Video"],
-            "tv": ["Video"]
+            "tv": ["Video"],
+            "games": ["TowerJelly", "PenguinPop", "CrystalSkull"]
         },
 
         timeoutSetUrlAsActive = null,
@@ -719,8 +720,10 @@ Evme.Brain = new function() {
 
             $("#loading-app").remove();
 
-            var $pseudo = $('<li class="inplace" id="loading-app">' + loadingApp.getHtml() + '</li>');
-            if ($app.attr("class")) {
+            var $pseudo = $('<li class="inplace" id="loading-app">' + loadingApp.getHtml() + '</li>'),
+                useClass = !data.isFolder;
+                
+            if (useClass) {
                 $pseudo.addClass($app.attr("class"));
             } else {
                 newPos.top -= appHeight/4;

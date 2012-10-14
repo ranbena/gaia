@@ -32,7 +32,7 @@ const Homescreen = (function() {
       DockManager.saveState();
       Permissions.hide();
     } else {
-      GridManager.goToPage(1);
+      GridManager.goToPage(0);
     }
   }
 
