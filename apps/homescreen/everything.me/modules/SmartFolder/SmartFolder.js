@@ -1,5 +1,5 @@
 Evme.SmartFolder = function(_options) {
-    var _this = this,
+    var _this = this, _name = "SmartFolder",
         name = '', image = '', scroll = null, shouldFadeImage = false,
         $el = null, $elScreen = null, $elTitle = null,
         $elAppsContainer = null, $elApps = null,
@@ -36,6 +36,8 @@ Evme.SmartFolder = function(_options) {
             "$parent": $elApps
         });
         
+        Evme.EventHandler.trigger(_name, "init");
+        
         return _this;
     };
     
@@ -45,12 +47,15 @@ Evme.SmartFolder = function(_options) {
             $elScreen.addClass(CLASS_WHEN_VISIBLE);
         }, 0);
         
+        Evme.EventHandler.trigger(_name, "show");
         return _this;
     };
     
     this.hide = function() {
         $el.removeClass(CLASS_WHEN_VISIBLE);
         $elScreen.removeClass(CLASS_WHEN_VISIBLE);
+        
+        Evme.EventHandler.trigger(_name, "hide");
         
         return _this;
     };
@@ -68,6 +73,7 @@ Evme.SmartFolder = function(_options) {
         
         onClose && onClose(_this);
         
+        Evme.EventHandler.trigger(_name, "close");
         return _this;
     };
     
@@ -88,6 +94,8 @@ Evme.SmartFolder = function(_options) {
                 SCROLL_TO_BOTTOM = $elApps.height() - $elAppsContainer.height();
             }
         });
+        
+        Evme.EventHandler.trigger(_name, "load");
     };
     
     this.appendTo = function($elParent) {

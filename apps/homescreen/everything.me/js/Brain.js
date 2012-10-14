@@ -858,8 +858,16 @@ Evme.Brain = new function() {
             $body.removeClass(Brain.BackgroundImage.CLASS_FULLSCREEN);
         };
     };
-
-
+    
+    this.SmartFolder = new function() {
+        this.show = function() {
+            $container.addClass("smart-folder-visible");
+        };
+        this.hide = function() {
+            $container.removeClass("smart-folder-visible");
+        };
+    };
+    
     this.Shortcuts = new function() {
         var _this = this,
             customizeInited = false,
