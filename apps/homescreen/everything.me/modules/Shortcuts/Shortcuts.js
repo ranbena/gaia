@@ -134,7 +134,7 @@ Evme.Shortcuts = new function() {
     this.draw = function(_shortcuts, icons) {
         for (var i=0; i<_shortcuts.length; i++) {
             var shortcut = new Evme.Shortcut();
-            var $el = shortcut.init(_shortcuts[i], i, click, dragStart, remove);
+            var $el = shortcut.init(_shortcuts[i], i, click);
             
             if ($el) {
                 shortcuts.push(shortcut);
@@ -380,27 +380,12 @@ Evme.Shortcuts = new function() {
         setDesign = true;
     }
     
-    function dragStart(data) {
-        Evme.EventHandler.trigger(_name, "dragStart", {
-            "e": data.e,
-            "shortcut": data.shortcut
-        });
-    }
-    
     function click(data) {
         if (_this.swiped() || !_this.enabled()) {
             return;
         }
         
         Evme.EventHandler.trigger(_name, "click", data);
-    }
-    
-    function remove(data) {
-        if (_this.swiped() || !_this.enabled()) {
-            return;
-        }
-        
-        Evme.EventHandler.trigger(_name, "remove", data);
     }
     
     function cbShow(bReport) {
@@ -427,16 +412,13 @@ Evme.Shortcuts = new function() {
 Evme.Shortcut = function() {
     var _name = "Shortcut", _this = this, cfg = null, id = "id"+Math.round(Math.random()*10000),
         $el = null, $thumb = null,  index = -1, query = "", image = "", imageLoadingRetry = 0,
-        onClick = null, onDragStart = null, onRemove = null, alreadyRemoved = false, tapIgnored = false,
-        timeoutDrag = null, touchStartPos = null, DISTANCE_TO_IGNORE_AS_MOVE = 5, DRAG_THRESHOLD = 100;
+        onClick = null;
     
-    this.init = function(_cfg, _index, _onClick, _onDragStart, _onRemove) {
+    this.init = function(_cfg, _index, _onClick) {
         cfg = _cfg;
         index = _index;
         query = cfg.query;
         onClick = _onClick;
-        onRemove = _onRemove;
-        onDragStart = _onDragStart;
         
         if (!cfg.query) {
             return null;
@@ -452,12 +434,8 @@ Evme.Shortcut = function() {
         
         _this.setImage(cfg.appIds);
         
-        $el.bind("touchstart", touchstart)
-           .bind("touchmove", touchmove)
-           .bind("click", clicked);
+        $el.bind("click", clicked);
            
-        //$el.find(".remove").bind("click", removed);
-        
         return $el;
     };
     
@@ -471,13 +449,6 @@ Evme.Shortcut = function() {
         }
     };
     
-    this.getData = function() { return cfg; };
-    this.getElement = function() { return $el; };
-    this.getThumb = function() { return $thumb; };
-    this.getId = function() { return id; };
-    this.getQuery = function() { return query; };
-    this.isCustom = function() { return cfg.isCustom; };
-    
     this.setImage = function(shortcutIcons) {
         if ($thumb && shortcutIcons && shortcutIcons.length > 0) {
             var $iconGroup = Evme.IconGroup.get(shortcutIcons);
@@ -485,66 +456,19 @@ Evme.Shortcut = function() {
         }
     };
     
-    function touchstart(e) {
-        if (onDragStart) {
-            timeoutDrag = window.setTimeout(function(){
-                onDragStart && onDragStart({
-                    "e": e,
-                    "shortcut": _this
-                });
-            }, DRAG_THRESHOLD);    
-        }
-        
-        tapIgnored = false;
-        touchStartPos = getEventPoint(e);
-    }
-    
-    function touchmove(e) {
-        if (!touchStartPos) return;
-        
-        var point = getEventPoint(e),
-            distanceX = [point[0] - touchStartPos[0]];
-            
-        if (Math.abs(distanceX[0]) > DISTANCE_TO_IGNORE_AS_MOVE) {
-            tapIgnored = true;
-        }
-    }
+    this.getData = function() { return cfg; };
+    this.getElement = function() { return $el; };
+    this.getThumb = function() { return $thumb; };
+    this.getId = function() { return id; };
+    this.getQuery = function() { return query; };
+    this.isCustom = function() { return cfg.isCustom; };
     
     function clicked() {
-        if (tapIgnored) return;
-
-        window.clearTimeout(timeoutDrag);
-        
         onClick({
             "shortcut": _this,
             "data": cfg,
             "$el": $el,
             "index": index
         });
-    }
-    
-    function removed(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        window.clearTimeout(timeoutDrag);
-        if (alreadyRemoved) {
-            return;
-        }
-        
-        alreadyRemoved = true;
-        onRemove({
-            "shortcut": _this,
-            "data": cfg,
-            "$el": $el,
-            "index": index
-        });
-    }
-    
-    function getEventPoint(e) {
-        var touch = e.touches && e.touches[0] ? e.touches[0] : e,
-            point = touch && [touch.pageX || touch.clientX, touch.pageY || touch.clientY];
-        
-        return point;
     }
 };

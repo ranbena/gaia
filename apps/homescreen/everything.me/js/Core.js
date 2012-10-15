@@ -48,11 +48,18 @@ window.Evme = new function() {
     // Gaia communication methods
     this.setOpacityBackground = function(value) {
         Evme.BackgroundImage.changeOpacity(value, OPACITY_CHANGE_DURATION);
-    }
+    };
 
     this.pageMove = function(value) {
         Evme.BackgroundImage.changeOpacity(Math.floor(value*100)/100);
-    }
+    };
+    
+    this.onShow = function() {
+        Evme.Shortcuts.refreshScroll();
+    };
+    this.onHide = function() {
+        
+    };
 
     function initObjects(data) {
         var $container = $("#" + Evme.Utils.getID());

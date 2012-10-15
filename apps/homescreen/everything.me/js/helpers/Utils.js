@@ -15,12 +15,16 @@ Evme.Utils = new function() {
         "APP_CLICK": "open-in-app",
         "APP_INSTALL": "add-bookmark",
         "IS_APP_INSTALLED": "is-app-installed",
-        "OPEN_URL": "open-url"
+        "OPEN_URL": "open-url",
+        "SHOW_MENU": "show-menu",
+        "HIDE_MENU": "hide-menu",
+        "MENU_HEIGHT": "menu-height"
     };
 
     this.log = function(message) {
         console.log("(" + (new Date().getTime()) + ") DOAT: " + message);
     };
+    
     this.sendToFFOS = function(type, data) {
         switch (type) {
             case FFOSMessages.APP_CLICK:
@@ -30,10 +34,19 @@ Evme.Utils = new function() {
                 EvmeManager.addBookmark(data);
                 break;
             case FFOSMessages.IS_APP_INSTALLED:
-                return EvmeManager.isAppInstalled(data.url)
+                return EvmeManager.isAppInstalled(data.url);
                 break;
             case FFOSMessages.OPEN_URL:
-                return EvmeManager.openUrl(data.url)
+                return EvmeManager.openUrl(data.url);
+                break;
+            case FFOSMessages.SHOW_MENU:
+                return EvmeManager.menuShow();
+                break;
+            case FFOSMessages.HIDE_MENU:
+                return EvmeManager.menuHide();
+                break;
+            case FFOSMessages.MENU_HEIGHT:
+                return EvmeManager.getMenuHeight();
                 break;
         }
     };

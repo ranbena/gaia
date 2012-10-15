@@ -1,7 +1,7 @@
 Evme.Searchbar = new function() {
     var _name = "Searchbar", _this = this,
         $el = null, $form = null, $clear = null, $defaultText = null,
-        value = "", Selection = null, focused = false,
+        value = "", Selection = null, isFocused = false,
         timeoutSearchOnBackspace = null, timeoutPause = null, timeoutIdle = null,
         intervalPolling = null;
         
@@ -320,9 +320,8 @@ Evme.Searchbar = new function() {
     }
     
     function cbFocus(e) {
-        if (focused) return;
-        
-        focused = true;
+        if (isFocused) return;
+        isFocused = true;
         
         //Do not use Evme.Utils.hideAddressBar() caus it has a delay that makes the address bar pop in a nasty way
         window.scrollTo(0,1);
@@ -333,9 +332,8 @@ Evme.Searchbar = new function() {
     }
     
     function cbBlur(e) {
-        if (!focused) return;
-        
-        focused = false;
+        if (!isFocused) return;
+        isFocused = false;
         
         Selection.cancel();
         

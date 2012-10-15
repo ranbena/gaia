@@ -84,6 +84,8 @@ Evme.Brain = new function() {
 
             Evme.Shortcuts.loadDefault();
             Evme.Shortcuts.show();
+            
+            Brain.FFOS.showMenu();
         };
     };
 
@@ -107,6 +109,8 @@ Evme.Brain = new function() {
             } else {
                 Evme.Helper.showTip();
             }
+            
+            Brain.FFOS.hideMenu();
 
             Evme.Location.hideButton();
 
@@ -141,6 +145,8 @@ Evme.Brain = new function() {
             if (Evme.Searchbar.getValue() == "") {
                 Evme.Helper.setTitle();
                 Evme.Helper.showTitle();
+                
+                Brain.FFOS.showMenu();
             }
 
             if (Evme.shouldSearchOnInputBlur){
@@ -243,6 +249,30 @@ Evme.Brain = new function() {
                 tipKeyboard.hide();
                 tipKeyboard = null;
             }
+        };
+    };
+    
+    this.FFOS = new function() {
+        var isMenuVisible = false;
+        
+        this.hideMenu = function() {
+            if (!isMenuVisible) return;
+            
+            Evme.Utils.sendToFFOS(Evme.Utils.FFOSMessages.HIDE_MENU);
+            $body.removeClass("ffos-menu-visible");
+            Evme.Shortcuts.refreshScroll();
+            
+            isMenuVisible = false;
+        };
+        
+        this.showMenu = function() {
+            if (isMenuVisible) return;
+            
+            Evme.Utils.sendToFFOS(Evme.Utils.FFOSMessages.SHOW_MENU);
+            $body.addClass("ffos-menu-visible");
+            Evme.Shortcuts.refreshScroll();
+            
+            isMenuVisible = true;
         };
     };
 
@@ -862,9 +892,13 @@ Evme.Brain = new function() {
     this.SmartFolder = new function() {
         this.show = function() {
             $container.addClass("smart-folder-visible");
+            Brain.FFOS.hideMenu();
         };
+        
         this.hide = function() {
             $container.removeClass("smart-folder-visible");
+            Brain.FFOS.showMenu();
+            Evme.Brain.Shortcuts.cancelSmartFolderRequests();
         };
     };
     
@@ -874,7 +908,9 @@ Evme.Brain = new function() {
             timeoutShowLoading = null,
             $screen = null,
             clickedCustomizeHandle = false,
-            loadingCustomization = false;
+            loadingCustomization = false,
+            requestSmartFolderApps = null,
+            requestSmartFolderImage = null;
 
         this.loaded = false;
 
@@ -894,6 +930,8 @@ Evme.Brain = new function() {
         };
 
         this.show = function() {
+            Brain.FFOS.showMenu();
+            
             new Evme.Tip(TIPS.APP_EXPLAIN, function(tip) {
                 $(document.body).bind("touchstart", tip.hide);
             }).show();
@@ -913,6 +951,7 @@ Evme.Brain = new function() {
             if (!_this.loaded || bForce) {
                 Evme.DoATAPI.Shortcuts.get({
                     "iconFormat": Evme.Utils.getIconsFormat(),
+                    "_NOCACHE": true
                 }, function(data, methodNamespace, methodName, url) {
                     Evme.Shortcuts.load(data.response, callback);
                 });
@@ -979,41 +1018,14 @@ Evme.Brain = new function() {
                 
                 _this.showSmartFolder({
                     "query": data.query
-                });   
+                });
             }
         };
         
-        
-        function folderLoadMore(folder) {
-            folder.appsPaging.offset += folder.appsPaging.limit;
-            if (folder.appsPaging.offset >= folder.appsPaging.max) {
-                return;
-            }
-            
-            folder.MoreIndicator.show();
-            
-            var iconsFormat = Evme.Utils.getIconsFormat();
-                
-            Evme.DoATAPI.search({
-                "query": folder.getName(),
-                "feature": SEARCH_SOURCES.SHORTCUT_SMART_FOLDER,
-                "exact": true,
-                "spellcheck": false,
-                "suggest": false,
-                "limit": folder.appsPaging.limit,
-                "first": folder.appsPaging.offset,
-                "iconFormat": iconsFormat
-            }, function(data) {
-                var apps = data.response.apps;
-                
-                folder.MoreIndicator.hide();
-                folder.loadApps({
-                    "apps": apps,
-                    "iconsFormat": iconsFormat,
-                    "offset": folder.appsPaging.offset
-                });
-            });
-        }
+        this.cancelSmartFolderRequests = function() {
+            requestSmartFolderApps && requestSmartFolderApps.abort();
+            requestSmartFolderImage && requestSmartFolderImage.abort();
+        };
         
         this.showSmartFolder = function(options) {
             var folder = new Evme.SmartFolder({
@@ -1023,20 +1035,6 @@ Evme.Brain = new function() {
                         });
             
             folder.show();
-            
-            Evme.DoATAPI.bgimage({
-                "query": options.query,
-                "feature": SEARCH_SOURCES.SHORTCUT_SMART_FOLDER,
-                "exact": true,
-                "width": screen.width,
-                "height": screen.height
-            }, function(data) {
-                folder.setImage({
-                    "image": Evme.Utils.formatImageData(data.response.image),
-                    "query": options.query,
-                    "source": data.response.source
-                });
-            });
             
             var iconsFormat = Evme.Utils.getIconsFormat();
                 
@@ -1055,7 +1053,7 @@ Evme.Brain = new function() {
                 "max": 3
             });
             
-            Evme.DoATAPI.search({
+            requestSmartFolderApps = Evme.DoATAPI.search({
                 "query": options.query,
                 "feature": SEARCH_SOURCES.SHORTCUT_SMART_FOLDER,
                 "exact": true,
@@ -1080,37 +1078,64 @@ Evme.Brain = new function() {
                     "iconsFormat": iconsFormat,
                     "offset": folder.appsPaging.offset
                 });
+                
+                requestSmartFolderApps = null;
+            });
+            
+            requestSmartFolderImage = Evme.DoATAPI.bgimage({
+                "query": options.query,
+                "feature": SEARCH_SOURCES.SHORTCUT_SMART_FOLDER,
+                "exact": true,
+                "width": screen.width,
+                "height": screen.height
+            }, function(data) {
+                folder.setImage({
+                    "image": Evme.Utils.formatImageData(data.response.image),
+                    "query": options.query,
+                    "source": data.response.source
+                });
+                
+                requestSmartFolderImage = null;
             });
         };
-
-        function searchShortcut(data) {
-            !data.source && (data.source = SEARCH_SOURCES.SHORTCUT);
-
-            Evme.EventHandler.trigger("Shortcut", "search", data);
-
-            Searcher.searchExactFromOutside(data.query, data["source"], data.index, data.type);
+        
+        function folderLoadMore(folder) {
+            folder.appsPaging.offset += folder.appsPaging.limit;
+            if (folder.appsPaging.offset >= folder.appsPaging.max) {
+                return;
+            }
+            
+            if (requestSmartFolderApps) {
+                return;
+            }
+            
+            folder.MoreIndicator.show();
+            
+            var iconsFormat = Evme.Utils.getIconsFormat();
+            
+            requestSmartFolderApps = Evme.DoATAPI.search({
+                "query": folder.getName(),
+                "feature": SEARCH_SOURCES.SHORTCUT_SMART_FOLDER,
+                "exact": true,
+                "spellcheck": false,
+                "suggest": false,
+                "limit": folder.appsPaging.limit,
+                "first": folder.appsPaging.offset,
+                "iconFormat": iconsFormat
+            }, function(data) {
+                var apps = data.response.apps;
+                
+                folder.MoreIndicator.hide();
+                folder.loadApps({
+                    "apps": apps,
+                    "iconsFormat": iconsFormat,
+                    "offset": folder.appsPaging.offset
+                });
+                
+                requestSmartFolderApps = null;
+            });
         }
-
-        this.clickContinue = function(data) {
-            data.source = SEARCH_SOURCES.SHORTCUT_CONTINUE_BUTTON;
-            searchShortcut(data);
-
-            // after we search, hide the category middle page
-            // so when users return they see the main categories
-            window.setTimeout(function(){
-                Evme.Shortcuts.showCategories();
-            }, 1000);
-        };
-
-        this.searchCategoryPage = function(data) {
-            data.source = SEARCH_SOURCES.SHORTCUT_ENTITY;
-            searchShortcut(data);
-
-            window.setTimeout(function(){
-                Evme.Shortcuts.showCategories();
-            }, 1000);
-        };
-
+        
         this.remove = function(data) {
             data.shortcut.remove();
             Evme.Shortcuts.remove(data.shortcut);
@@ -1123,12 +1148,6 @@ Evme.Brain = new function() {
         this.load = function(data) {
             _this.loaded = true;
         };
-
-        this.dragStart = function(data) {
-            if (Evme.Shortcuts.customizing()) {
-                Evme.ShortcutsCustomize.Dragger.start(data.e, data.shortcut);
-            }
-        };
     };
 
     this.ShortcutsCustomize = new function() {
@@ -1140,6 +1159,8 @@ Evme.Brain = new function() {
         };
 
         this.show = function() {
+            Brain.FFOS.hideMenu();
+            
             if (isFirstShow) {
                 isFirstShow = false;
 
@@ -1179,16 +1200,17 @@ Evme.Brain = new function() {
         };
 
         this.hide = function() {
+            Brain.FFOS.showMenu();
         };
 
         this.done = function(data) {
-            Evme.Shortcuts.show();
-            Evme.ShortcutsCustomize.hide();
-
             Evme.DoATAPI.Shortcuts.set({
                 "shortcuts": JSON.stringify(data.shortcuts)
             }, function(data){
                 Brain.Shortcuts.loadFromAPI(function(){
+                    Evme.Shortcuts.show();
+                    Evme.ShortcutsCustomize.hide();
+                    
                     _this.addCustomizeButton();
                 }, true);
             });

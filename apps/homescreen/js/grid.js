@@ -176,6 +176,7 @@ const GridManager = (function() {
   }
 
   function setOverlayPanning(index, deltaX, backward, duration) {
+      return;
     if (index === 1 && !backward) {
       applyEffectOverlay(landingOverlay,
                          (deltaX / windowWidth) * -opacityOnAppGridPageMax,

@@ -44,6 +44,18 @@ var EvmeManager = (function() {
             }
         });
     }
+    
+    function menuShow() {
+        footerStyle.MozTransform = "translateY(0)";
+    }
+    
+    function menuHide() {
+        footerStyle.MozTransform = "translateY(75px)";
+    }
+    
+    function getMenuHeight() {
+        return document.getElementById("footer").offsetHeight;
+    }
 
     return {
         openApp: openApp,
@@ -54,7 +66,11 @@ var EvmeManager = (function() {
             return Applications.isInstalled(url);
         },
 
-        openUrl: openUrl
+        openUrl: openUrl,
+        
+        menuShow: menuShow,
+        menuHide: menuHide,
+        getMenuHeight: getMenuHeight
     };
 }());
 
