@@ -147,6 +147,7 @@ window.Evme = new function() {
         Evme.Analytics.init({
             "config": data.analytics,
             "logger": logger,
+            "namespace": Evme,
             "DoATAPI": Evme.DoATAPI,
             "getCurrentAppsRowsCols": Evme.Apps.getCurrentRowsCols,
             "Brain": Evme.Brain,
