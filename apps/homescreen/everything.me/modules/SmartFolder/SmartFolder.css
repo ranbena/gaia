@@ -88,14 +88,14 @@
         background: rgba(0, 0, 0, .55);
     }
     #evmeContainer .smart-folder .close {
+        background: transparent url('/everything.me/images/imageclose.png') 50% 50% no-repeat;
         position: absolute;
-        top: -10px;
-        right: -10px;
+        top: 6px;
+        right: 6px;
         width: 29px;
         height: 31px;
         cursor: pointer;
         z-index: 100;
-        background-position: 0 -220px;
     }
     #evmeContainer .smart-folder .evme-apps {
         position: absolute;

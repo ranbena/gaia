@@ -82,23 +82,23 @@
         -moz-transition: -moz-transform .2s linear;
         transition: transform .2s linear;
     }
-    #evmeContainer .evme-apps ul.has-installed li.installed {
+    #evmeContainer .evme-apps ul li.installed {
         position: absolute;
         top: 6px;
     }
-    #evmeContainer .evme-apps ul.has-installed li.installed .thumb:after {
+    #evmeContainer .evme-apps ul li.installed .thumb:after {
         display: none;
     }
-    #evmeContainer .evme-apps ul.has-installed li.installed.pos0 {
+    #evmeContainer .evme-apps ul li.installed.pos0 {
         left: 0;
     }
-    #evmeContainer .evme-apps ul.has-installed li.installed.pos1 {
+    #evmeContainer .evme-apps ul li.installed.pos1 {
         left: 25%;
     }
-    #evmeContainer .evme-apps ul.has-installed li.installed.pos2 {
+    #evmeContainer .evme-apps ul li.installed.pos2 {
         left: 50%;
     }
-    #evmeContainer .evme-apps ul.has-installed li.installed.pos3 {
+    #evmeContainer .evme-apps ul li.installed.pos3 {
         left: 75%;
     }
     #evmeContainer .evme-apps ul li.new {
@@ -155,6 +155,16 @@
             -moz-transform: scale(0);
             transform: scale(0);
         }
+        #evmeContainer .evme-apps ul li.installed .c {
+            padding-top: 50px;
+        }
+            #evmeContainer .evme-apps ul li.installed .thumb {
+                border-radius: 0;
+                width: 58px;
+                height: 58px;
+                margin-left: -29px;
+                margin-top: -3px;
+            }
         #evmeContainer .evme-apps ul li .thumb:after,
         #evmeContainer .app-icon:after {
             content: "";
