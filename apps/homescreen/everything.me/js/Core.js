@@ -57,7 +57,7 @@ window.Evme = new function() {
     function initObjects(data) {
         var $container = $("#" + Evme.Utils.getID());
 
-        Evme.Connection.init({
+        Evme.ConnectionMessage.init({
             "$parent": $container,
             "texts": data.texts.connection
         });

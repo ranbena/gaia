@@ -1,6 +1,5 @@
-Evme.Connection = new function() {
-    
-    var _name = "Connection", _this = this,
+Evme.ConnectionMessage = new function() {
+    var _name = "ConnectionMessage", _this = this,
             $el = null;
             
     var EL_ID = "connection-message",
@@ -13,13 +12,6 @@ Evme.Connection = new function() {
         $parent = options.$parent;
         
         DEFAULT_MESSAGE = options.texts.defaultMessage;
-        
-        window.addEventListener(Evme.Utils.CONNECTION.EVENT_ONLINE, function(){
-            Evme.EventHandler.trigger(_name, "online");
-        });
-        window.addEventListener(Evme.Utils.CONNECTION.EVENT_OFFLINE, function(){
-            Evme.EventHandler.trigger(_name, "offline");
-        });
         
         Evme.EventHandler.trigger(_name, "init");
     };

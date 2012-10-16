@@ -147,6 +147,9 @@ Evme.Brain = new function() {
             _this.setEmptyClass();
 
             Evme.Shortcuts.show();
+
+            Evme.DoATAPI.cancelQueue();
+            Evme.ConnectionMessage.hide();
         };
 
         this.clear = function(e) {
@@ -154,10 +157,6 @@ Evme.Brain = new function() {
             Evme.Apps.clear();
             Evme.Helper.setTitle();
             Brain.Helper.showDefault();
-
-            Evme.DoATAPI.cancelQueue();
-
-            Evme.Connection.hide();
         };
 
         this.returnPressed = function(data) {
@@ -1160,14 +1159,11 @@ Evme.Brain = new function() {
 
     this.Connection = new function() {
         this.online = function() {
-            Evme.Connection.hide();
+            Evme.ConnectionMessage.hide();
             Evme.DoATAPI.backOnline();
         };
         this.offline = function() {
-        };
-        this.show = function() {
-        };
-        this.hide = function() {
+            
         };
     };
 
@@ -1177,7 +1173,7 @@ Evme.Brain = new function() {
             if (Evme.Searchbar.getValue()) {
                 message = "To get apps for \""+Evme.Searchbar.getValue()+"\" please connect to the internet";
             }
-            Evme.Connection.show(message);
+            Evme.ConnectionMessage.show(message);
         };
     };
 
