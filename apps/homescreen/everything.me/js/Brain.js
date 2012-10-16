@@ -1049,7 +1049,7 @@ Evme.Brain = new function() {
             
             
             var installedApps = Searcher.getInstalledApps({
-                "type": options.query,
+                "query": options.query,
                 "max": 3
             });
             
@@ -1467,22 +1467,22 @@ Evme.Brain = new function() {
         
         this.getInstalledApps = function(options, cb) {
             var query = options.query || '',
-                type = (options.type || '').toLowerCase(),
                 max = options.max,
                 regex = new RegExp('(' + query + ')', 'i'),
                 apps = [],
+                typeApps = INSTALLED_APPS_TO_TYPE[query.toLowerCase()],
                 _apps = Applications.getAll();
                 
-            if (!query && type && !INSTALLED_APPS_TO_TYPE[type]) {
+            if (!query) {
                 return apps;
             }
-                
+            
             for (var i=0; i<_apps.length; i++) {
                 var app = _apps[i],
                     manifest = app.manifest,
                     name = manifest.name;
                 
-                if (query && regex.test(name) || type && INSTALLED_APPS_TO_TYPE[type].indexOf(name) !== -1) {
+                if (regex.test(name) || typeApps && typeApps.indexOf(manifest.name) !== -1) {
                     apps.push({
                        'installed': true,
                        'appUrl': app.origin,
@@ -1495,16 +1495,12 @@ Evme.Brain = new function() {
                        'id': app._id,
                        'name': manifest.name
                     });
-                
-                    if (apps.length >= max) {
-                       break;
-                    }
                 }
             }
             
-            return apps;
+            apps.splice(max);
             
-            Evme.Apps.loadInstalled(apps, cb);
+            return apps;
         };
 
         function getAppsComplete(data, options, installedApps) {
