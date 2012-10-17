@@ -615,6 +615,8 @@ Evme.DoATAPI = new function() {
             params["latlon"] = userLat + "," + userLon;
         }
         
+        ignoreCache = true;
+        
         var cacheKey = "";
         if (useCache) {
             cacheKey = getCacheKey(methodNamespace, methodName, params);

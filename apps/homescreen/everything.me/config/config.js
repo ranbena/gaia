@@ -17,7 +17,7 @@ Evme.__config = {
     "numberOfAppsToLoad": 16,
     "minHeightForMoreButton": 470,
     "minimumLettersForSearch": 1,
-    "defaultBGImage": "/everything.me/images/clouds.jpg?1",
+    "defaultBGImage": "", //"/everything.me/images/clouds.jpg?1",
     "bgImageSize": [320, 460],
     "defaultSuggestions": [
         "News",
@@ -118,7 +118,8 @@ Evme.__config = {
         },
         "apps": {
             "more": "More",
-            "moreLoading": "Loading..."
+            "moreLoading": "Loading...",
+            "connectionError": "Connect to the internet to get even more apps for {QUERY}"
         },
         "backgroundImage": {
             "sourceLabel": "Source:"

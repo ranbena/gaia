@@ -147,10 +147,6 @@
             transform: scale(.7) !important;
         }
         
-    #evmeContainer #shortcuts .header {
-        display: none;
-    }
-    
     #evmeContainer #category-page-name {
         text-transform: capitalize;
     }

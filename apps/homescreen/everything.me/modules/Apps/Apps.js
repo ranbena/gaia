@@ -98,22 +98,27 @@ Evme.Apps = new function() {
         return TIMEOUT_BEFORE_REPORTING_APP_HOLD;
     };
     
-    this.load = function(apps, appOffset, iconsFormat) {
-        var isMore = appOffset > 0;
+    this.load = function(options) {
+        var apps = options.apps,
+            isInstalled = options.installed,
+            offset = options.offset,
+            iconsFormat = options.iconsFormat,
+            onDone = options.onDone,
+            isMore = offset > 0;
         
-        if (!isMore) {
+        if (isInstalled) {
             _this.clear();
         }
         
-        var missingIcons = drawApps(apps, isMore, iconsFormat);
+        var missingIcons = drawApps(apps, isMore, iconsFormat, onDone);
         
         cbLoadComplete(apps, missingIcons);
         
         return missingIcons;
     };
     
-    this.updateApps = function(apps, appOffset, iconsFormat) {
-        updateApps(apps, iconsFormat);
+    this.updateApps = function(options) {
+        updateApps(options.apps, options.iconsFormat);
         
         return null;
     };
@@ -128,7 +133,7 @@ Evme.Apps = new function() {
         defaultIconToUse = 0;
         numberOfApps = 0;
         $list[0].innerHTML = "";
-        $list.removeClass("has-installed");
+        $list.parent().removeClass("has-installed");
         _this.More.hide();
         _this.More.hideButton();
         scroll.scrollTo(0, 0);
@@ -322,20 +327,16 @@ Evme.Apps = new function() {
             "isMore": isMore,
             "iconsFormat": iconsFormat,
             "$list": $list,
-            "onDone": function(group, appsList) {
+            "onDone": function(appsList) {
                 _this.setAppsClasses();
                 
-                if (group > 1 || !isMore) {
-                    _this.refreshScroll();
+                _this.refreshScroll();
+                
+                for (var i=0; i<appsList.length; i++) {
+                    appsArray[appsList[i].getId()] = appsList[i];
                 }
                 
-                if (appsList) {
-                    for (var i=0; i<appsList.length; i++) {
-                        appsArray[appsList[i].getId()] = appsList[i];
-                    }
-                    
-                    cb && cb();
-                }
+                cb && cb();
             }
         });
         

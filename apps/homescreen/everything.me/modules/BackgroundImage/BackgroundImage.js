@@ -1,7 +1,7 @@
 Evme.BackgroundImage = new function() {
     var _name = "BackgroundImage", _this = this,
             $el = null, $elFullScreen = null, $fullScreenFade = null, $default = null, elStyle = null,
-            currentImage = {}, $currentImage = null, active = false, changeOpacityTransitionCallback = null,
+            currentImage = null, $currentImage = null, active = false, changeOpacityTransitionCallback = null,
             defaultImage = "";
 
     var SOURCE_LABEL = "FROM CONFIG",
@@ -34,7 +34,7 @@ Evme.BackgroundImage = new function() {
             };
         }
 
-        if (currentImage.image !== oImage.image) {
+        if (!currentImage || currentImage.image !== oImage.image) {
             removeCurrent();
 
             if (isDefault) {
@@ -157,7 +157,7 @@ Evme.BackgroundImage = new function() {
     };
 
     this.get = function() {
-        return currentImage;
+        return currentImage || {"image": defaultImage};
     };
 
     this.changeOpacity = function(value, duration, cb) {

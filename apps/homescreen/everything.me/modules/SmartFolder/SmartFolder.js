@@ -1,7 +1,7 @@
 Evme.SmartFolder = function(_options) {
     var _this = this, _name = "SmartFolder",
-        name = '', image = '', scroll = null, shouldFadeImage = false,
-        $el = null, $elScreen = null, $elTitle = null,
+        name = '', image = '', scroll = null, shouldFadeImage = false, bgImage = null,
+        $el = null, $elScreen = null, $elTitle = null, $elClose = null,
         $elAppsContainer = null, $elApps = null,
         $elImage = null, $elImageOverlay = null, $elImageFullscreen = null,
         reportedScrollMove = false, onScrollEnd = null, onClose = null;
@@ -10,7 +10,7 @@ Evme.SmartFolder = function(_options) {
         CLASS_WHEN_IMAGE_FULLSCREEN = 'full-image',
         CLASS_WHEN_ANIMATING = 'animate',
         CLASS_WHEN_MAX_HEIGHT = 'maxheight',
-        TITLE_PREFIX = "Everything",
+        TITLE_PREFIX = "<em><b></b></em>Everything",
         LOAD_MORE_TEXT = "Loading...",
         SCROLL_TO_BOTTOM = "CALCULATED",
         SCROLL_TO_SHOW_IMAGE = 80,
@@ -23,6 +23,7 @@ Evme.SmartFolder = function(_options) {
         
         createElement();
         
+        options.bgImage && _this.setBgImage(options.bgImage);
         options.name && _this.setName(options.name);
         options.image && _this.setImage(options.image);
         options.parent && _this.appendTo(options.parent);
@@ -47,7 +48,9 @@ Evme.SmartFolder = function(_options) {
             $elScreen.addClass(CLASS_WHEN_VISIBLE);
         }, 0);
         
-        Evme.EventHandler.trigger(_name, "show");
+        Evme.EventHandler.trigger(_name, "show", {
+            "folder": _this
+        });
         return _this;
     };
     
@@ -55,7 +58,9 @@ Evme.SmartFolder = function(_options) {
         $el.removeClass(CLASS_WHEN_VISIBLE);
         $elScreen.removeClass(CLASS_WHEN_VISIBLE);
         
-        Evme.EventHandler.trigger(_name, "hide");
+        Evme.EventHandler.trigger(_name, "hide", {
+            "folder": _this
+        });
         
         return _this;
     };
@@ -77,7 +82,7 @@ Evme.SmartFolder = function(_options) {
         return _this;
     };
     
-    this.loadApps = function(options) {
+    this.loadApps = function(options, onDone) {
         var apps = options.apps,
             iconsFormat = options.iconsFormat,
             offset = options.offset;
@@ -92,6 +97,8 @@ Evme.SmartFolder = function(_options) {
                 scroll.refresh();
                 
                 SCROLL_TO_BOTTOM = $elApps.height() - $elAppsContainer.height();
+                
+                onDone && onDone();
             }
         });
         
@@ -133,6 +140,15 @@ Evme.SmartFolder = function(_options) {
         return _this;
     };
     
+    this.setBgImage = function(_bgImage) {
+        if (!_bgImage || _bgImage == bgImage) return _this;
+        bgImage = _bgImage;
+        
+        $el.css('background-image', 'url(' + bgImage + ')');
+        
+        return _this;
+    };
+    
     this.showFullscreen = function(e) {
         e && e.preventDefault();
         e && e.stopPropagation();
@@ -161,7 +177,6 @@ Evme.SmartFolder = function(_options) {
     this.fadeImage = function(howMuch) {
         $elImageOverlay[0].style.opacity = howMuch;
         $elAppsContainer[0].style.opacity = howMuch;
-        $elTitle[0].style.opacity = howMuch;
     };
     
     this.MoreIndicator = new function() {
@@ -207,7 +222,7 @@ Evme.SmartFolder = function(_options) {
     function createElement() {
         $elScreen = $('<div class="screen smart-folder-screen"></div>');
         $el = $('<div class="smart-folder">' +
-                    '<h2></h2>' +
+                    '<h2 class="title"></h2>' +
                     '<div class="evme-apps">' +
                         '<ul></ul>' +
                     '</div>' +
@@ -215,13 +230,14 @@ Evme.SmartFolder = function(_options) {
                     '<b class="close"></b>' +
                 '</div>');
                 
-        $elTitle = $el.find("h2");
+        $elTitle = $el.find(".title");
         $elAppsContainer = $el.find(".evme-apps");
         $elApps = $elAppsContainer.find("ul");
         $elImage = $el.find(".image");
         $elImageOverlay = $el.find(".image-overlay");
+        $elClose = $el.find(".close");
         
-        $el.find(".close").bind("touchstart", _this.close);
+        $elClose.bind("click", _this.close);
         $elAppsContainer.data("scrollOffset", 0);
         
         scroll = new Scroll($elApps.parent()[0], {

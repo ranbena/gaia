@@ -1,6 +1,6 @@
 Evme.Shortcuts = new function() {
-    var _name = "Shortcuts", _this = this, scroll = null, scrollPage = null, itemsDesign = "FROM CONFIG", setDesign = false,
-        $el = null, $list = null, $header = null, $loading = null,
+    var _name = "Shortcuts", _this = this, scroll = null, itemsDesign = "FROM CONFIG", setDesign = false,
+        $el = null, $list = null, $loading = null,
         shortcuts = [], visible = false, isSwiping = false, swiped = false, customizing = false, enabled = true,
         defaultShortcuts = null, categoryPageData = {};
     
@@ -16,21 +16,11 @@ Evme.Shortcuts = new function() {
         
         defaultShortcuts = Evme.Storage.get(KEY_USER_SHORTCUTS) || options.defaultShortcuts;
         
-        $header = $("#shortcuts-header");
-        
-        $("#header-category .back").bind("touchstart", _this.showCategories);
-        $("#category-page-button").bind("click", clickContinueButton);
-        
         scroll = new Scroll($el.find("#shortcuts-list")[0], {
             "hScroll": false,
             "checkDOMChanges": false,
             "onBeforeScrollMove": function(e){ swiped = true; },
             "onBeforeScrollEnd": function(){ swiped = false; }
-        });
-        scrollPage = new Scroll($("#page-category")[0], {
-            "hScroll": false,
-            "checkDOMChanges": false,
-            "onBeforeScrollStart": function() {}
         });
         
         Evme.EventHandler.trigger(_name, "init");
@@ -187,113 +177,6 @@ Evme.Shortcuts = new function() {
         
         return false;
     };
-    
-    this.showPage = function(data) {
-        categoryPageData = data || {};
-        
-        !categoryPageData.query && (categoryPageData.query = "");
-        !categoryPageData.title && (categoryPageData.title = categoryPageData.query);
-        !categoryPageData.options && (categoryPageData.options = []);
-        
-        $("#category-page-name").html(categoryPageData.title || categoryPageData.query);
-        
-        if (categoryPageData.button) {
-            $("#category-page-button").html(categoryPageData.button).addClass("visible");
-        } else {
-            $("#category-page-button").removeClass("visible")
-        }
-        
-        var html = '';
-        for (var i=0; i<categoryPageData.options.length; i++) {
-            var o = categoryPageData.options[i];
-            
-            html += '<li class="category-item">' +
-                        '<form method="get" action="" data-type="' + o.type + '">' +
-                            '<label>' + (o.title || "") + '</label>' +
-                            '<input type="text" value="" class="textinput" name="search_' + o.type + '" id="search_' + o.type + '" placeholder="' + (o.placeholder || "") + '" />' +
-                            '<em class="arrow-next"></em>' +
-                        '</form>' +
-                    '</li>';
-        }
-        $("#category-options").html(html);
-        
-        $("#category-options input").bind("focus", function(e) {
-            $("#" + Evme.Utils.getID()).addClass("mode-edit");
-        }).bind("blur", function(e) {
-            $("#" + Evme.Utils.getID()).removeClass("mode-edit");
-        });
-        $("#category-options form").bind("submit", function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            categoryQuerySearch($(this));
-        });
-        $("#category-options em").bind("click", function(e) {
-            categoryQuerySearch($(this).parent());
-        });
-        
-        $("#page-categories, #header-categories").removeClass("active");
-        $("#page-category, #header-category").addClass("active");
-        $("#shortcuts").addClass("page-category").removeClass("page-categories");
-        
-        scrollPage.refresh();
-        
-        Evme.EventHandler.trigger("Shortcuts", "categoryPageShow", {
-            "query": categoryPageData.title
-        });
-    };
-    
-    this.showCategories = function(e) {
-        if (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-        
-        $("#page-category, #header-category").removeClass("active");
-        $("#page-categories, #header-categories").addClass("active");
-        $("#shortcuts").addClass("page-categories").removeClass("page-category");
-    };
-    
-    this.setCustomTitle = function(title) {
-        $("#shortcuts-custom-title").remove();
-        var $elTitle = $('<li id="shortcuts-custom-title">' + title + '</li>');
-        $header.append($elTitle);
-        
-        
-        $header.children().removeClass("active");
-        $elTitle.addClass("active");
-    };
-    
-    this.removeCustomTitle = function() {
-        _this.showCategories();
-        $("#shortcuts-custom-title").removeClass("active");
-    };
-    
-    function categoryQuerySearch($form) {
-        var type = $form.data("type"),
-            $input = $form.find("input"),
-            query = $input.val();
-            
-        $input.blur();
-        
-        if (query) {
-            Evme.EventHandler.trigger(_name, "searchCategoryPage", {
-                "query": query,
-                "type": type
-            });
-        }
-    }
-    
-    function clickContinueButton(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        var query = categoryPageData.query;
-        
-        Evme.EventHandler.trigger(_name, "clickContinue", {
-            "query": query
-        });
-    }
     
     this.refreshScroll = function() {
         scroll && scroll.refresh();

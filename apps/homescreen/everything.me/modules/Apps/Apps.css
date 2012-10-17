@@ -10,42 +10,9 @@
 #evmeContainer.loading-app .evme-apps {
     pointer-events: none;
 }
-
-#evmeContainer #apps-loading,
-#evmeContainer #apps-error {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    margin-top: -20px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #fff;
-    text-shadow: 1px 0 2px rgba(0, 0, 0, .5);
-    text-align: center;
-    display: none;
-}
-    #evmeContainer #apps-loading > div,
-    #evmeContainer #apps-error > div {
-        position: relative;
-        display: inline-block;
-        vertical-align: middle;
-        width: 1px;
-        height: 1px;
-        margin-right: 11px;
-        top: -2px;
-    }
-    #evmeContainer #apps-error #apps-error-retry {
-        position: absolute;
-        top: 20px;
-        left: 50%;
-        width: 30px;
-        margin-left: -23px;
-    }
     
-#evmeContainer #apps-loading.visible,
-#evmeContainer #apps-error.visible {
-    display: block;
+#evmeContainer.empty-query #evmeApps {
+    display: none;
 }
 
 #evmeContainer .evme-apps ul {
@@ -56,10 +23,10 @@
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
-#evmeContainer .evme-apps ul.has-installed {
+#evmeContainer .evme-apps.has-installed ul {
     padding-top: 104px;
 }
-#evmeContainer .evme-apps ul.has-installed:before {
+#evmeContainer .evme-apps.has-installed ul:before {
     content: '';
     position: absolute;
     left: 15px;
@@ -119,7 +86,7 @@
         z-index: 100;
         opacity: 0;
     }
-    #evmeContainer .evme-apps ul.has-installed #button-more {
+    #evmeContainer .evme-apps.has-installed ul #button-more {
         bottom: 0;
     }
     #evmeContainer .evme-apps ul #button-more.visible {
@@ -249,10 +216,14 @@
             margin-right: 3px;
             top: -2px;
         }
-        #evmeContainer .evme-apps ul.has-installed li#more-apps {
-            
-        }
-    
+        
+#evmeContainer #evmeApps .connection-message {
+    background: rgba(255,255,255,.01);
+}
+#evmeContainer #evmeApps.has-installed .connection-message {
+    -moz-transform: translateY(35px);
+    transform: translateY(35px);
+}
     
 body:not(.istouch) .evme-apps {
     
@@ -270,7 +241,7 @@ body:not(.istouch) .evme-apps ul li:nth-child(5n+1) {
 /* Loading an app */
 .loading-app .evme-apps ul li,
 .loading-app .evme-apps ul #button-more.visible,
-.loading-app .evme-apps ul.has-installed:before {
+.loading-app .evme-apps.has-installed ul:before {
     opacity: 0;
 }
 .loading-app .evme-apps ul li.inplace {

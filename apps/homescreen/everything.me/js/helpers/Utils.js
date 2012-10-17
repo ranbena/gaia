@@ -262,6 +262,11 @@ Evme.Utils = new function() {
                     hasInstalled = true;
                 }
             }
+            
+            if (hasInstalled) {
+                $list.parent().addClass("has-installed");
+            }
+            
             $list[0].appendChild(docFrag);
             
             if (doLater.length > 0) {
@@ -277,8 +282,10 @@ Evme.Utils = new function() {
                         $list.find(".new").removeClass("new");
                     }, 10);
                     
-                    onDone && onDone(2);
+                    onDone && onDone(appsList);
                 }, TIMEOUT_BEFORE_DRAWING_REST_OF_APPS);
+            } else {
+                onDone && onDone(appsList);
             }
             
             if (docFrag.childNodes.length > 0) {
@@ -286,12 +293,6 @@ Evme.Utils = new function() {
                     $list.find(".new").removeClass("new");
                 }, 10);
             }
-            
-            if (hasInstalled) {
-                $list.addClass("has-installed");
-            }
-            
-            onDone && onDone(1, appsList);
             
             return iconsResult;
         }
@@ -379,12 +380,7 @@ Evme.Utils = new function() {
     this.getCurrentSearchQuery = function(){
         return Evme.Brain.Searcher.getDisplayedQuery();
     };
-
-    this.CONNECTION = {
-        "EVENT_ONLINE": "ononline",
-        "EVENT_OFFLINE": "onoffline"
-    };
-
+    
     var Connection = new function(){
         var _this = this,
             currentIndex,
@@ -418,33 +414,36 @@ Evme.Utils = new function() {
             ];
 
         this.init = function() {
-            window.addEventListener("online", function() {
-                Evme.EventHandler.trigger("Connection", "online");
-            });
-            window.addEventListener("offline", function() {
-                Evme.EventHandler.trigger("Connection", "offline");
-            });
-                
+            window.addEventListener("online", _this.setOnline);
+            window.addEventListener("offline", _this.setOffline);
+            
             _this.set();
         };
-
+        
+        this.setOnline = function() {
+            Evme.EventHandler.trigger("Connection", "online");
+        };
+        this.setOffline = function() {
+            Evme.EventHandler.trigger("Connection", "offline");
+        };
+        
         this.online = function(callback) {
             callback(navigator.onLine);
         };
-
+        
         this.get = function(){
             return getCurrent();
         };
-
+        
         this.set = function(index){
              currentIndex = index || (navigator.connection && navigator.connection.type) || 0;
              return getCurrent();
         };
-
+        
         function getCurrent(){
             return aug({}, consts, types[currentIndex]);
         }
-
+        
         function aug(){
             var main = arguments[0];
             for (var i=1, len=arguments.length; i<len; i++){
@@ -452,10 +451,11 @@ Evme.Utils = new function() {
             };
             return main;
         }
-
+        
         // init
         _this.init();
     };
+    this.Connection = Connection;
 
     this.init();
 };

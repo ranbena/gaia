@@ -22,6 +22,7 @@ window.Evme = new function() {
             "logger": logger,
             "minimumLettersForSearch": data.minimumLettersForSearch,
             "helper": data.texts.helper,
+            "apps": data.texts.apps,
             "promptInstallAppText": data.texts.installAppPrompt,
             "trending": {
                 "itemsPerPage": data.trending.itemsPerPage,
@@ -63,12 +64,12 @@ window.Evme = new function() {
 
     function initObjects(data) {
         var $container = $("#" + Evme.Utils.getID());
-
-        Evme.Connection.init({
+        
+        Evme.ConnectionMessage.init({
             "$parent": $container,
             "texts": data.texts.connection
         });
-
+        
         Evme.Location.init({
             "$elName": $(".user-location"),
             "$elButton": $("#button-location"),
@@ -78,12 +79,12 @@ window.Evme = new function() {
             "$elDoItLater": $("#later"),
             "texts": data.texts.location
         });
-
+        
         Evme.Screens.init({
             "$screens": $(".content_page"),
             "tabs": data.texts.tabs
         });
-
+        
         Evme.Shortcuts.init({
             "$el": $("#shortcuts"),
             "$loading": $("#shortcuts-loading"),
@@ -91,7 +92,7 @@ window.Evme = new function() {
             "shortcutsFavorites": data.texts.shortcutsFavorites,
             "defaultShortcuts": data._defaultShortcuts
         });
-
+        
         Evme.ShortcutsCustomize.init({
             "$parent": $container,
             "texts": data.texts.shortcutsFavorites
