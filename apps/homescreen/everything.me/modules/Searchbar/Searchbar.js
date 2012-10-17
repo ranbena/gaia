@@ -240,10 +240,7 @@ Evme.Searchbar = new function() {
         if (isFocused) return;
         isFocused = true;
         
-        //Do not use Evme.Utils.hideAddressBar() caus it has a delay that makes the address bar pop in a nasty way
-        window.scrollTo(0,1);
-        
-        Evme.Brain && Evme.Brain[_name].onfocus({
+        Brain && Brain[_name].onfocus({
             "e": e
         });
     }

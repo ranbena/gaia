@@ -250,10 +250,7 @@ Evme.Location = new function() {
             
             $close.bind("mousedown", cbClose);
             
-            $input.bind("blur", cbBlur)
-                  .bind("focus", function() {
-                      Viewport.hideAddressBar();
-                  });
+            $input.bind("blur", cbBlur);
             
             $input.bind("keyup", checkValue);
             
