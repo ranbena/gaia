@@ -103,14 +103,14 @@ Evme.Searchbar = new function() {
     };
 
     this.focus = function() {
-        if (focused) return;
+        if (isFocused) return;
         
         $el[0].focus();
         cbFocus();
     };
 
     this.blur = function(e) {
-        if (!focused) return;
+        if (!isFocused) return;
         
         $el[0].blur();
         cbBlur(e);
@@ -240,7 +240,7 @@ Evme.Searchbar = new function() {
         if (isFocused) return;
         isFocused = true;
         
-        Brain && Brain[_name].onfocus({
+        Evme.Brain && Evme.Brain[_name].onfocus({
             "e": e
         });
     }
@@ -249,7 +249,7 @@ Evme.Searchbar = new function() {
         if (!isFocused) return;
         isFocused = false;
         
-        Brain && Brain[_name].onblur({
+        Evme.Brain && Evme.Brain[_name].onblur({
             "e": e
         });
     }

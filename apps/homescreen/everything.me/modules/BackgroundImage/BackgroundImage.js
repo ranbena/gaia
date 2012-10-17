@@ -14,14 +14,15 @@ Evme.BackgroundImage = new function() {
         $el = options.$el;
         $fullScreenFade = options.$elementsToFade;
         elStyle = $el[0].style;
-
+        
         SOURCE_LABEL = options.texts.sourceLabel;
-
+        
+        $default = $('<div class="img default-image visible"></div>');
         if (defaultImage) {
-            $default = $('<div style="background-image: url(' + defaultImage + ')" class="img default-image visible"></div>');
-            $el.append($default);
+            $default.css('background-image', defaultImage);
         }
-
+        $el.append($default);
+        
         Evme.EventHandler.trigger(_name, "init");
     };
 

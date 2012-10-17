@@ -30,11 +30,14 @@
     #search-overlay .img.visible {
         opacity: 0.4;
     }
+    #search-overlay .img.default-image {
+        background: #000;
+    }
     #search-overlay .img.default-image.visible {
-        opacity: 0;
+        opacity: 1;
     }
     #search-overlay.default .img.default-image.visible {
-        opacity: 1;
+        opacity: .4;
     }
 
 #bgimage-overlay {

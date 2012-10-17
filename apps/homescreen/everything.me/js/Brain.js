@@ -1455,7 +1455,7 @@ Evme.Brain = new function() {
             
             Evme.Apps.load({
                 "apps": installedApps,
-                "installed": true,
+                "installed": installedApps.length > 0,
                 "iconFormat": iconsFormat,
                 "offset": 0,
                 "onDone": function() {
