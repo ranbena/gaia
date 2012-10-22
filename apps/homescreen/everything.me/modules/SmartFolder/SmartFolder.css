@@ -42,14 +42,15 @@
         position: relative;
         z-index: 50;
         height: 55px;
-        line-height: 55px;
+        line-height: 61px;
         padding: 0 20px;
         font-size: 17px;
         font-weight: normal;
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellisis;
-        border-bottom: 1px solid rgba(255, 255, 255, .3);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, .6);
+        border-bottom: 1px solid rgba(255, 255, 255, .8);
         -moz-box-sizing: border-box;
         box-sizing: border-box;
     }
@@ -63,9 +64,7 @@
             bottom: -5px;
             width: 0;
             height: 0;
-            border: 5px solid transparent;
-            border-top-color: rgba(255, 255, 255, .3);
-            border-left-color: rgba(255, 255, 255, .3);
+            border: 5px solid rgba(255, 255, 255, .8);
             -moz-transform: rotate(45deg);
             transform: rotate(45deg);
         }
@@ -92,7 +91,7 @@
     #evmeContainer .smart-folder > .close {
         background: transparent url('/everything.me/images/imageclose.png') 50% 50% no-repeat;
         position: absolute;
-        top: 12px;
+        top: 16px;
         right: 6px;
         width: 29px;
         height: 31px;
