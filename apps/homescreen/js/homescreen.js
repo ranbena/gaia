@@ -13,7 +13,7 @@ const Homescreen = (function() {
     GridManager.init('.apps', function gm_init() {
       DockManager.init(document.querySelector('#footer .dockWrapper'));
       PaginationBar.show();
-      GridManager.goToPage(0);
+      GridManager.goToPage(1);
       DragDropManager.init();
       Wallpaper.init();
 
@@ -32,7 +32,7 @@ const Homescreen = (function() {
       DockManager.saveState();
       Permissions.hide();
     } else {
-      GridManager.goToPage(0);
+      GridManager.goToPage(1);
     }
   }
 
