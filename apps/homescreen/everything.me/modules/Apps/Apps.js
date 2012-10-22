@@ -100,13 +100,12 @@ Evme.Apps = new function() {
     
     this.load = function(options) {
         var apps = options.apps,
-            isInstalled = options.installed,
             offset = options.offset,
             iconsFormat = options.iconsFormat,
             onDone = options.onDone,
             isMore = offset > 0;
         
-        if (isInstalled) {
+        if (options.clear) {
             _this.clear();
         }
         

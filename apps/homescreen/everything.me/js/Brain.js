@@ -1437,9 +1437,11 @@ Evme.Brain = new function() {
                 });
             }
             
+            options.hasInstalledApps = installedApps.length > 0;
+            
             Evme.Apps.load({
                 "apps": installedApps,
-                "installed": installedApps.length > 0,
+                "clear": appsCurrentOffset == 0,
                 "iconFormat": iconsFormat,
                 "offset": 0,
                 "onDone": function() {
@@ -1513,7 +1515,8 @@ Evme.Brain = new function() {
                 isExactMatch = options.exact,
                 iconsFormat = options.iconsFormat,
                 queryTyped = options.queryTyped, // used for searching for exact results if user stopped typing for X seconds
-                onlyDidYouMean = options.onlyDidYouMean;
+                onlyDidYouMean = options.onlyDidYouMean,
+                hasInstalledApps = options.hasInstalledApps;
 
             if (data.errorCode !== Evme.DoATAPI.ERROR_CODES.SUCCESS) {
                 return false;
@@ -1577,7 +1580,7 @@ Evme.Brain = new function() {
                     Evme.Apps.More.hide();
 
                     var method = _source == SEARCH_SOURCES.PAUSE? "updateApps" : "load";
-
+                    
                     // if just updating apps (user paused while typing) but we get different apps back from API- replace them instead of updating
                     if (method == "updateApps" && Evme.Apps.getAppsSignature() != Evme.Apps.getAppsSignature(apps)) {
                         method = "load";
@@ -1585,7 +1588,8 @@ Evme.Brain = new function() {
 
                     var iconsResponse = Evme.Apps[method]({
                         "apps": apps,
-                        "iconsFormat": iconsFormat
+                        "iconsFormat": iconsFormat,
+                        "clear": !hasInstalledApps && appsCurrentOffset == 0
                     });
 
                     if (iconsResponse) {
