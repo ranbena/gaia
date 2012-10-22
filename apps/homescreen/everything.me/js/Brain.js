@@ -15,16 +15,16 @@ Evme.Brain = new function() {
         SEARCH_SOURCES = {},
         PAGEVIEW_SOURCES = {},
         TIPS = {},
-
+        
         // whether to show shortcuts customize on startup or not
         ENABLE_FAVORITES_SHORTCUTS_SCREEN = false,
-
+        
         HISTORY_CLEAR_TEXT = "FROM CONFIG",
         REFINE_DISMISS_TEXT = "FROM CONFIG",
         NO_REFINE_TEXT = "FROM CONFIG",
         SHOW_HISTORY_TEXT = "FROM CONFIG",
         APPS_ERROR_TEXT = "FROM CONFIG",
-
+        
         QUERY_TYPES = {
             "EXPERIENCE": "experience",
             "APP": "app",
@@ -32,10 +32,12 @@ Evme.Brain = new function() {
         },
         
         INSTALLED_APPS_TO_TYPE = {
+            /*
             "music": ["Music"],
             "movies": ["Video"],
             "tv": ["Video"],
             "games": ["TowerJelly", "PenguinPop", "CrystalSkull", "CubeVid"]
+            */
         },
 
         timeoutSetUrlAsActive = null,
