@@ -2,9 +2,7 @@ Evme.Shortcuts = new function() {
     var _name = "Shortcuts", _this = this, scroll = null, itemsDesign = "FROM CONFIG", setDesign = false,
         $el = null, $list = null, $loading = null,
         shortcuts = [], visible = false, isSwiping = false, swiped = false, customizing = false, enabled = true,
-        defaultShortcuts = null, categoryPageData = {};
-    
-    var KEY_USER_SHORTCUTS = "userShortcuts";
+        categoryPageData = {};
     
     this.init = function(options) {
         !options && (options = {});
@@ -13,8 +11,6 @@ Evme.Shortcuts = new function() {
         $list = $el.find("#shortcuts-items");
         $loading = options.$loading;
         itemsDesign = options.design;
-        
-        defaultShortcuts = Evme.Storage.get(KEY_USER_SHORTCUTS) || options.defaultShortcuts;
         
         scroll = new Scroll($el.find("#shortcuts-list")[0], {
             "hScroll": false,
@@ -26,16 +22,10 @@ Evme.Shortcuts = new function() {
         Evme.EventHandler.trigger(_name, "init");
     };
     
-    this.loadDefault = function() {
-        _this.load(defaultShortcuts);
-    };
-
     this.load = function(data, cbLoadSuccess, cbLoadError) {
         if (!data || !("shortcuts" in data)){
             cbLoadError && cbLoadError(data);
         } else {
-            Evme.Storage.set(KEY_USER_SHORTCUTS, data);
-            
             var shortcuts = data.shortcuts,
                 icons = data.icons;
                 
@@ -76,7 +66,7 @@ Evme.Shortcuts = new function() {
             
         for (var i=0; i<_shortcuts.length; i++) {
             var shortcut = new Evme.Shortcut();
-            var $el = shortcut.init(_shortcuts[i], i, click);
+            var $el = shortcut.init(_shortcuts[i], i, click, onContext);
             
             if ($el) {
                 $el.addClass("remove");
@@ -124,7 +114,7 @@ Evme.Shortcuts = new function() {
     this.draw = function(_shortcuts, icons) {
         for (var i=0; i<_shortcuts.length; i++) {
             var shortcut = new Evme.Shortcut();
-            var $el = shortcut.init(_shortcuts[i], i, click);
+            var $el = shortcut.init(_shortcuts[i], i, click, onContext);
             
             if ($el) {
                 shortcuts.push(shortcut);
@@ -271,6 +261,10 @@ Evme.Shortcuts = new function() {
         Evme.EventHandler.trigger(_name, "click", data);
     }
     
+    function onContext(data) {
+        Evme.EventHandler.trigger(_name, "hold");
+    }
+    
     function cbShow(bReport) {
         Evme.EventHandler.trigger(_name, "show", {
             "shortcuts": shortcuts,
@@ -295,13 +289,18 @@ Evme.Shortcuts = new function() {
 Evme.Shortcut = function() {
     var _name = "Shortcut", _this = this, cfg = null, id = "id"+Math.round(Math.random()*10000),
         $el = null, $thumb = null,  index = -1, query = "", image = "", imageLoadingRetry = 0,
-        onClick = null;
+        onTap = null, onLongTap = null, timeoutHold = null,
+        posStart = [0, 0], timeStart = 0, fingerMoved = true;
+        
+    var THRESHOLD = 5,
+        TIME_BEFORE_CONTEXT = 600;
     
-    this.init = function(_cfg, _index, _onClick) {
+    this.init = function(_cfg, _index, _onClick, _onContext) {
         cfg = _cfg;
         index = _index;
         query = cfg.query;
-        onClick = _onClick;
+        onTap = _onClick;
+        onLongTap = _onContext;
         
         if (!cfg.query) {
             return null;
@@ -317,19 +316,11 @@ Evme.Shortcut = function() {
         
         _this.setImage(cfg.appIds);
         
-        $el.bind("click", clicked);
-           
+        $el.bind("touchstart", onTouchStart);
+        $el.bind("touchmove", onTouchMove);
+        $el.bind("touchend", fireTap);
+        
         return $el;
-    };
-    
-    this.remove = function() {
-        if ($el) {
-            $el.addClass("remove");
-            window.setTimeout(function() {
-                $el.remove();
-                Evme.Shortcuts.refreshScroll();
-            }, 200);
-        }
     };
     
     this.setImage = function(shortcutIcons) {
@@ -346,12 +337,53 @@ Evme.Shortcut = function() {
     this.getQuery = function() { return query; };
     this.isCustom = function() { return cfg.isCustom; };
     
-    function clicked() {
-        onClick({
+    function onTouchStart(e) {
+        e = (e.touches || [e])[0];
+        
+        fingerMoved = false;
+        
+        posStart = [e.pageX, e.pageY];
+        timeStart = Date.now();
+        
+        window.clearTimeout(timeoutHold);
+        timeoutHold = window.setTimeout(fireLongTap, TIME_BEFORE_CONTEXT);
+    }
+    
+    function onTouchMove(e) {
+        e = (e.changedTouches || [e])[0];
+        
+        var p = [e.pageX, e.pageY];
+        if (Math.abs(p[0] - posStart[0]) > THRESHOLD || Math.abs(p[1] - posStart[1]) > THRESHOLD) {
+            fingerMoved = true;
+            window.clearTimeout(timeoutHold);
+        }
+    }
+    
+    function fireLongTap(e) {
+        window.clearTimeout(timeoutHold);
+        if (fingerMoved) return;
+        fingerMoved = false;
+        
+        onLongTap({
             "shortcut": _this,
             "data": cfg,
             "$el": $el,
-            "index": index
+            "index": index,
+            "e": e
+        });
+    }
+    
+    function fireTap(e) {
+        window.clearTimeout(timeoutHold);
+        if (fingerMoved) return;
+        fingerMoved = false;
+        
+        onTap({
+            "shortcut": _this,
+            "data": cfg,
+            "$el": $el,
+            "index": index,
+            "e": e
         });
     }
 };

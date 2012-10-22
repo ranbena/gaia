@@ -86,7 +86,6 @@ Evme.Brain = new function() {
             Evme.Searchbar.clear();
             Brain.Searchbar.setEmptyClass();
 
-            Evme.Shortcuts.loadDefault();
             Evme.Shortcuts.show();
             
             Brain.FFOS.showMenu();
@@ -900,7 +899,6 @@ Evme.Brain = new function() {
         var _this = this,
             customizeInited = false,
             timeoutShowLoading = null,
-            $screen = null,
             clickedCustomizeHandle = false,
             loadingCustomization = false,
             requestSmartFolderApps = null,
@@ -908,19 +906,8 @@ Evme.Brain = new function() {
 
         this.loaded = false;
 
-        var SHOW_FAVORITES_SHORTCUTS_SELECTION_SCREEN_STORAGE_KEY = "shrtFav";
-
         this.init = function() {
-            $screen = $('<div id="category-page-screen"></div>');
-            $("#shortcuts-page .pages").append($screen);
-
-            var $buttonClose = $('<b id="close-category"></b>');
-            $buttonClose.bind("touchstart", function(e){
-                e.preventDefault();
-                e.stopPropagation();
-                _this.closeCategoryPage();
-            });
-            $("#shortcuts-page .pages").append($buttonClose);
+            
         };
 
         this.show = function() {
@@ -931,40 +918,33 @@ Evme.Brain = new function() {
             }).show();
 
             Brain.Searchbar.hideKeyboardTip();
-
+            
             _this.loadFromAPI(function(){
                 Brain.ShortcutsCustomize.addCustomizeButton();
             });
         };
         
         this.loadFromAPI = function(callback, bForce) {
-            if (!_this.loaded || bForce) {
-                Evme.DoATAPI.Shortcuts.get({
-                    "iconFormat": Evme.Utils.getIconsFormat(),
-                    "_NOCACHE": true
-                }, function onSuccess(data, methodNamespace, methodName, url) {
-                    Evme.Shortcuts.load(data.response, callback);
-                });
-            } else {
-                callback && callback(Evme.Shortcuts.get());
-            }
+            Evme.DoATAPI.Shortcuts.get({}, function onSuccess(data) {
+                Evme.Shortcuts.load(data.response, callback);
+            });
         };
 
         function checkForMissingShortcutIcons() {
             var $elsWithMissingIcons = Evme.Shortcuts.getElement().find("*[iconToGet]"),
                 appIds = [];
-
+            
             if ($elsWithMissingIcons.length == 0) {
                 return false;
             }
-
+            
             for (var i=0,l=$elsWithMissingIcons.length; i<l; i++) {
                 var $el = $elsWithMissingIcons[i],
                     appId = $el.getAttribute("iconToGet");
 
                 appIds.push(appId);
             }
-
+            
             Evme.DoATAPI.icons({
                 "ids": appIds.join(","),
                 "iconFormat": Evme.Utils.getIconsFormat()
@@ -972,7 +952,7 @@ Evme.Brain = new function() {
                 if (!data || !data.response) {
                     return;
                 }
-
+                
                 var icons = data.response;
                 for (var i in icons) {
                     var icon = icons[i],
@@ -982,28 +962,30 @@ Evme.Brain = new function() {
                     $elsWithMissingIcons.filter("[iconToGet='" + icon.id + "']").css("background-image", "url(" + iconImage + ")");
                 }
             });
-
+            
             return true;
         }
-
+        
         this.hide = function() {
-
+            
         };
-
-        this.handleCustomizeClick = function() {
-            Evme.ShortcutsCustomize.show(false);
+        
+        this.hold = function() {
+            Evme.Shortcuts.isEditing = true;
+            $body.addClass("shortcuts-customizing");
+            Brain.FFOS.hideMenu();
         };
-
+        
         this.click = function(data) {
             if (!data || !data.data || !data.data.query) {
                 return;
             }
-
-            if (!Evme.Shortcuts.customizing() && !Evme.Shortcuts.isSwiping()) {
+            
+            if (!Evme.Shortcuts.isEditing && !Evme.Shortcuts.isSwiping()) {
                 var query = data.data.query;
-
+                
                 data.query = query;
-
+                
                 Evme.EventHandler.trigger("Shortcut", "click", data);
                 
                 _this.showSmartFolder({
@@ -1134,7 +1116,7 @@ Evme.Brain = new function() {
         this.remove = function(data) {
             data.shortcut.remove();
             Evme.Shortcuts.remove(data.shortcut);
-
+            
             if (!data.shortcut.isCustom()) {
                 Evme.ShortcutsCustomize.add(data.data);
             }

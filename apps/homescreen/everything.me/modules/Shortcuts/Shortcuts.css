@@ -51,6 +51,7 @@
         clear: both;
     }
     #evmeContainer .shortcut {
+        position: relative;
         display: inline-block;
         vertical-align: top;
         z-index: 10;
@@ -59,18 +60,16 @@
         text-align: center;
         cursor: pointer;
     }
-    #evmeContainer .shortcut.dragging {
-        -moz-transition: none;
-        transition: none;
-        z-index: 50;
-    }
-        #evmeContainer .shortcut.dragging .thumb {
-            -moz-transform: scale(1.7);
-            transform: scale(1.7);
-        }
-        #evmeContainer .shortcut.dragging b {
-            -moz-transform: translateY(20px);
-            transform: translateY(20px);
+        #evmeContainer .shortcut .remove {
+            position: absolute;
+            top: -5px;
+            left: 0;
+            right: 0;
+            height: 25px;
+            z-index: 100;
+            display: none;
+            cursor: pointer;
+            background: transparent url('/everything.me/images/shared/close.png') 50% 0 no-repeat;
         }
     #evmeContainer .shortcut.disabled {
         opacity: 0;
@@ -103,15 +102,12 @@
             margin: 0 auto;
             z-index: 10;
             border-radius: 32px;
+            -moz-transform-origin: 50% 50%;
         }
         #evmeContainer .shortcut.add .thumb * span,
         #evmeContainer .shortcut .thumb * span {
           transition: none !important;
           transform: none !important;
-        }
-        #evmeContainer .shortcut.remove .thumb {
-            -moz-transform: scale(1.3);
-            transform: scale(1.3);
         }
         #evmeContainer .shortcut.add .thumb:before {
             content: "";
@@ -322,4 +318,23 @@
 #evmeContainer #shortcuts #shortcuts-list ul {
     padding-top: 5px;
     padding-bottom: 0;
+}
+
+
+#evmeContainer.shortcuts-customizing .shortcut .thumb {
+    -moz-animation: shake 800ms infinite ease-out;
+}
+#evmeContainer.shortcuts-customizing .shortcut .remove {
+    display: block;
+}
+#evmeContainer.shortcuts-customizing .shortcut.add {
+    display: none;
+}
+
+@-moz-keyframes shake {
+  0% { -moz-transform: scale(1); }
+    25% { -moz-transform: scale(1.05); }
+  50% { -moz-transform: scale(1); }
+  75% { -moz-transform: scale(0.95); }
+    100% { -moz-transform: scale(1); }
 }

@@ -186,35 +186,23 @@ Evme.DoATAPI = new function() {
     
     this.Shortcuts = new function() {
         var _this = this,
-            width = 110, height = 90, SHORTCUT_CACHE_VERSION = "1",
-            cacheKeyGet = "";
-        
-        this.size = function() {
-            return {
-                "width": width,
-                "height": height
-            };
-        };
+            STORAGE_KEY_SHORTCUTS = "localShortcuts",
+            STORAGE_KEY_ICONS = "localShortcutsIcons";
         
         this.get = function(_options, callback) {
-            !_options && (_options = {});
+            var shortcuts = Evme.Storage.get(STORAGE_KEY_SHORTCUTS),
+                icons = Evme.Storage.get(STORAGE_KEY_SHORTCUTS);
+                
+            if (!shortcuts) {
+                shortcuts = Evme.__config["_" + STORAGE_KEY_SHORTCUTS];
+                icons = Evme.__config["_" + STORAGE_KEY_ICONS];
+            }
             
-            var options = {
-                "width": width,
-                "height": height,
-                "iconFormat": _options.iconFormat,
-                "queries": _options.queries,
-                "cacheVersion": SHORTCUT_CACHE_VERSION
-            };
+            var response = createResponse(shortcuts, icons);
             
-            !cacheKeyGet && (cacheKeyGet = getCacheKey("Shortcuts", "get", options));
+            callback && callback(response);
             
-            return request({
-                "methodNamespace": "Shortcuts",
-                "methodName": "get",
-                "params": options,
-                "callback": callback
-            }, _options._NOCACHE);
+            return response;
         };
         
         this.set = function(_options, callback) {
@@ -232,6 +220,40 @@ Evme.DoATAPI = new function() {
                 "params": options,
                 "callback": callback
             }, _options._NOCACHE);
+        };
+        
+        this.remove = function(shortcut) {
+            var response = _this.get().response,
+                shortcuts = response.shortcuts,
+                icons = response.icons,
+                allAppIds = {};
+                
+            for (var i=0; i<shortcuts.length; i++) {
+                var s = shortcuts[i],
+                    needToRemoveIcons = false;
+                
+                if (s.query.toLowerCase() == shortcut.toLowerCase()) {
+                    shortcuts.splice(i, 1);
+                    needToRemoveIcons = true;
+                }
+                
+                for (var j=0; j<s.appIds.length; j++) {
+                    if (!allAppIds[s.appIds[j].id]) {
+                        allAppIds[s.appIds[j].id] = {
+                            "num": 0,
+                            "needToRemove": needToRemoveIcons
+                        };
+                    }
+                    allAppIds[s.appIds[j].id].num++;
+                }
+            }
+            
+            // after the shortcut itself was removed, we check if its icons are associated with other shortcuts
+            for (var appId in allAppIds) {
+                if (allAppIds[appId].needToRemove && allAppIds[appId].num < 2) {
+                    delete icons[appId];
+                }
+            }
         };
         
         this.suggest = function(_options, callback) {
@@ -267,12 +289,21 @@ Evme.DoATAPI = new function() {
                 "params": options,
                 "callback": callback
             }, _options._NOCACHE);
+        };
+        
+        function createResponse(shortcuts, icons) {
+            return {
+                "response": {
+                    "shortcuts": shortcuts,
+                    "icons": icons
+                }
+            };
         }
         
         this.cleanCache = function() {
             Evme.DoATAPI.removeFromCache(cacheKeyGet);
         };
-    }
+    };
     
     this.trending = function(_options, callback) {
         !_options && (_options = {});
