@@ -34,6 +34,10 @@
         height: 36px;
         line-height: 36px;
     }
+    .empty-query:not(.keyboard-visible) #search-q {
+        height: 36px;
+        line-height: 36px;
+    }
     .empty-query:not(.keyboard-visible) #search-q-bg {
         background-position: 98% 10px;
     }

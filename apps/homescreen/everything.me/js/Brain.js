@@ -102,18 +102,6 @@ Evme.Brain = new function() {
         this.focus = function(data) {
             Evme.Utils.setKeyboardVisibility(true);
             
-            if (!Evme.Screens.Search.active()) {
-                if (data && data.e && data.e.type === "touchstart"){
-                    data.e.preventDefault();
-                }
-                window.setTimeout(function() {
-                    Evme.Screens.Search.show({"pageviewSource": PAGEVIEW_SOURCES.TAB});
-                }, 0);
-                window.setTimeout(Evme.Helper.showTip, 320);
-            } else {
-                Evme.Helper.showTip();
-            }
-            
             Brain.FFOS.hideMenu();
 
             Evme.Location.hideButton();
@@ -158,10 +146,10 @@ Evme.Brain = new function() {
                 timeoutBlur = window.setTimeout(_this.returnPressed, TIMEOUT_BEFORE_RUNNING_BLUR);
             }
         };
-
+        
         this.onfocus = this.focus;
         this.onblur = this.blur;
-
+        
         this.empty = function(data) {
             Searcher.cancelRequests();
             _this.emptySource = (data && data.pageviewSource) || (data.sourceObjectName === "Searchbar" && PAGEVIEW_SOURCES.CLEAR);
@@ -171,20 +159,20 @@ Evme.Brain = new function() {
             Evme.DoATAPI.cancelQueue();
             Evme.ConnectionMessage.hide();
         };
-
+        
         this.clear = function(e) {
             Searcher.cancelRequests();
             Evme.Apps.clear();
             Evme.Helper.setTitle();
             Brain.Helper.showDefault();
         };
-
+        
         this.returnPressed = function(data) {
             if (Brain.Dialog.isActive()) {
                 data && data.e && data.e.preventDefault();
                 return;
             }
-
+            
             var query = Evme.Searchbar.getValue();
             Searcher.searchExactFromOutside(query, SEARCH_SOURCES.RETURN_KEY);
             Evme.Searchbar.blur();
@@ -199,20 +187,18 @@ Evme.Brain = new function() {
                 $body.removeClass("empty-query");
             }
         };
-
+        
         this.cancelBlur = function() {
             window.clearTimeout(timeoutBlur);
         };
-
-        this.backButtonClick = function(data) {
+        
+        this.clearButtonClick = function(data) {
             _this.cancelBlur();
-            Evme.Screens.Search.hide();
-
-            if (!Evme.Screens.active()) {
-                Evme.Screens.goTo(DEFAULT_PAGE);
+            if (!Evme.Utils.isKeyboardVisible()) {
+                Brain.FFOS.showMenu();
             }
         };
-
+        
         this.valueChanged = function(data) {
             _this.hideKeyboardTip();
 
@@ -437,10 +423,6 @@ Evme.Brain = new function() {
         };
 
         function showApps(query, source) {
-            if (!Evme.Screens.Search.active()) {
-                return;
-            }
-
             if (typeof query == "string") {
                 query = {
                     "query": query,
@@ -1826,8 +1808,6 @@ Evme.Brain = new function() {
             if (query) {
                 Evme.Helper.reset();
                 Evme.Searchbar.setValue(query, false);
-
-                Evme.Screens.Search.show();
 
                 if (lastSearch.query != query || lastSearch.type != type || !lastSearch.exact) {
                     resetLastSearch();

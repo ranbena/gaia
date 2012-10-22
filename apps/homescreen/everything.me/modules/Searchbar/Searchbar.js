@@ -33,13 +33,6 @@ Evme.Searchbar = new function() {
             cbReturnPressed(e, $el.val());
         });
         
-        $("#button-back").bind("touchstart", function(){
-            $(this).addClass("down");
-        }).bind("click", function(e){
-            $(this).removeClass("down");
-            backButtonClick(e);
-        });
-        
         DEFAULT_TEXT = options.texts.defaultText;
         if (DEFAULT_TEXT) {
             $defaultText.html(DEFAULT_TEXT);
@@ -53,7 +46,7 @@ Evme.Searchbar = new function() {
             e.preventDefault();
             e.stopPropagation();
             clearButtonClick();
-        });
+        }).bind("click", clearButtonClick);
         
         _this.bindEvents($el, cbFocus, inputKeyDown, inputKeyUp);
             
@@ -140,11 +133,6 @@ Evme.Searchbar = new function() {
         $("#search-header").addClass("clear-visible");
     };
     
-    function backButtonClick(e) {
-        e.stopPropagation();
-        Evme.EventHandler.trigger(_name, "backButtonClick");
-    }
-    
     function clearButtonClick() {
         _this.setValue("", false, true);
         
@@ -156,6 +144,8 @@ Evme.Searchbar = new function() {
             cbClear();
             cbEmpty();
         }, 0);
+        
+        Evme.EventHandler.trigger(_name, "clearButtonClick");
     }
     
     function inputKeyDown(e) {
