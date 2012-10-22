@@ -49,6 +49,9 @@
         -moz-transition: -moz-transform .2s linear;
         transition: transform .2s linear;
     }
+    #evmeContainer .evme-apps:not(.has-installed) .has-installed-visible {
+        display: none;
+    }
     #evmeContainer .evme-apps ul li.installed {
         position: absolute;
         top: 6px;
@@ -224,7 +227,7 @@
     -moz-transform: translateY(35px);
     transform: translateY(35px);
 }
-    
+
 body:not(.istouch) .evme-apps {
     
 }

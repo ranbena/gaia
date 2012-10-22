@@ -119,7 +119,7 @@ Evme.__config = {
         "apps": {
             "more": "More",
             "moreLoading": "Loading...",
-            "connectionError": "Connect to the internet to get even more apps for {QUERY}"
+            "connectionError": "Connect to the internet to get <span class='has-installed-visible'>even more </span>apps for {QUERY}"
         },
         "backgroundImage": {
             "sourceLabel": "Source:"
