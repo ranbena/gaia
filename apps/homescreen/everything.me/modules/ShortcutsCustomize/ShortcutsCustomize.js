@@ -1,7 +1,7 @@
 Evme.ShortcutsCustomize = new function() {
     var _name = 'ShortcutsCustomize', _this = this,
         $list = null,
-        numSelectedStartedWith = 0, numSuggestedStartedWith = 0;
+        numSelectedStartedWith = 0, numSuggestedStartedWith = 0, savedIcons = null;
         
     this.init = function(options) {
         $parent = options.$parent;
@@ -41,9 +41,12 @@ Evme.ShortcutsCustomize = new function() {
         return shortcuts;
     };
     
-    this.load = function(shortcuts) {
+    this.load = function(data) {
+        var shortcuts = data.shortcuts;
+            
         numSelectedStartedWith = 0;
         numSuggestedStartedWith = 0;
+        savedIcons = data.icons;
         
         $list.empty();
         _this.add(shortcuts);
@@ -71,16 +74,18 @@ Evme.ShortcutsCustomize = new function() {
     };
     
     this.Loading = new function() {
-        var _this = this,
-            active = false,
-            ID = 'shortcuts-customize-loading';
+        var active = false,
+            ID = 'shortcuts-customize-loading',
+            TEXT_CANCEL = "Cancel";
         
         this.show = function() {
             if (active) return;
             
-            var $el = $('<div id="' + ID + '"></div>');
+            var $el = $('<div id="' + ID + '"><menu><button>' + TEXT_CANCEL + '</button></menu></div>');
             $('#' + Evme.Utils.getID()).append($el);
             active = true;
+            
+            $el.find("button").bind("click", onLoadingCancel);
         };
         
         this.hide = function() {
@@ -95,11 +100,18 @@ Evme.ShortcutsCustomize = new function() {
         Evme.EventHandler.trigger(_name, 'hide');
     }
     
+    function onLoadingCancel(e) {
+        Evme.EventHandler.trigger(_name, 'loadingCancel', {
+            'e': e
+        });
+    }
+    
     function done() {
         var shortcuts = _this.get();
         
         Evme.EventHandler.trigger(_name, 'done', {
             'shortcuts': shortcuts,
+            'icons': savedIcons,
             'numSelectedStartedWith': numSelectedStartedWith,
             'numSuggestedStartedWith': numSuggestedStartedWith,
             'numSelected': shortcuts.length,

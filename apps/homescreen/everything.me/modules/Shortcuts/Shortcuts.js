@@ -1,6 +1,6 @@
 Evme.Shortcuts = new function() {
     var _name = "Shortcuts", _this = this, scroll = null, itemsDesign = "FROM CONFIG", setDesign = false,
-        $el = null, $list = null, $loading = null,
+        $el = null, $list = null, $loading = null, loadedResponse = null,
         shortcuts = [], visible = false, isSwiping = false, swiped = false, customizing = false, enabled = true,
         categoryPageData = {};
     
@@ -15,26 +15,30 @@ Evme.Shortcuts = new function() {
         scroll = new Scroll($el.find("#shortcuts-list")[0], {
             "hScroll": false,
             "checkDOMChanges": false,
-            "onBeforeScrollMove": function(e){ swiped = true; },
-            "onBeforeScrollEnd": function(){ swiped = false; }
+            "onBeforeScrollMove": function(e){ swiped = true; $el.addClass("swiping"); },
+            "onBeforeScrollEnd": function(){ swiped = false; $el.removeClass("swiping"); }
         });
+        
+        $el.bind("click", onListClick);
         
         Evme.EventHandler.trigger(_name, "init");
     };
     
-    this.load = function(data, cbLoadSuccess, cbLoadError) {
+    this.load = function(data) {
         if (!data || !("shortcuts" in data)){
             cbLoadError && cbLoadError(data);
         } else {
-            var shortcuts = data.shortcuts,
+            loadedResponse = JSON.parse(JSON.stringify(data));
+            
+            var _shortcuts = data.shortcuts.splice(0),
                 icons = data.icons;
                 
             for (var id in icons) {
                 Evme.IconManager.add(id, icons[id], Evme.Utils.getIconsFormat());
             }
             
-            for (var i=0; i<shortcuts.length; i++) {
-                var appIds = shortcuts[i].appIds,
+            for (var i=0; i<_shortcuts.length; i++) {
+                var appIds = _shortcuts[i].appIds,
                     apps = [];
                 
                 for (var j=0; j<appIds.length; j++) {
@@ -44,16 +48,19 @@ Evme.Shortcuts = new function() {
                     });
                 }
                 
-                shortcuts[i].appIds = apps;
+                _shortcuts[i].appIds = apps;
             }
             
             setShortcutsDesign();
             
             _this.clear();
-            _this.draw(shortcuts);
-            cbLoadSuccess && cbLoadSuccess(_this.get());
+            _this.draw(_shortcuts);
             cbLoaded();
         }
+    };
+    
+    this.getLoadedResponse = function() {
+        return loadedResponse;
     };
     
     this.add = function(_shortcuts) {
@@ -66,7 +73,7 @@ Evme.Shortcuts = new function() {
             
         for (var i=0; i<_shortcuts.length; i++) {
             var shortcut = new Evme.Shortcut();
-            var $el = shortcut.init(_shortcuts[i], i, click, onContext);
+            var $el = shortcut.init(_shortcuts[i], i);
             
             if ($el) {
                 $el.addClass("remove");
@@ -113,12 +120,11 @@ Evme.Shortcuts = new function() {
 
     this.draw = function(_shortcuts, icons) {
         for (var i=0; i<_shortcuts.length; i++) {
-            var shortcut = new Evme.Shortcut();
-            var $el = shortcut.init(_shortcuts[i], i, click, onContext);
+            var shortcut = new Evme.Shortcut(),
+                $el = shortcut.init(_shortcuts[i], i);
             
             if ($el) {
                 shortcuts.push(shortcut);
-
                 $list.append($el);
             }
         }
@@ -253,16 +259,11 @@ Evme.Shortcuts = new function() {
         setDesign = true;
     }
     
-    function click(data) {
-        if (_this.swiped() || !_this.enabled()) {
-            return;
+    function onListClick(e) {
+        if (e.originalTarget.id == 'shortcuts-list') {
+            Evme.EventHandler.trigger(_name, "listClick", {
+            });
         }
-        
-        Evme.EventHandler.trigger(_name, "click", data);
-    }
-    
-    function onContext(data) {
-        Evme.EventHandler.trigger(_name, "hold");
     }
     
     function cbShow(bReport) {
@@ -289,18 +290,16 @@ Evme.Shortcuts = new function() {
 Evme.Shortcut = function() {
     var _name = "Shortcut", _this = this, cfg = null, id = "id"+Math.round(Math.random()*10000),
         $el = null, $thumb = null,  index = -1, query = "", image = "", imageLoadingRetry = 0,
-        onTap = null, onLongTap = null, timeoutHold = null,
+        timeoutHold = null, removed = false,
         posStart = [0, 0], timeStart = 0, fingerMoved = true;
         
     var THRESHOLD = 5,
         TIME_BEFORE_CONTEXT = 600;
     
-    this.init = function(_cfg, _index, _onClick, _onContext) {
+    this.init = function(_cfg, _index) {
         cfg = _cfg;
         index = _index;
         query = cfg.query;
-        onTap = _onClick;
-        onLongTap = _onContext;
         
         if (!cfg.query) {
             return null;
@@ -318,7 +317,8 @@ Evme.Shortcut = function() {
         
         $el.bind("touchstart", onTouchStart);
         $el.bind("touchmove", onTouchMove);
-        $el.bind("touchend", fireTap);
+        $el.bind("touchend", onTouchEnd);
+        $el.find(".remove").bind("click", _this.remove);
         
         return $el;
     };
@@ -328,6 +328,24 @@ Evme.Shortcut = function() {
             var $iconGroup = Evme.IconGroup.get(shortcutIcons);
             $thumb.append($iconGroup);
         }
+    };
+    
+    this.remove = function(e) {
+        if (removed) return;
+        
+        removed = true;
+        $el && $el.addClass("remove");
+        
+        window.setTimeout(function(){
+            $el && $el.remove();
+        }, 300);
+        
+        Evme.EventHandler.trigger(_name, "remove", {
+            "shortcut": _this,
+            "data": cfg,
+            "index": index,
+            "e": e
+        });
     };
     
     this.getData = function() { return cfg; };
@@ -359,26 +377,27 @@ Evme.Shortcut = function() {
         }
     }
     
-    function fireLongTap(e) {
+    function onTouchEnd(e) {
         window.clearTimeout(timeoutHold);
         if (fingerMoved) return;
         fingerMoved = false;
         
-        onLongTap({
+        Evme.EventHandler.trigger(_name, "click", {
             "shortcut": _this,
             "data": cfg,
+            "query": cfg.query,
             "$el": $el,
             "index": index,
             "e": e
         });
     }
     
-    function fireTap(e) {
+    function fireLongTap(e) {
         window.clearTimeout(timeoutHold);
         if (fingerMoved) return;
         fingerMoved = false;
         
-        onTap({
+        Evme.EventHandler.trigger(_name, "hold", {
             "shortcut": _this,
             "data": cfg,
             "$el": $el,

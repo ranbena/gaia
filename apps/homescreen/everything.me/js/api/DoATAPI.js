@@ -187,122 +187,117 @@ Evme.DoATAPI = new function() {
     this.Shortcuts = new function() {
         var _this = this,
             STORAGE_KEY_SHORTCUTS = "localShortcuts",
-            STORAGE_KEY_ICONS = "localShortcutsIcons";
+            STORAGE_KEY_ICONS = "localShortcutsIcons",
+            queriesToAppIds = {};
         
         this.get = function(_options, callback) {
             var shortcuts = Evme.Storage.get(STORAGE_KEY_SHORTCUTS),
-                icons = Evme.Storage.get(STORAGE_KEY_SHORTCUTS);
+                icons = Evme.Storage.get(STORAGE_KEY_ICONS);
                 
             if (!shortcuts) {
                 shortcuts = Evme.__config["_" + STORAGE_KEY_SHORTCUTS];
                 icons = Evme.__config["_" + STORAGE_KEY_ICONS];
             }
             
-            var response = createResponse(shortcuts, icons);
+            saveAppIds(shortcuts);
             
-            callback && callback(response);
-            
-            return response;
+            callback && callback(createResponse(shortcuts, icons));
         };
         
         this.set = function(_options, callback) {
             !_options && (_options = {});
-        
-            var options = {
-                "shortcuts": _options.shortcuts || []
-            };
             
-            _this.cleanCache();
+            var shortcuts = _options.shortcuts || [],
+                icons = _options.icons || {};
             
-            return request({
-                "methodNamespace": "Shortcuts",
-                "methodName": "set",
-                "params": options,
-                "callback": callback
-            }, _options._NOCACHE);
+            for (var i=0; i<shortcuts.length; i++) {
+                if (typeof shortcuts[i] == "string") {
+                    var query = shortcuts[i];
+                    shortcuts[i] = {
+                        "query": query,
+                        "appIds": queriesToAppIds[query.toLowerCase()] || []
+                    };
+                }
+            }
+            
+            Evme.Storage.set(STORAGE_KEY_SHORTCUTS, shortcuts);
+            Evme.Storage.set(STORAGE_KEY_ICONS, icons);
+            
+            callback && callback();
         };
         
         this.remove = function(shortcut) {
-            var response = _this.get().response,
-                shortcuts = response.shortcuts,
-                icons = response.icons,
-                allAppIds = {};
-                
-            for (var i=0; i<shortcuts.length; i++) {
-                var s = shortcuts[i],
-                    needToRemoveIcons = false;
-                
-                if (s.query.toLowerCase() == shortcut.toLowerCase()) {
-                    shortcuts.splice(i, 1);
-                    needToRemoveIcons = true;
-                }
-                
-                for (var j=0; j<s.appIds.length; j++) {
-                    if (!allAppIds[s.appIds[j].id]) {
-                        allAppIds[s.appIds[j].id] = {
-                            "num": 0,
-                            "needToRemove": needToRemoveIcons
-                        };
+            _this.get({}, function(response){
+                var shortcuts = response.response.shortcuts,
+                    icons = response.response.icons,
+                    allAppIds = {};
+                    
+                for (var i=0; i<shortcuts.length; i++) {
+                    var s = shortcuts[i],
+                        needToRemoveIcons = false;
+                    
+                    if (s.query.toLowerCase() == shortcut.toLowerCase()) {
+                        shortcuts.splice(i, 1);
+                        needToRemoveIcons = true;
                     }
-                    allAppIds[s.appIds[j].id].num++;
+                    
+                    for (var j=0; j<s.appIds.length; j++) {
+                        if (!allAppIds[s.appIds[j].id]) {
+                            allAppIds[s.appIds[j].id] = {
+                                "num": 0,
+                                "needToRemove": needToRemoveIcons
+                            };
+                        }
+                        allAppIds[s.appIds[j].id].num++;
+                    }
                 }
-            }
-            
-            // after the shortcut itself was removed, we check if its icons are associated with other shortcuts
-            for (var appId in allAppIds) {
-                if (allAppIds[appId].needToRemove && allAppIds[appId].num < 2) {
-                    delete icons[appId];
+                
+                // after the shortcut itself was removed, we check if its icons are associated with other shortcuts
+                for (var appId in allAppIds) {
+                    if (allAppIds[appId].needToRemove && allAppIds[appId].num < 2) {
+                        delete icons[appId];
+                    }
                 }
-            }
+                
+                _this.set({
+                    "shortcuts": shortcuts,
+                    "icons": icons
+                });
+            })
         };
         
         this.suggest = function(_options, callback) {
             !_options && (_options = {});
             
             var options = {
-                "width": width,
-                "height": height
+                "existing": JSON.stringify(_options.existing || [])
             };
             
             return request({
                 "methodNamespace": "Shortcuts",
                 "methodName": "suggestions",
                 "params": options,
-                "callback": callback
+                "callback": function(data) {
+                    saveAppIds(data.response.shortcuts);
+                    callback && callback(data);
+                }
             }, _options._NOCACHE);
         };
         
-        this.image = function(_options, callback) {
-            !_options && (_options = {});
-            
-            var options = {
-                "query": _options.query,
-                "feature": "csht",
-                "exact": true,
-                "width": width,
-                "height": height
-            };
-            
-            return request({
-                "methodNamespace": "Search",
-                "methodName": "bgimage",
-                "params": options,
-                "callback": callback
-            }, _options._NOCACHE);
-        };
+        function saveAppIds(shortcuts) {
+            for (var i=0; i<shortcuts.length; i++) {
+                queriesToAppIds[shortcuts[i].query.toLowerCase()] = shortcuts[i].appIds;
+            }
+        }
         
         function createResponse(shortcuts, icons) {
             return {
                 "response": {
-                    "shortcuts": shortcuts,
+                    "shortcuts": JSON.parse(JSON.stringify(shortcuts)),
                     "icons": icons
                 }
             };
         }
-        
-        this.cleanCache = function() {
-            Evme.DoATAPI.removeFromCache(cacheKeyGet);
-        };
     };
     
     this.trending = function(_options, callback) {

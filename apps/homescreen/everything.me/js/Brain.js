@@ -904,8 +904,6 @@ Evme.Brain = new function() {
             requestSmartFolderApps = null,
             requestSmartFolderImage = null;
 
-        this.loaded = false;
-
         this.init = function() {
             
         };
@@ -919,79 +917,17 @@ Evme.Brain = new function() {
 
             Brain.Searchbar.hideKeyboardTip();
             
-            _this.loadFromAPI(function(){
-                Brain.ShortcutsCustomize.addCustomizeButton();
-            });
+            _this.loadFromAPI();
         };
         
-        this.loadFromAPI = function(callback, bForce) {
+        this.loadFromAPI = function() {
             Evme.DoATAPI.Shortcuts.get({}, function onSuccess(data) {
-                Evme.Shortcuts.load(data.response, callback);
+                Evme.Shortcuts.load(data.response);
             });
         };
-
-        function checkForMissingShortcutIcons() {
-            var $elsWithMissingIcons = Evme.Shortcuts.getElement().find("*[iconToGet]"),
-                appIds = [];
-            
-            if ($elsWithMissingIcons.length == 0) {
-                return false;
-            }
-            
-            for (var i=0,l=$elsWithMissingIcons.length; i<l; i++) {
-                var $el = $elsWithMissingIcons[i],
-                    appId = $el.getAttribute("iconToGet");
-
-                appIds.push(appId);
-            }
-            
-            Evme.DoATAPI.icons({
-                "ids": appIds.join(","),
-                "iconFormat": Evme.Utils.getIconsFormat()
-            }, function(data) {
-                if (!data || !data.response) {
-                    return;
-                }
-                
-                var icons = data.response;
-                for (var i in icons) {
-                    var icon = icons[i],
-                        objIcon = Evme.IconManager.add(icon.id, icon.icon, Evme.Utils.getIconsFormat()),
-                        iconImage = Evme.Utils.formatImageData(objIcon);
-
-                    $elsWithMissingIcons.filter("[iconToGet='" + icon.id + "']").css("background-image", "url(" + iconImage + ")");
-                }
-            });
-            
-            return true;
-        }
         
         this.hide = function() {
             
-        };
-        
-        this.hold = function() {
-            Evme.Shortcuts.isEditing = true;
-            $body.addClass("shortcuts-customizing");
-            Brain.FFOS.hideMenu();
-        };
-        
-        this.click = function(data) {
-            if (!data || !data.data || !data.data.query) {
-                return;
-            }
-            
-            if (!Evme.Shortcuts.isEditing && !Evme.Shortcuts.isSwiping()) {
-                var query = data.data.query;
-                
-                data.query = query;
-                
-                Evme.EventHandler.trigger("Shortcut", "click", data);
-                
-                _this.showSmartFolder({
-                    "query": data.query
-                });
-            }
         };
         
         this.cancelSmartFolderRequests = function() {
@@ -1113,26 +1049,58 @@ Evme.Brain = new function() {
             });
         }
         
-        this.remove = function(data) {
-            data.shortcut.remove();
-            Evme.Shortcuts.remove(data.shortcut);
-            
-            if (!data.shortcut.isCustom()) {
-                Evme.ShortcutsCustomize.add(data.data);
-            }
+        this.load = function() {
+            Brain.ShortcutsCustomize.addCustomizeButton();
+            window.setTimeout(Evme.ShortcutsCustomize.Loading.hide, 50);
         };
-
-        this.load = function(data) {
-            _this.loaded = true;
+        
+        this.listClick = function(data) {
+            Brain.Shortcuts.doneEdit();
+        };
+        
+        this.doneEdit = function() {
+            if (!Evme.Shortcuts.isEditing) return;
+            
+            Evme.Shortcuts.isEditing = false;
+            $body.removeClass("shortcuts-customizing");
+            Brain.FFOS.showMenu();
         };
     };
+    
+    this.Shortcut = new function() {
+        this.hold = function() {
+            Evme.Shortcuts.isEditing = true;
+            $body.addClass("shortcuts-customizing");
+            Brain.FFOS.hideMenu();
+        };
+        
+        this.click = function(data) {
+            if(!Evme.Shortcuts.isEditing && !Evme.Shortcuts.isSwiping()) {
+                var query = data.data.query;
+                
+                data.query = query;
+                
+                Brain.Shortcuts.showSmartFolder({
+                    "query": data.query
+                });
+            }
+        };
+        
+        this.remove = function(data) {
+            Evme.Shortcuts.remove(data.shortcut);
+            Evme.Shortcuts.refreshScroll();
+            Evme.DoATAPI.Shortcuts.remove(data.data.query);   
+        };
+    };
+    
     this.ShortcutsCustomize = new function() {
         var _this = this,
             isRequesting = false,
-            isFirstShow = true;
+            isFirstShow = true,
+            requestSuggest = null;
         
         this.init = function() {
-
+            
         };
         
         this.show = function() {
@@ -1144,15 +1112,12 @@ Evme.Brain = new function() {
         };
         
         this.done = function(data) {
-            Evme.ShortcutsCustomize.Loading.show();
-            
             Evme.DoATAPI.Shortcuts.set({
-                "shortcuts": JSON.stringify(data.shortcuts)
-            }, function(data){
-                Brain.Shortcuts.loadFromAPI(function(){
-                    _this.addCustomizeButton();
-                    window.setTimeout(Evme.ShortcutsCustomize.Loading.hide, 50);
-                }, true);
+                "shortcuts": data.shortcuts,
+                "icons": data.icons
+            }, function(){
+                Brain.Shortcuts.loadFromAPI();
+                Brain.FFOS.showMenu();
             });
         };
         
@@ -1166,35 +1131,57 @@ Evme.Brain = new function() {
                 Evme.ShortcutsCustomize.Loading.show();
                 
                 // load user/default shortcuts from API
-                Brain.Shortcuts.loadFromAPI(function(userShortcuts) {
+                var loadedResponse = Evme.Shortcuts.getLoadedResponse(),
+                    currentIcons = loadedResponse.icons,
+                    arrShortcuts = [],
+                    shortcutsToFavorite = {};
+                
+                for (var i=0; i<loadedResponse.shortcuts.length; i++) {
+                    var query = loadedResponse.shortcuts[i].query.toLowerCase();
+                    arrShortcuts[i] = query;
+                    shortcutsToFavorite[query] = true;
+                }
+                
+                // load suggested shortcuts from API
+                requestSuggest = Evme.DoATAPI.Shortcuts.suggest({
+                    "existing": arrShortcuts
+                }, function(data) {
+                    var suggestedShortcuts = data.response.shortcuts,
+                        icons = data.response.icons;
                     
-                    var shortcutsToFavorite = {};
-                    
-                    for (var i=0; i<userShortcuts.length; i++) {
-                        shortcutsToFavorite[userShortcuts[i].getQuery().toLowerCase()] = true;
+                    for (var i=0; i<suggestedShortcuts.length; i++) {
+                        var query = suggestedShortcuts[i].query.toLowerCase();
+                        
+                        if (!shortcutsToFavorite[query]) {
+                            shortcutsToFavorite[query] = false;
+                        }
                     }
                     
-                    // load suggested shortcuts from API
-                    Evme.DoATAPI.Shortcuts.suggest({}, function(data) {
-                        var suggestedShortcuts = data.response.shortcuts;
-                        
-                        for (var i=0; i<suggestedShortcuts.length; i++) {
-                            var query = suggestedShortcuts[i].query.toLowerCase();
-                            
-                            if (!shortcutsToFavorite[query]) {
-                                shortcutsToFavorite[query] = false;
-                            }
-                        }
-                        
-                        Evme.ShortcutsCustomize.load(shortcutsToFavorite);
-                        isFirstShow = false;
-                        isRequesting = false;
-                        Brain.ShortcutsCustomize.showUI();
+                    for (var id in icons) {
+                        currentIcons[id] = icons[id];
+                    }
+                    
+                    Evme.ShortcutsCustomize.load({
+                        "shortcuts": shortcutsToFavorite,
+                        "icons": currentIcons
                     });
+                    isFirstShow = false;
+                    isRequesting = false;
+                    Brain.ShortcutsCustomize.showUI();
                 });
             } else {
                 Evme.ShortcutsCustomize.show();
             }
+        };
+        
+        this.loadingCancel = function(data) {
+            data.e.preventDefault();
+            data.e.stopPropagation();
+            
+            requestSuggest && requestSuggest.abort();
+            window.setTimeout(Evme.ShortcutsCustomize.Loading.hide, 50);
+            isRequesting = false;
+            Brain.FFOS.showMenu();
         };
         
         this.addCustomizeButton = function() {
@@ -1238,7 +1225,6 @@ Evme.Brain = new function() {
             return (active !== null && !Brain.Tips.isVisible());
         };
     };
-
 
 
     this.Tips = new function() {

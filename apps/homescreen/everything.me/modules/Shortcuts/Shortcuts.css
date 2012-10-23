@@ -106,8 +106,8 @@
         }
         #evmeContainer .shortcut.add .thumb * span,
         #evmeContainer .shortcut .thumb * span {
-          transition: none !important;
-          transform: none !important;
+            transition: none !important;
+            transform: none !important;
         }
         #evmeContainer .shortcut.add .thumb:before {
             content: "";
@@ -321,7 +321,7 @@
 }
 
 
-#evmeContainer.shortcuts-customizing .shortcut .thumb {
+#evmeContainer.shortcuts-customizing #shortcuts:not(.swiping) .shortcut .thumb {
     -moz-animation: shake 800ms infinite ease-out;
 }
 #evmeContainer.shortcuts-customizing .shortcut .remove {
@@ -331,10 +331,18 @@
     display: none;
 }
 
+#evmeContainer.shortcuts-customizing .shortcut.remove .thumb {
+    -moz-animation: remove 150ms 1;
+}
+
 @-moz-keyframes shake {
-  0% { -moz-transform: scale(1); }
-    25% { -moz-transform: scale(1.05); }
-  50% { -moz-transform: scale(1); }
-  75% { -moz-transform: scale(0.95); }
-    100% { -moz-transform: scale(1); }
+  0%   { -moz-transform: scale(1) translateZ(0); }
+  25%  { -moz-transform: scale(1.05) translateZ(0); }
+  50%  { -moz-transform: scale(1) translateZ(0); }
+  75%  { -moz-transform: scale(0.95) translateZ(0); }
+  100% { -moz-transform: scale(1) translateZ(0); }
+}
+@-moz-keyframes remove {
+  0%   { -moz-transform: scale(1) translateZ(0); opacity: 1; }
+  100% { -moz-transform: scale(1.1) translateZ(0); opacity: 0; }
 }

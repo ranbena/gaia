@@ -59,7 +59,7 @@ window.Evme = new function() {
         Evme.Shortcuts.refreshScroll();
     };
     this.onHide = function() {
-        
+        Evme.Brain.Shortcuts.doneEdit();
     };
 
     function initObjects(data) {
