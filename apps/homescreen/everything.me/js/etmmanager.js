@@ -52,6 +52,9 @@ var EvmeManager = (function() {
     function menuHide() {
         footerStyle.MozTransform = "translateY(75px)";
     }
+
+    var footerStyle = document.getElementById("footer").style;
+    footerStyle.MozTransition = "-moz-transform .3s ease";
     
     function getMenuHeight() {
         return document.getElementById("footer").offsetHeight;

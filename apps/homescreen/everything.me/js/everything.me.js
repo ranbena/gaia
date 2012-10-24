@@ -60,7 +60,8 @@ var EverythingME = {
                     'modules/SearchHistory/SearchHistory.js',
                     'modules/Helper/Helper.js',
                     'modules/Tip/Tip.js',
-                    'modules/Connection/Connection.js',
+                    'modules/ConnectionMessage/ConnectionMessage.js',
+                    'modules/SmartFolder/SmartFolder.js',
                     'js/helpers/Storage.js',
                     'js/developer/zepto.0.7.js',
                     'js/developer/utils.1.3.js',
@@ -87,7 +88,8 @@ var EverythingME = {
                      'modules/SearchHistory/SearchHistory.css',
                      'modules/Helper/Helper.css',
                      'modules/Tip/Tip.css',
-                     'modules/Connection/Connection.css'];
+                     'modules/ConnectionMessage/ConnectionMessage.css',
+                     'modules/SmartFolder/SmartFolder.css'];
     var head = document.head;
 
     var scriptLoadCount = 0;
