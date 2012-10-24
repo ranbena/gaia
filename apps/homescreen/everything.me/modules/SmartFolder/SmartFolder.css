@@ -26,7 +26,6 @@
     -moz-transition: opacity .4s ease-out;
     transition: opacity .4s ease-out;
     opacity: 0;
-    background: rgba(0, 0, 0, .3);
 }
 #evmeContainer .smart-folder-screen.visible {
     opacity: 1;
