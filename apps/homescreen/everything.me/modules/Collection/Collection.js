@@ -862,6 +862,7 @@ void function() {
       });
     }
   }
+  Evme.Collection.createCollectionIcon = createCollectionIcon;
 
   /**
    * CollectionStorage
